@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Living — Revenue Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 2rem; }
+  .logo { font-size: 22px; font-weight: 600; color: #1a1a18; }
+  .logo span { font-size: 14px; font-weight: 400; color: #888; margin-left: 8px; }
+  .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .controls input[type=date] { font-size: 13px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a18; outline: none; }
+  .controls input[type=date]:focus { border-color: #185FA5; }
+  .btn { font-size: 13px; padding: 8px 18px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a18; cursor: pointer; transition: background .15s; }
+  .btn:hover { background: #f0f0ee; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+  .btn-primary:hover { background: #0C447C; }
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid #e0e0de; margin-bottom: 1.5rem; }
+  .tab { font-size: 14px; padding: 10px 20px; cursor: pointer; color: #888; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s; }
+  .tab:hover { color: #1a1a18; }
+  .tab.active { color: #185FA5; font-weight: 500; border-bottom-color: #185FA5; }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .metric { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #e8e8e6; }
+  .metric-label { font-size: 11px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
+  .metric-value { font-size: 22px; font-weight: 600; color: #1a1a18; }
+  .metric-sub { font-size: 11px; color: #aaa; margin-top: 3px; }
+  .portfolio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem; }
+  .port-card { background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; padding: 1.25rem; }
+  .port-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+  .port-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pm { background: #f8f8f6; border-radius: 8px; padding: 10px; }
+  .pm-label { font-size: 11px; color: #888; }
+  .pm-value { font-size: 17px; font-weight: 600; color: #1a1a18; }
+  .section-title { font-size: 13px; font-weight: 500; color: #888; margin: 1.5rem 0 10px; text-transform: uppercase; letter-spacing: .5px; }
+  .chart-section { background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
+  .chart-section .section-title { margin-top: 0; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: #888; margin-bottom: 12px; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .lsq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .table-wrap { overflow-x: auto; background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; }
+  table { width: 100%; font-size: 13px; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 14px; border-bottom: 1px solid #e8e8e6; color: #888; font-weight: 500; white-space: nowrap; background: #fafaf8; }
+  td { padding: 9px 14px; border-bottom: 1px solid #f0f0ee; color: #1a1a18; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafaf8; }
+  .num { text-align: right; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; display: inline-block; }
+  .badge-ok { background: #EAF3DE; color: #3B6D11; }
+  .badge-warn { background: #FAEEDA; color: #854F0B; }
+  .badge-cancel { background: #FCEBEB; color: #A32D2D; }
+  .err { background: #FCEBEB; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #A32D2D; margin-bottom: 1rem; border: 1px solid #F09595; }
+  .loading { background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; padding: 32px; text-align: center; font-size: 14px; color: #888; }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #e0e0de; border-top-color: #185FA5; border-radius: 50%; animation: spin .7s linear infinite; margin-right: 10px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty { background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; padding: 48px 32px; text-align: center; color: #aaa; }
+  .empty-icon { font-size: 32px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; }
+  @media(max-width: 640px) {
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="logo">US Living <span>Revenue Report</span></div>
+    <div class="controls">
+      <input type="date" id="df">
+      <span style="color:#ccc;font-size:13px">→</span>
+      <input type="date" id="dt">
+      <button class="btn btn-primary" id="btnLoad" onclick="loadData()">Cargar datos</button>
+    </div>
+  </div>
+  <div id="errBox" style="display:none" class="err"></div>
+  <div id="loadBox" class="loading" style="display:none">
+    <span class="spinner"></span> Conectando con Guesty...
+  </div>
+  <div id="main" style="display:none">
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('overview',this)">Resumen</div>
+      <div class="tab" onclick="showTab('units',this)">Por unidad</div>
+      <div class="tab" onclick="showTab('bookings',this)">Reservas</div>
+    </div>
+    <div id="tab-overview">
+      <div class="metrics" id="metricsTop"></div>
+      <div class="portfolio-grid" id="portfolioCards"></div>
+      <div class="chart-section">
+        <div class="section-title">Revenue total por mes</div>
+        <div class="legend" id="legendRev"></div>
+        <div style="position:relative;width:100%;height:260px"><canvas id="chartRev" role="img" aria-label="Revenue por mes"></canvas></div>
+      </div>
+      <div class="chart-section">
+        <div class="section-title">Ocupación por portfolio</div>
+        <div class="legend" id="legendOcc"></div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="chartOcc" role="img" aria-label="Ocupación por portfolio"></canvas></div>
+      </div>
+    </div>
+    <div id="tab-units" style="display:none">
+      <div class="table-wrap">
+        <table id="tblUnits">
+          <thead><tr><th>Unidad</th><th>Portfolio</th><th class="num">Revenue</th><th class="num">Noches</th><th class="num">Ocupación</th><th class="num">ADR</th><th class="num">Cleaning</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="tab-bookings" style="display:none">
+      <div class="table-wrap">
+        <table id="tblBookings">
+          <thead><tr><th>Propiedad</th><th>Huésped</th><th>Check-in</th><th>Check-out</th><th class="num">Noches</th><th>Canal</th><th>Estado</th><th class="num">Revenue</th><th class="num">Cleaning</th><th class="num">Comisión</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="emptyBox" class="empty">
+    <div class="empty-icon">📊</div>
+    <p>Seleccioná un período y hacé clic en <strong>Cargar datos</strong></p>
+  </div>
+</div>
+<script>
+const CID = '0oau4qsezroVbiksG5d7';
+const CSEC = 'ETE_alcXjfPPOTg_hnfRttrOoYoGx3fcMOShkF3XrAw28MjpHoHroV9oEL14MIXo';
+let chartRev, chartOcc;
+function firstOfMonth() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0]; }
+function today() { return new Date().toISOString().split('T')[0]; }
+document.getElementById('df').value = firstOfMonth();
+document.getElementById('dt').value = today();
+function showTab(name, el) {
+  ['overview','units','bookings'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display = 'block';
+  el.classList.add('active');
+}
+function $c(v) { return '$' + Math.round(v).toLocaleString('en-US'); }
+function pct(v) { return Math.round(v * 100) + '%'; }
+async function getToken() {
+  const r = await fetch('https://open-api.guesty.com/oauth2/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'client_credentials', scope: 'open-api', client_id: CID, client_secret: CSEC }) });
+  if (!r.ok) throw new Error('Error de autenticación con Guesty.');
+  return (await r.json()).access_token;
+}
+async function fetchAll(token, from, to) {
+  let all = [], skip = 0;
+  while (true) {
+    const url = `https://open-api.guesty.com/v1/reservations?limit=100&skip=${skip}&checkIn[$gte]=${from}&checkIn[$lte]=${to}`;
+    const r = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) throw new Error('Error al traer reservas de Guesty.');
+    const d = await r.json();
+    const rows = d.results || d.data || [];
+    all = all.concat(rows);
+    if (rows.length < 100 || all.length >= 2000) break;
+    skip += 100;
+  }
+  return all;
+}
+async function loadData() {
+  const from = document.getElementById('df').value, to = document.getElementById('dt').value;
+  if (!from || !to) { showErr('Seleccioná un período válido.'); return; }
+  document.getElementById('errBox').style.display = 'none';
+  document.getElementById('main').style.display = 'none';
+  document.getElementById('emptyBox').style.display = 'none';
+  document.getElementById('loadBox').style.display = 'block';
+  document.getElementById('btnLoad').disabled = true;
+  try { const token = await getToken(); const res = await fetchAll(token, from, to); render(res, from, to); }
+  catch(e) { showErr(e.message); }
+  finally { document.getElementById('loadBox').style.display = 'none'; document.getElementById('btnLoad').disabled = false; }
+}
+function showErr(m) { document.getElementById('errBox').textContent = m; document.getElementById('errBox').style.display = 'block'; document.getElementById('emptyBox').style.display = 'none'; }
+function getPortfolio(listing) {
+  const n = listing || '';
+  if (n.includes('3700M') || n.includes('3700 M') || n.toLowerCase().includes('3700m')) return '3700M';
+  if (n.includes('UBP') || n.includes('Bayou') || n.includes('Midtown') || n.includes('Montrose')) return 'Bayou Park';
+  return 'Other';
+}
+function render(reservations, from, to) {
+  const confirmed = reservations.filter(r => r.status !== 'cancelled');
+  const byUnit = {}, byPortfolio = { '3700M': {rev:0,nights:0,clean:0,comm:0}, 'Bayou Park': {rev:0,nights:0,clean:0,comm:0}, 'Other': {rev:0,nights:0,clean:0,comm:0} }, byMonth = {};
+  const diffDays = Math.max(1, Math.ceil((new Date(to) - new Date(from)) / 86400000));
+  confirmed.forEach(r => {
+    const rev = r.money?.fareAccommodation || r.money?.totalPaid || 0;
+    const clean = r.money?.cleaningFee || 0;
+    const comm = Math.abs(r.money?.hostServiceFee || r.money?.channelCommission || 0);
+    const nights = r.nightsCount || r.nights || 0;
+    const prop = r.listing?.nickname || r.listing?.title || r.listingId || '—';
+    const shortProp = prop.split('/')[0].trim();
+    const portfolio = getPortfolio(prop);
+    const ym = (r.checkIn || '').substring(0, 7);
+    if (!byUnit[shortProp]) byUnit[shortProp] = { rev:0, nights:0, clean:0, portfolio };
+    byUnit[shortProp].rev += rev; byUnit[shortProp].nights += nights; byUnit[shortProp].clean += clean;
+    byPortfolio[portfolio].rev += rev; byPortfolio[portfolio].nights += nights; byPortfolio[portfolio].clean += clean; byPortfolio[portfolio].comm += comm;
+    if (ym) { if (!byMonth[ym]) byMonth[ym] = { '3700M':0, 'Bayou Park':0, 'Other':0 }; byMonth[ym][portfolio] += rev; }
+  });
+  const totalRev = Object.values(byPortfolio).reduce((a,b) => a+b.rev, 0);
+  const totalNights = Object.values(byPortfolio).reduce((a,b) => a+b.nights, 0);
+  const totalClean = Object.values(byPortfolio).reduce((a,b) => a+b.clean, 0);
+  const totalComm = Object.values(byPortfolio).reduce((a,b) => a+b.comm, 0);
+  const unitCount = Object.keys(byUnit).length || 1;
+  const adr = confirmed.length > 0 ? totalRev / confirmed.length : 0;
+  const availNights = unitCount * diffDays;
+  const occ = availNights > 0 ? totalNights / availNights : 0;
+  const revpar = availNights > 0 ? totalRev / availNights : 0;
+  document.getElementById('metricsTop').innerHTML = `<div class="metric"><div class="metric-label">Revenue total</div><div class="metric-value">${$c(totalRev)}</div><div class="metric-sub">${confirmed.length} reservas confirmadas</div></div><div class="metric"><div class="metric-label">Noches vendidas</div><div class="metric-value">${Math.round(totalNights).toLocaleString()}</div><div class="metric-sub">de ${Math.round(availNights).toLocaleString()} disponibles</div></div><div class="metric"><div class="metric-label">Ocupación</div><div class="metric-value">${pct(occ)}</div><div class="metric-sub">${unitCount} unidades activas</div></div><div class="metric"><div class="metric-label">ADR</div><div class="metric-value">${$c(adr)}</div><div class="metric-sub">promedio por reserva</div></div><div class="metric"><div class="metric-label">RevPAR</div><div class="metric-value">${$c(revpar)}</div><div class="metric-sub">por noche disponible</div></div><div class="metric"><div class="metric-label">Cleaning fees</div><div class="metric-value">${$c(totalClean)}</div><div class="metric-sub">Comisiones: ${$c(totalComm)}</div></div>`;
+  const portColors = { '3700M': '#185FA5', 'Bayou Park': '#1D9E75' };
+  document.getElementById('portfolioCards').innerHTML = ['3700M','Bayou Park'].map(name => {
+    const p = byPortfolio[name], pUnits = Object.values(byUnit).filter(u => u.portfolio === name).length || 1;
+    const pAvail = pUnits * diffDays, pConf = confirmed.filter(r => getPortfolio(r.listing?.nickname || r.listing?.title || '') === name);
+    const pOcc = pAvail > 0 ? p.nights / pAvail : 0, pADR = pConf.length > 0 ? p.rev / pConf.length : 0, pRevpar = pAvail > 0 ? p.rev / pAvail : 0;
+    return `<div class="port-card"><div class="port-title" style="color:${portColors[name]}">${name}</div><div class="port-metrics"><div class="pm"><div class="pm-label">Revenue</div><div class="pm-value">${$c(p.rev)}</div></div><div class="pm"><div class="pm-label">Ocupación</div><div class="pm-value">${pct(pOcc)}</div></div><div class="pm"><div class="pm-label">ADR</div><div class="pm-value">${$c(pADR)}</div></div><div class="pm"><div class="pm-label">RevPAR</div><div class="pm-value">${$c(pRevpar)}</div></div><div class="pm"><div class="pm-label">Noches vendidas</div><div class="pm-value">${Math.round(p.nights).toLocaleString()}</div></div><div class="pm"><div class="pm-label">Cleaning fees</div><div class="pm-value">${$c(p.clean)}</div></div></div></div>`;
+  }).join('');
+  const months = Object.keys(byMonth).sort();
+  const monthLabels = months.map(m => { const [y,mo] = m.split('-'); return new Date(y,mo-1).toLocaleString('es',{month:'short',year:'2-digit'}); });
+  document.getElementById('legendRev').innerHTML = `<span><span class="lsq" style="background:#185FA5"></span>3700M</span><span><span class="lsq" style="background:#1D9E75"></span>Bayou Park</span>`;
+  if (chartRev) chartRev.destroy();
+  chartRev = new Chart(document.getElementById('chartRev'), { type: 'bar', data: { labels: monthLabels, datasets: [{ label: '3700M', data: months.map(m => Math.round(byMonth[m]['3700M'])), backgroundColor: '#185FA5', borderWidth: 0 },{ label: 'Bayou Park', data: months.map(m => Math.round(byMonth[m]['Bayou Park'])), backgroundColor: '#1D9E75', borderWidth: 0 }]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + $c(ctx.parsed.y) } } }, scales: { x: { stacked: true, ticks: { autoSkip: false, maxRotation: 45 } }, y: { stacked: true, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } } } } });
+  document.getElementById('legendOcc').innerHTML = `<span><span class="lsq" style="background:#185FA5"></span>3700M</span><span><span class="lsq" style="background:#1D9E75"></span>Bayou Park</span>`;
+  const occData = (portfolio) => months.map(m => { const res = confirmed.filter(r => (r.checkIn||'').substring(0,7) === m && getPortfolio(r.listing?.nickname||r.listing?.title||'') === portfolio); const n = res.reduce((a,r) => a+(r.nightsCount||0),0); const u = Object.values(byUnit).filter(u => u.portfolio === portfolio).length || 1; const days = new Date(m.split('-')[0],m.split('-')[1],0).getDate(); return Math.round(n/(u*days)*100); });
+  if (chartOcc) chartOcc.destroy();
+  chartOcc = new Chart(document.getElementById('chartOcc'), { type: 'line', data: { labels: monthLabels, datasets: [{ label: '3700M', data: occData('3700M'), borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.08)', tension: 0.3, fill: true, pointRadius: 3 },{ label: 'Bayou Park', data: occData('Bayou Park'), borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', tension: 0.3, fill: true, pointRadius: 3, borderDash: [5,3] }]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { autoSkip: false, maxRotation: 45 } }, y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } } } });
+  document.querySelector('#tblUnits tbody').innerHTML = Object.entries(byUnit).sort((a,b) => b[1].rev-a[1].rev).map(([name,u]) => { const occ = diffDays > 0 ? u.nights/diffDays : 0; const adr = u.nights > 0 ? u.rev/u.nights : 0; const pc = u.portfolio === '3700M' ? '#185FA5' : '#1D9E75'; return `<tr><td>${name}</td><td style="color:${pc};font-weight:500">${u.portfolio}</td><td class="num">${$c(u.rev)}</td><td class="num">${Math.round(u.nights)}</td><td class="num">${pct(occ)}</td><td class="num">${$c(adr)}</td><td class="num">${$c(u.clean)}</td></tr>`; }).join('');
+  document.querySelector('#tblBookings tbody').innerHTML = reservations.slice(0,500).map(r => { const rev = r.money?.fareAccommodation||r.money?.totalPaid||0; const clean = r.money?.cleaningFee||0; const comm = Math.abs(r.money?.hostServiceFee||r.money?.channelCommission||0); const prop = (r.listing?.nickname||r.listing?.title||'—').split('/')[0].trim(); const guest = r.guest?.fullName||r.guestName||'—'; const ci = r.checkIn?r.checkIn.split('T')[0]:'—'; const co = r.checkOut?r.checkOut.split('T')[0]:'—'; const nights = r.nightsCount||r.nights||'—'; const ch = r.source||r.channelId||'Directo'; const st = r.status||'confirmed'; const badge = st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok'; const stLabel = st==='cancelled'?'Cancelada':st==='inquiry'?'Consulta':'Confirmada'; return `<tr><td>${prop}</td><td>${guest}</td><td>${ci}</td><td>${co}</td><td class="num">${nights}</td><td>${ch}</td><td><span class="badge ${badge}">${stLabel}</span></td><td class="num">${$c(rev)}</td><td class="num">${$c(clean)}</td><td class="num">${$c(comm)}</td></tr>`; }).join('');
+  document.getElementById('main').style.display = 'block';
+  document.getElementById('emptyBox').style.display = 'none';
+}
+</script>
+</body>
+</html>
