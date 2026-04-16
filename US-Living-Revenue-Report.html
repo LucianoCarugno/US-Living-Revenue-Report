@@ -60,10 +60,7 @@
   .empty { background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; padding: 48px 32px; text-align: center; color: #aaa; }
   .empty-icon { font-size: 32px; margin-bottom: 12px; }
   .empty p { font-size: 14px; }
-  @media(max-width: 640px) {
-    .portfolio-grid { grid-template-columns: 1fr; }
-    .metrics { grid-template-columns: repeat(2, 1fr); }
-  }
+  @media(max-width: 640px) { .portfolio-grid { grid-template-columns: 1fr; } .metrics { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
@@ -78,9 +75,7 @@
     </div>
   </div>
   <div id="errBox" style="display:none" class="err"></div>
-  <div id="loadBox" class="loading" style="display:none">
-    <span class="spinner"></span> Conectando con Guesty...
-  </div>
+  <div id="loadBox" class="loading" style="display:none"><span class="spinner"></span> Conectando con Guesty...</div>
   <div id="main" style="display:none">
     <div class="tabs">
       <div class="tab active" onclick="showTab('overview',this)">Resumen</div>
@@ -124,13 +119,17 @@
   </div>
 </div>
 <script>
+const PROXY = 'https://guesty-proxy.luciano-bd7.workers.dev';
 const CID = '0oau4qsezroVbiksG5d7';
 const CSEC = 'ETE_alcXjfPPOTg_hnfRttrOoYoGx3fcMOShkF3XrAw28MjpHoHroV9oEL14MIXo';
 let chartRev, chartOcc;
+
+function proxy(url) { return PROXY + '?url=' + encodeURIComponent(url); }
 function firstOfMonth() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0]; }
 function today() { return new Date().toISOString().split('T')[0]; }
 document.getElementById('df').value = firstOfMonth();
 document.getElementById('dt').value = today();
+
 function showTab(name, el) {
   ['overview','units','bookings'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -139,16 +138,21 @@ function showTab(name, el) {
 }
 function $c(v) { return '$' + Math.round(v).toLocaleString('en-US'); }
 function pct(v) { return Math.round(v * 100) + '%'; }
+
 async function getToken() {
-  const r = await fetch('https://open-api.guesty.com/oauth2/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'client_credentials', scope: 'open-api', client_id: CID, client_secret: CSEC }) });
+  const body = new URLSearchParams({ grant_type: 'client_credentials', scope: 'open-api', client_id: CID, client_secret: CSEC });
+  const r = await fetch(proxy('https://open-api.guesty.com/oauth2/token'), {
+    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body
+  });
   if (!r.ok) throw new Error('Error de autenticación con Guesty.');
   return (await r.json()).access_token;
 }
+
 async function fetchAll(token, from, to) {
   let all = [], skip = 0;
   while (true) {
     const url = `https://open-api.guesty.com/v1/reservations?limit=100&skip=${skip}&checkIn[$gte]=${from}&checkIn[$lte]=${to}`;
-    const r = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+    const r = await fetch(proxy(url), { headers: { Authorization: 'Bearer ' + token } });
     if (!r.ok) throw new Error('Error al traer reservas de Guesty.');
     const d = await r.json();
     const rows = d.results || d.data || [];
@@ -158,6 +162,7 @@ async function fetchAll(token, from, to) {
   }
   return all;
 }
+
 async function loadData() {
   const from = document.getElementById('df').value, to = document.getElementById('dt').value;
   if (!from || !to) { showErr('Seleccioná un período válido.'); return; }
@@ -170,13 +175,16 @@ async function loadData() {
   catch(e) { showErr(e.message); }
   finally { document.getElementById('loadBox').style.display = 'none'; document.getElementById('btnLoad').disabled = false; }
 }
+
 function showErr(m) { document.getElementById('errBox').textContent = m; document.getElementById('errBox').style.display = 'block'; document.getElementById('emptyBox').style.display = 'none'; }
+
 function getPortfolio(listing) {
   const n = listing || '';
   if (n.includes('3700M') || n.includes('3700 M') || n.toLowerCase().includes('3700m')) return '3700M';
   if (n.includes('UBP') || n.includes('Bayou') || n.includes('Midtown') || n.includes('Montrose')) return 'Bayou Park';
   return 'Other';
 }
+
 function render(reservations, from, to) {
   const confirmed = reservations.filter(r => r.status !== 'cancelled');
   const byUnit = {}, byPortfolio = { '3700M': {rev:0,nights:0,clean:0,comm:0}, 'Bayou Park': {rev:0,nights:0,clean:0,comm:0}, 'Other': {rev:0,nights:0,clean:0,comm:0} }, byMonth = {};
