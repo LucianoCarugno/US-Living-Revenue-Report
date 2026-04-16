@@ -8,13 +8,12 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; }
-  .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .page { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
   .header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 2rem; }
   .logo { font-size: 22px; font-weight: 600; color: #1a1a18; }
   .logo span { font-size: 14px; font-weight: 400; color: #888; margin-left: 8px; }
   .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .controls input[type=date] { font-size: 13px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a18; outline: none; }
-  .controls input[type=date]:focus { border-color: #185FA5; }
   .btn { font-size: 13px; padding: 8px 18px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a18; cursor: pointer; transition: background .15s; }
   .btn:hover { background: #f0f0ee; }
   .btn:disabled { opacity: .4; cursor: not-allowed; }
@@ -29,25 +28,20 @@
   .metric-label { font-size: 11px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
   .metric-value { font-size: 22px; font-weight: 600; color: #1a1a18; }
   .metric-sub { font-size: 11px; color: #aaa; margin-top: 3px; }
-  .portfolio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem; }
-  .port-card { background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; padding: 1.25rem; }
-  .port-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
-  .port-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .pm { background: #f8f8f6; border-radius: 8px; padding: 10px; }
-  .pm-label { font-size: 11px; color: #888; }
-  .pm-value { font-size: 17px; font-weight: 600; color: #1a1a18; }
   .section-title { font-size: 13px; font-weight: 500; color: #888; margin: 1.5rem 0 10px; text-transform: uppercase; letter-spacing: .5px; }
   .chart-section { background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
   .chart-section .section-title { margin-top: 0; }
   .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: #888; margin-bottom: 12px; }
   .legend span { display: flex; align-items: center; gap: 5px; }
   .lsq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-  .table-wrap { overflow-x: auto; background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; }
-  table { width: 100%; font-size: 13px; border-collapse: collapse; }
-  th { text-align: left; padding: 10px 14px; border-bottom: 1px solid #e8e8e6; color: #888; font-weight: 500; white-space: nowrap; background: #fafaf8; }
-  td { padding: 9px 14px; border-bottom: 1px solid #f0f0ee; color: #1a1a18; white-space: nowrap; }
+  .port-header { font-size: 16px; font-weight: 600; margin-bottom: 1rem; padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid #e8e8e6; background: #fff; }
+  .table-wrap { overflow-x: auto; background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; margin-bottom: 1.5rem; }
+  table { width: 100%; font-size: 12px; border-collapse: collapse; }
+  th { text-align: left; padding: 9px 12px; border-bottom: 1px solid #e8e8e6; color: #888; font-weight: 500; white-space: nowrap; background: #fafaf8; }
+  td { padding: 8px 12px; border-bottom: 1px solid #f0f0ee; color: #1a1a18; white-space: nowrap; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #fafaf8; }
+  tr.total-row td { font-weight: 600; background: #f0f4f8; border-top: 1px solid #e8e8e6; }
   .num { text-align: right; }
   .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; display: inline-block; }
   .badge-ok { background: #EAF3DE; color: #3B6D11; }
@@ -58,9 +52,8 @@
   .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #e0e0de; border-top-color: #185FA5; border-radius: 50%; animation: spin .7s linear infinite; margin-right: 10px; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .empty { background: #fff; border: 1px solid #e8e8e6; border-radius: 12px; padding: 48px 32px; text-align: center; color: #aaa; }
-  .empty-icon { font-size: 32px; margin-bottom: 12px; }
   .empty p { font-size: 14px; }
-  @media(max-width: 640px) { .portfolio-grid { grid-template-columns: 1fr; } .metrics { grid-template-columns: repeat(2, 1fr); } }
+  @media(max-width: 640px) { .metrics { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
@@ -79,12 +72,13 @@
   <div id="main" style="display:none">
     <div class="tabs">
       <div class="tab active" onclick="showTab('overview',this)">Overview</div>
-      <div class="tab" onclick="showTab('units',this)">By unit</div>
+      <div class="tab" onclick="showTab('tab3700',this)">3700M</div>
+      <div class="tab" onclick="showTab('tabBP',this)">Bayou Park</div>
       <div class="tab" onclick="showTab('bookings',this)">Bookings</div>
     </div>
+
     <div id="tab-overview">
       <div class="metrics" id="metricsTop"></div>
-      <div class="portfolio-grid" id="portfolioCards"></div>
       <div class="chart-section">
         <div class="section-title">Total revenue by month</div>
         <div class="legend" id="legendRev"></div>
@@ -96,30 +90,36 @@
         <div style="position:relative;width:100%;height:220px"><canvas id="chartOcc" role="img" aria-label="Occupancy by portfolio"></canvas></div>
       </div>
     </div>
-    <div id="tab-units" style="display:none">
-      <div class="table-wrap">
-        <table id="tblUnits">
-          <thead><tr><th>Unit</th><th>Portfolio</th><th class="num">Revenue</th><th class="num">Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">Cleaning</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+
+    <div id="tab-tab3700" style="display:none">
+      <div class="port-header" style="color:#185FA5">3700M — Unit Breakdown</div>
+      <div class="table-wrap"><table id="tbl3700">
+        <thead><tr><th>Unit</th><th class="num">Avail. Nights</th><th class="num">Occ. Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th><th class="num">Room Revenue</th><th class="num">Cleaning Fee</th><th class="num">OTA Adjustment</th><th class="num">Total Revenue</th><th class="num">OTA Commission</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
     </div>
+
+    <div id="tab-tabBP" style="display:none">
+      <div class="port-header" style="color:#1D9E75">Bayou Park — Unit Breakdown</div>
+      <div class="table-wrap"><table id="tblBP">
+        <thead><tr><th>Unit</th><th class="num">Avail. Nights</th><th class="num">Occ. Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th><th class="num">Room Revenue</th><th class="num">Cleaning Fee</th><th class="num">OTA Adjustment</th><th class="num">Total Revenue</th><th class="num">OTA Commission</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </div>
+
     <div id="tab-bookings" style="display:none">
-      <div class="table-wrap">
-        <table id="tblBookings">
-          <thead><tr><th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th><th class="num">Nights</th><th>Channel</th><th>Status</th><th class="num">Revenue</th><th class="num">Cleaning</th><th class="num">Commission</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+      <div class="table-wrap"><table id="tblBookings">
+        <thead><tr><th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th><th class="num">Nights</th><th>Channel</th><th>Status</th><th class="num">Room Revenue</th><th class="num">Cleaning</th><th class="num">OTA Adj.</th><th class="num">Total Revenue</th><th class="num">Commission</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
     </div>
   </div>
-  <div id="emptyBox" class="empty">
-    <div class="empty-icon">📊</div>
-    <p>Select a period and click <strong>Load data</strong></p>
-  </div>
+  <div id="emptyBox" class="empty"><p>Select a period and click <strong>Load data</strong></p></div>
 </div>
 <script>
 const PROXY = 'https://guesty-proxy.luciano-bd7.workers.dev';
+const UNITS_3700M = 10;
+const UNITS_BP = 20;
 let chartRev, chartOcc;
 
 function firstOfMonth() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0]; }
@@ -128,7 +128,7 @@ document.getElementById('df').value = firstOfMonth();
 document.getElementById('dt').value = today();
 
 function showTab(name, el) {
-  ['overview','units','bookings'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
+  ['overview','tab3700','tabBP','bookings'].forEach(t => document.getElementById('tab-'+t).style.display = 'none');
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-'+name).style.display = 'block';
   el.classList.add('active');
@@ -136,45 +136,21 @@ function showTab(name, el) {
 function $c(v) { return '$' + Math.round(v).toLocaleString('en-US'); }
 function pct(v) { return Math.round(v * 100) + '%'; }
 
-// Distributes revenue proportionally across months based on nights in each month
-function accrueRevenue(reservation, byMonth, byUnit, byPortfolio) {
-  const rev = reservation.money?.fareAccommodation || reservation.money?.totalPaid || reservation.money?.hostPayout || 0;
-  const clean = reservation.money?.cleaningFee || 0;
-  const comm = Math.abs(reservation.money?.hostServiceFee || reservation.money?.channelCommission || 0);
-  const prop = reservation.listing?.nickname || reservation.listing?.title || reservation.listingId || '—';
-  const shortProp = prop.split('/')[0].trim();
-  const portfolio = getPortfolio(prop);
+function getPortfolio(listing) {
+  const n = listing || '';
+  if (n.includes('3700M') || n.includes('3700 M') || n.toLowerCase().includes('3700m')) return '3700M';
+  if (n.includes('UBP') || n.includes('Bayou') || n.includes('Midtown') || n.includes('Montrose')) return 'Bayou Park';
+  return 'Other';
+}
 
-  const checkIn = new Date(reservation.checkIn);
-  const checkOut = new Date(reservation.checkOut);
-  const totalNights = Math.round((checkOut - checkIn) / 86400000);
-  if (totalNights <= 0) return;
-
-  if (!byUnit[shortProp]) byUnit[shortProp] = { rev:0, nights:0, clean:0, portfolio };
-  byUnit[shortProp].rev += rev;
-  byUnit[shortProp].nights += totalNights;
-  byUnit[shortProp].clean += clean;
-  byPortfolio[portfolio].rev += rev;
-  byPortfolio[portfolio].nights += totalNights;
-  byPortfolio[portfolio].clean += clean;
-  byPortfolio[portfolio].comm += comm;
-
-  // Distribute revenue day by day across months
-  const dailyRate = rev / totalNights;
-  let current = new Date(checkIn);
-  while (current < checkOut) {
-    const ym = current.toISOString().substring(0, 7);
-    if (!byMonth[ym]) byMonth[ym] = { '3700M':0, 'Bayou Park':0, 'Other':0 };
-    byMonth[ym][portfolio] += dailyRate;
-    current.setDate(current.getDate() + 1);
-  }
+function getDaysInPeriod(from, to) {
+  return Math.max(1, Math.ceil((new Date(to) - new Date(from)) / 86400000));
 }
 
 async function fetchAll(from, to) {
   let all = [], skip = 0;
   while (true) {
-    const url = `${PROXY}/reservations?from=${from}&to=${to}&skip=${skip}`;
-    const r = await fetch(url);
+    const r = await fetch(`${PROXY}/reservations?from=${from}&to=${to}&skip=${skip}`);
     if (!r.ok) throw new Error('Error fetching reservations from Guesty.');
     const d = await r.json();
     const rows = d.results || d.data || [];
@@ -200,51 +176,158 @@ async function loadData() {
 
 function showErr(m) { document.getElementById('errBox').textContent = m; document.getElementById('errBox').style.display = 'block'; document.getElementById('emptyBox').style.display = 'none'; }
 
-function getPortfolio(listing) {
-  const n = listing || '';
-  if (n.includes('3700M') || n.includes('3700 M') || n.toLowerCase().includes('3700m')) return '3700M';
-  if (n.includes('UBP') || n.includes('Bayou') || n.includes('Midtown') || n.includes('Montrose')) return 'Bayou Park';
-  return 'Other';
-}
-
 function render(reservations, from, to) {
   const confirmed = reservations.filter(r => r.status !== 'cancelled');
-  const byUnit = {}, byPortfolio = { '3700M': {rev:0,nights:0,clean:0,comm:0}, 'Bayou Park': {rev:0,nights:0,clean:0,comm:0}, 'Other': {rev:0,nights:0,clean:0,comm:0} }, byMonth = {};
-  const diffDays = Math.max(1, Math.ceil((new Date(to) - new Date(from)) / 86400000));
+  const diffDays = getDaysInPeriod(from, to);
+  const byUnit = {}, byMonth = {};
+  const byPortfolio = { '3700M': {roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0}, 'Bayou Park': {roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0} };
 
-  confirmed.forEach(r => accrueRevenue(r, byMonth, byUnit, byPortfolio));
+  confirmed.forEach(r => {
+    const roomRev = r.money?.fareAccommodation || 0;
+    const clean = r.money?.fareCleaning || r.money?.cleaningFee || 0;
+    const otaAdj = r.money?.resolutionAmount || 0;
+    const otaComm = r.money?.hostServiceFee || r.money?.channelCommission || 0;
+    const nights = r.nightsCount || r.nights || 0;
+    const prop = r.listing?.nickname || r.listing?.title || '—';
+    const shortProp = prop.split('/')[0].trim();
+    const portfolio = getPortfolio(prop);
 
-  const totalRev = Object.values(byPortfolio).reduce((a,b) => a+b.rev, 0);
-  const totalNights = Object.values(byPortfolio).reduce((a,b) => a+b.nights, 0);
-  const totalClean = Object.values(byPortfolio).reduce((a,b) => a+b.clean, 0);
-  const totalComm = Object.values(byPortfolio).reduce((a,b) => a+b.comm, 0);
-  const unitCount = Object.keys(byUnit).length || 1;
-  const adr = confirmed.length > 0 ? totalRev / confirmed.length : 0;
-  const availNights = unitCount * diffDays;
-  const occ = availNights > 0 ? totalNights / availNights : 0;
-  const revpar = availNights > 0 ? totalRev / availNights : 0;
+    if (!byUnit[shortProp]) byUnit[shortProp] = { roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0, portfolio };
+    byUnit[shortProp].roomRev += roomRev;
+    byUnit[shortProp].clean += clean;
+    byUnit[shortProp].otaAdj += otaAdj;
+    byUnit[shortProp].otaComm += otaComm;
+    byUnit[shortProp].nights += nights;
 
-  document.getElementById('metricsTop').innerHTML = `<div class="metric"><div class="metric-label">Total Revenue</div><div class="metric-value">${$c(totalRev)}</div><div class="metric-sub">${confirmed.length} confirmed bookings</div></div><div class="metric"><div class="metric-label">Nights sold</div><div class="metric-value">${Math.round(totalNights).toLocaleString()}</div><div class="metric-sub">of ${Math.round(availNights).toLocaleString()} available</div></div><div class="metric"><div class="metric-label">Occupancy</div><div class="metric-value">${pct(occ)}</div><div class="metric-sub">${unitCount} active units</div></div><div class="metric"><div class="metric-label">ADR</div><div class="metric-value">${$c(adr)}</div><div class="metric-sub">avg per booking</div></div><div class="metric"><div class="metric-label">RevPAR</div><div class="metric-value">${$c(revpar)}</div><div class="metric-sub">per available night</div></div><div class="metric"><div class="metric-label">Cleaning fees</div><div class="metric-value">${$c(totalClean)}</div><div class="metric-sub">Commissions: ${$c(totalComm)}</div></div>`;
+    if (byPortfolio[portfolio]) {
+      byPortfolio[portfolio].roomRev += roomRev;
+      byPortfolio[portfolio].clean += clean;
+      byPortfolio[portfolio].otaAdj += otaAdj;
+      byPortfolio[portfolio].otaComm += otaComm;
+      byPortfolio[portfolio].nights += nights;
+    }
 
-  const portColors = { '3700M': '#185FA5', 'Bayou Park': '#1D9E75' };
-  document.getElementById('portfolioCards').innerHTML = ['3700M','Bayou Park'].map(name => {
-    const p = byPortfolio[name], pUnits = Object.values(byUnit).filter(u => u.portfolio === name).length || 1;
-    const pAvail = pUnits * diffDays, pConf = confirmed.filter(r => getPortfolio(r.listing?.nickname || r.listing?.title || '') === name);
-    const pOcc = pAvail > 0 ? p.nights / pAvail : 0, pADR = pConf.length > 0 ? p.rev / pConf.length : 0, pRevpar = pAvail > 0 ? p.rev / pAvail : 0;
-    return `<div class="port-card"><div class="port-title" style="color:${portColors[name]}">${name}</div><div class="port-metrics"><div class="pm"><div class="pm-label">Revenue</div><div class="pm-value">${$c(p.rev)}</div></div><div class="pm"><div class="pm-label">Occupancy</div><div class="pm-value">${pct(pOcc)}</div></div><div class="pm"><div class="pm-label">ADR</div><div class="pm-value">${$c(pADR)}</div></div><div class="pm"><div class="pm-label">RevPAR</div><div class="pm-value">${$c(pRevpar)}</div></div><div class="pm"><div class="pm-label">Nights sold</div><div class="pm-value">${Math.round(p.nights).toLocaleString()}</div></div><div class="pm"><div class="pm-label">Cleaning fees</div><div class="pm-value">${$c(p.clean)}</div></div></div></div>`;
+    // Accrue revenue by day across months
+    const checkIn = new Date(r.checkIn);
+    const checkOut = new Date(r.checkOut);
+    const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
+    const dailyRate = roomRev / totalNights;
+    let cur = new Date(checkIn);
+    while (cur < checkOut) {
+      const ym = cur.toISOString().substring(0,7);
+      if (!byMonth[ym]) byMonth[ym] = { '3700M':0, 'Bayou Park':0 };
+      if (byMonth[ym][portfolio] !== undefined) byMonth[ym][portfolio] += dailyRate;
+      cur.setDate(cur.getDate() + 1);
+    }
+  });
+
+  // Overview metrics
+  const avail3700 = UNITS_3700M * diffDays;
+  const availBP = UNITS_BP * diffDays;
+  const totalRoomRev = byPortfolio['3700M'].roomRev + byPortfolio['Bayou Park'].roomRev;
+  const totalClean = byPortfolio['3700M'].clean + byPortfolio['Bayou Park'].clean;
+  const totalOtaAdj = byPortfolio['3700M'].otaAdj + byPortfolio['Bayou Park'].otaAdj;
+  const totalOtaComm = byPortfolio['3700M'].otaComm + byPortfolio['Bayou Park'].otaComm;
+  const totalNights = byPortfolio['3700M'].nights + byPortfolio['Bayou Park'].nights;
+  const totalAvail = avail3700 + availBP;
+  const totalRev = totalRoomRev + totalClean + totalOtaAdj;
+  const occ = totalAvail > 0 ? totalNights / totalAvail : 0;
+  const adr = totalNights > 0 ? totalRoomRev / totalNights : 0;
+  const revpar = totalAvail > 0 ? totalRoomRev / totalAvail : 0;
+
+  document.getElementById('metricsTop').innerHTML = `
+    <div class="metric"><div class="metric-label">Room Revenue</div><div class="metric-value">${$c(totalRoomRev)}</div><div class="metric-sub">${confirmed.length} bookings</div></div>
+    <div class="metric"><div class="metric-label">Total Revenue</div><div class="metric-value">${$c(totalRev)}</div><div class="metric-sub">incl. cleaning & adj.</div></div>
+    <div class="metric"><div class="metric-label">Occupancy</div><div class="metric-value">${pct(occ)}</div><div class="metric-sub">${totalNights} / ${totalAvail} nights</div></div>
+    <div class="metric"><div class="metric-label">ADR</div><div class="metric-value">${$c(adr)}</div><div class="metric-sub">per occupied night</div></div>
+    <div class="metric"><div class="metric-label">RevPAR</div><div class="metric-value">${$c(revpar)}</div><div class="metric-sub">per available night</div></div>
+    <div class="metric"><div class="metric-label">OTA Commission</div><div class="metric-value">${$c(Math.abs(totalOtaComm))}</div><div class="metric-sub">Cleaning: ${$c(totalClean)}</div></div>
+  `;
+
+  // Portfolio breakdown tables
+  function buildPortfolioTable(portfolio, tableId, unitCount) {
+    const units = Object.entries(byUnit).filter(([,u]) => u.portfolio === portfolio).sort((a,b) => b[1].roomRev - a[1].roomRev);
+    const availPerUnit = diffDays;
+    let totRoomRev=0, totClean=0, totOtaAdj=0, totOtaComm=0, totNights=0;
+
+    const rows = units.map(([name, u]) => {
+      const avail = availPerUnit;
+      const occPct = avail > 0 ? u.nights / avail : 0;
+      const adr = u.nights > 0 ? u.roomRev / u.nights : 0;
+      const revpar = avail > 0 ? u.roomRev / avail : 0;
+      const totalRev = u.roomRev + u.clean + u.otaAdj;
+      totRoomRev+=u.roomRev; totClean+=u.clean; totOtaAdj+=u.otaAdj; totOtaComm+=u.otaComm; totNights+=u.nights;
+      return `<tr>
+        <td>${name}</td>
+        <td class="num">${avail}</td>
+        <td class="num">${Math.round(u.nights)}</td>
+        <td class="num">${pct(occPct)}</td>
+        <td class="num">${$c(adr)}</td>
+        <td class="num">${$c(revpar)}</td>
+        <td class="num">${$c(u.roomRev)}</td>
+        <td class="num">${$c(u.clean)}</td>
+        <td class="num">${$c(u.otaAdj)}</td>
+        <td class="num">${$c(totalRev)}</td>
+        <td class="num">${$c(Math.abs(u.otaComm))}</td>
+      </tr>`;
+    }).join('');
+
+    const totalAvailPort = unitCount * diffDays;
+    const totOcc = totalAvailPort > 0 ? totNights / totalAvailPort : 0;
+    const totADR = totNights > 0 ? totRoomRev / totNights : 0;
+    const totRevPAR = totalAvailPort > 0 ? totRoomRev / totalAvailPort : 0;
+    const totRev = totRoomRev + totClean + totOtaAdj;
+
+    const totalRow = `<tr class="total-row">
+      <td>TOTAL</td>
+      <td class="num">${totalAvailPort}</td>
+      <td class="num">${Math.round(totNights)}</td>
+      <td class="num">${pct(totOcc)}</td>
+      <td class="num">${$c(totADR)}</td>
+      <td class="num">${$c(totRevPAR)}</td>
+      <td class="num">${$c(totRoomRev)}</td>
+      <td class="num">${$c(totClean)}</td>
+      <td class="num">${$c(totOtaAdj)}</td>
+      <td class="num">${$c(totRev)}</td>
+      <td class="num">${$c(Math.abs(totOtaComm))}</td>
+    </tr>`;
+
+    document.querySelector(`#${tableId} tbody`).innerHTML = rows + totalRow;
+  }
+
+  buildPortfolioTable('3700M', 'tbl3700', UNITS_3700M);
+  buildPortfolioTable('Bayou Park', 'tblBP', UNITS_BP);
+
+  // Bookings table
+  document.querySelector('#tblBookings tbody').innerHTML = reservations.slice(0,500).map(r => {
+    const roomRev = r.money?.fareAccommodation || 0;
+    const clean = r.money?.fareCleaning || r.money?.cleaningFee || 0;
+    const otaAdj = r.money?.resolutionAmount || 0;
+    const otaComm = Math.abs(r.money?.hostServiceFee || r.money?.channelCommission || 0);
+    const totalRev = roomRev + clean + otaAdj;
+    const prop = (r.listing?.nickname||r.listing?.title||'—').split('/')[0].trim();
+    const guest = r.guest?.fullName||'—';
+    const ci = r.checkIn?r.checkIn.split('T')[0]:'—';
+    const co = r.checkOut?r.checkOut.split('T')[0]:'—';
+    const nights = r.nightsCount||r.nights||'—';
+    const ch = r.source||'Direct';
+    const st = r.status||'confirmed';
+    const badge = st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok';
+    const stLabel = st==='cancelled'?'Cancelled':st==='inquiry'?'Inquiry':'Confirmed';
+    return `<tr><td>${prop}</td><td>${guest}</td><td>${ci}</td><td>${co}</td><td class="num">${nights}</td><td>${ch}</td><td><span class="badge ${badge}">${stLabel}</span></td><td class="num">${$c(roomRev)}</td><td class="num">${$c(clean)}</td><td class="num">${$c(otaAdj)}</td><td class="num">${$c(totalRev)}</td><td class="num">${$c(otaComm)}</td></tr>`;
   }).join('');
 
+  // Charts
   const months = Object.keys(byMonth).sort();
   const monthLabels = months.map(m => { const [y,mo] = m.split('-'); return new Date(y,mo-1).toLocaleString('en',{month:'short',year:'2-digit'}); });
   document.getElementById('legendRev').innerHTML = `<span><span class="lsq" style="background:#185FA5"></span>3700M</span><span><span class="lsq" style="background:#1D9E75"></span>Bayou Park</span>`;
   if (chartRev) chartRev.destroy();
-  chartRev = new Chart(document.getElementById('chartRev'), { type: 'bar', data: { labels: monthLabels, datasets: [{ label: '3700M', data: months.map(m => Math.round(byMonth[m]['3700M'])), backgroundColor: '#185FA5', borderWidth: 0 },{ label: 'Bayou Park', data: months.map(m => Math.round(byMonth[m]['Bayou Park'])), backgroundColor: '#1D9E75', borderWidth: 0 }]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + $c(ctx.parsed.y) } } }, scales: { x: { stacked: true, ticks: { autoSkip: false, maxRotation: 45 } }, y: { stacked: true, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } } } } });
+  chartRev = new Chart(document.getElementById('chartRev'), { type:'bar', data:{ labels:monthLabels, datasets:[{ label:'3700M', data:months.map(m=>Math.round(byMonth[m]['3700M'])), backgroundColor:'#185FA5', borderWidth:0 },{ label:'Bayou Park', data:months.map(m=>Math.round(byMonth[m]['Bayou Park'])), backgroundColor:'#1D9E75', borderWidth:0 }]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}}, scales:{ x:{stacked:true, ticks:{autoSkip:false, maxRotation:45}}, y:{stacked:true, ticks:{callback:v=>'$'+(v/1000).toFixed(0)+'k'}}}}});
   document.getElementById('legendOcc').innerHTML = `<span><span class="lsq" style="background:#185FA5"></span>3700M</span><span><span class="lsq" style="background:#1D9E75"></span>Bayou Park</span>`;
-  const occData = (portfolio) => months.map(m => { const res = confirmed.filter(r => (r.checkIn||'').substring(0,7) === m && getPortfolio(r.listing?.nickname||r.listing?.title||'') === portfolio); const n = res.reduce((a,r) => a+(r.nightsCount||0),0); const u = Object.values(byUnit).filter(u => u.portfolio === portfolio).length || 1; const days = new Date(m.split('-')[0],m.split('-')[1],0).getDate(); return Math.round(n/(u*days)*100); });
+  const occData = (portfolio, unitCount) => months.map(m => { const res = confirmed.filter(r => (r.checkIn||'').substring(0,7)===m && getPortfolio(r.listing?.nickname||r.listing?.title||'')===portfolio); const n=res.reduce((a,r)=>a+(r.nightsCount||0),0); const days=new Date(m.split('-')[0],m.split('-')[1],0).getDate(); return Math.round(n/(unitCount*days)*100); });
   if (chartOcc) chartOcc.destroy();
-  chartOcc = new Chart(document.getElementById('chartOcc'), { type: 'line', data: { labels: monthLabels, datasets: [{ label: '3700M', data: occData('3700M'), borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.08)', tension: 0.3, fill: true, pointRadius: 3 },{ label: 'Bayou Park', data: occData('Bayou Park'), borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', tension: 0.3, fill: true, pointRadius: 3, borderDash: [5,3] }]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { autoSkip: false, maxRotation: 45 } }, y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } } } });
-  document.querySelector('#tblUnits tbody').innerHTML = Object.entries(byUnit).sort((a,b) => b[1].rev-a[1].rev).map(([name,u]) => { const occ = diffDays > 0 ? u.nights/diffDays : 0; const adr = u.nights > 0 ? u.rev/u.nights : 0; const pc = u.portfolio === '3700M' ? '#185FA5' : '#1D9E75'; return `<tr><td>${name}</td><td style="color:${pc};font-weight:500">${u.portfolio}</td><td class="num">${$c(u.rev)}</td><td class="num">${Math.round(u.nights)}</td><td class="num">${pct(occ)}</td><td class="num">${$c(adr)}</td><td class="num">${$c(u.clean)}</td></tr>`; }).join('');
-  document.querySelector('#tblBookings tbody').innerHTML = reservations.slice(0,500).map(r => { const rev = r.money?.fareAccommodation||r.money?.totalPaid||r.money?.hostPayout||0; const clean = r.money?.cleaningFee||0; const comm = Math.abs(r.money?.hostServiceFee||r.money?.channelCommission||0); const prop = (r.listing?.nickname||r.listing?.title||'—').split('/')[0].trim(); const guest = r.guest?.fullName||r.guestName||'—'; const ci = r.checkIn?r.checkIn.split('T')[0]:'—'; const co = r.checkOut?r.checkOut.split('T')[0]:'—'; const nights = r.nightsCount||r.nights||'—'; const ch = r.source||r.channelId||'Direct'; const st = r.status||'confirmed'; const badge = st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok'; const stLabel = st==='cancelled'?'Cancelled':st==='inquiry'?'Inquiry':'Confirmed'; return `<tr><td>${prop}</td><td>${guest}</td><td>${ci}</td><td>${co}</td><td class="num">${nights}</td><td>${ch}</td><td><span class="badge ${badge}">${stLabel}</span></td><td class="num">${$c(rev)}</td><td class="num">${$c(clean)}</td><td class="num">${$c(comm)}</td></tr>`; }).join('');
+  chartOcc = new Chart(document.getElementById('chartOcc'), { type:'line', data:{ labels:monthLabels, datasets:[{ label:'3700M', data:occData('3700M',UNITS_3700M), borderColor:'#185FA5', backgroundColor:'rgba(24,95,165,0.08)', tension:0.3, fill:true, pointRadius:3 },{ label:'Bayou Park', data:occData('Bayou Park',UNITS_BP), borderColor:'#1D9E75', backgroundColor:'rgba(29,158,117,0.08)', tension:0.3, fill:true, pointRadius:3, borderDash:[5,3] }]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ticks:{autoSkip:false,maxRotation:45}}, y:{min:0,max:100,ticks:{callback:v=>v+'%'}}}}});
+
   document.getElementById('main').style.display = 'block';
   document.getElementById('emptyBox').style.display = 'none';
 }
