@@ -120,11 +120,8 @@
 </div>
 <script>
 const PROXY = 'https://guesty-proxy.luciano-bd7.workers.dev';
-const CID = '0oau4slv13WfprN3U5d7';
-const CSEC = 'xj-fAXTVSaRQMs_7I8RxLnySnAI2gtJa__tJ5DftiTvwbPMhnQjLXFgFYINR50M7';
 let chartRev, chartOcc;
 
-function proxy(url) { return PROXY + '?url=' + encodeURIComponent(url); }
 function firstOfMonth() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0]; }
 function today() { return new Date().toISOString().split('T')[0]; }
 document.getElementById('df').value = firstOfMonth();
@@ -139,20 +136,11 @@ function showTab(name, el) {
 function $c(v) { return '$' + Math.round(v).toLocaleString('en-US'); }
 function pct(v) { return Math.round(v * 100) + '%'; }
 
-async function getToken() {
-  const body = new URLSearchParams({ grant_type: 'client_credentials', scope: 'open-api', client_id: CID, client_secret: CSEC });
-  const r = await fetch(proxy('https://open-api.guesty.com/oauth2/token'), {
-    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body
-  });
-  if (!r.ok) throw new Error('Error de autenticación con Guesty.');
-  return (await r.json()).access_token;
-}
-
-async function fetchAll(token, from, to) {
+async function fetchAll(from, to) {
   let all = [], skip = 0;
   while (true) {
-    const url = `https://open-api.guesty.com/v1/reservations?limit=100&skip=${skip}&checkIn[$gte]=${from}&checkIn[$lte]=${to}`;
-    const r = await fetch(proxy(url), { headers: { Authorization: 'Bearer ' + token } });
+    const url = `${PROXY}/reservations?from=${from}&to=${to}&skip=${skip}`;
+    const r = await fetch(url);
     if (!r.ok) throw new Error('Error al traer reservas de Guesty.');
     const d = await r.json();
     const rows = d.results || d.data || [];
@@ -171,7 +159,7 @@ async function loadData() {
   document.getElementById('emptyBox').style.display = 'none';
   document.getElementById('loadBox').style.display = 'block';
   document.getElementById('btnLoad').disabled = true;
-  try { const token = await getToken(); const res = await fetchAll(token, from, to); render(res, from, to); }
+  try { const res = await fetchAll(from, to); render(res, from, to); }
   catch(e) { showErr(e.message); }
   finally { document.getElementById('loadBox').style.display = 'none'; document.getElementById('btnLoad').disabled = false; }
 }
