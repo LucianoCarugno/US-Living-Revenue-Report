@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -71,35 +71,35 @@
       <input type="date" id="df">
       <span style="color:#ccc;font-size:13px">→</span>
       <input type="date" id="dt">
-      <button class="btn btn-primary" id="btnLoad" onclick="loadData()">Cargar datos</button>
+      <button class="btn btn-primary" id="btnLoad" onclick="loadData()">Load data</button>
     </div>
   </div>
   <div id="errBox" style="display:none" class="err"></div>
-  <div id="loadBox" class="loading" style="display:none"><span class="spinner"></span> Conectando con Guesty...</div>
+  <div id="loadBox" class="loading" style="display:none"><span class="spinner"></span> Connecting to Guesty...</div>
   <div id="main" style="display:none">
     <div class="tabs">
-      <div class="tab active" onclick="showTab('overview',this)">Resumen</div>
-      <div class="tab" onclick="showTab('units',this)">Por unidad</div>
-      <div class="tab" onclick="showTab('bookings',this)">Reservas</div>
+      <div class="tab active" onclick="showTab('overview',this)">Overview</div>
+      <div class="tab" onclick="showTab('units',this)">By unit</div>
+      <div class="tab" onclick="showTab('bookings',this)">Bookings</div>
     </div>
     <div id="tab-overview">
       <div class="metrics" id="metricsTop"></div>
       <div class="portfolio-grid" id="portfolioCards"></div>
       <div class="chart-section">
-        <div class="section-title">Revenue total por mes</div>
+        <div class="section-title">Total revenue by month</div>
         <div class="legend" id="legendRev"></div>
-        <div style="position:relative;width:100%;height:260px"><canvas id="chartRev" role="img" aria-label="Revenue por mes"></canvas></div>
+        <div style="position:relative;width:100%;height:260px"><canvas id="chartRev" role="img" aria-label="Revenue by month"></canvas></div>
       </div>
       <div class="chart-section">
-        <div class="section-title">Ocupación por portfolio</div>
+        <div class="section-title">Occupancy by portfolio</div>
         <div class="legend" id="legendOcc"></div>
-        <div style="position:relative;width:100%;height:220px"><canvas id="chartOcc" role="img" aria-label="Ocupación por portfolio"></canvas></div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="chartOcc" role="img" aria-label="Occupancy by portfolio"></canvas></div>
       </div>
     </div>
     <div id="tab-units" style="display:none">
       <div class="table-wrap">
         <table id="tblUnits">
-          <thead><tr><th>Unidad</th><th>Portfolio</th><th class="num">Revenue</th><th class="num">Noches</th><th class="num">Ocupación</th><th class="num">ADR</th><th class="num">Cleaning</th></tr></thead>
+          <thead><tr><th>Unit</th><th>Portfolio</th><th class="num">Revenue</th><th class="num">Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">Cleaning</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -107,7 +107,7 @@
     <div id="tab-bookings" style="display:none">
       <div class="table-wrap">
         <table id="tblBookings">
-          <thead><tr><th>Propiedad</th><th>Huésped</th><th>Check-in</th><th>Check-out</th><th class="num">Noches</th><th>Canal</th><th>Estado</th><th class="num">Revenue</th><th class="num">Cleaning</th><th class="num">Comisión</th></tr></thead>
+          <thead><tr><th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th><th class="num">Nights</th><th>Channel</th><th>Status</th><th class="num">Revenue</th><th class="num">Cleaning</th><th class="num">Commission</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -115,7 +115,7 @@
   </div>
   <div id="emptyBox" class="empty">
     <div class="empty-icon">📊</div>
-    <p>Seleccioná un período y hacé clic en <strong>Cargar datos</strong></p>
+    <p>Select a period and click <strong>Load data</strong></p>
   </div>
 </div>
 <script>
@@ -141,7 +141,7 @@ async function fetchAll(from, to) {
   while (true) {
     const url = `${PROXY}/reservations?from=${from}&to=${to}&skip=${skip}`;
     const r = await fetch(url);
-    if (!r.ok) throw new Error('Error al traer reservas de Guesty.');
+    if (!r.ok) throw new Error('Error fetching reservations from Guesty.');
     const d = await r.json();
     const rows = d.results || d.data || [];
     all = all.concat(rows);
@@ -153,7 +153,7 @@ async function fetchAll(from, to) {
 
 async function loadData() {
   const from = document.getElementById('df').value, to = document.getElementById('dt').value;
-  if (!from || !to) { showErr('Seleccioná un período válido.'); return; }
+  if (!from || !to) { showErr('Please select a valid period.'); return; }
   document.getElementById('errBox').style.display = 'none';
   document.getElementById('main').style.display = 'none';
   document.getElementById('emptyBox').style.display = 'none';
@@ -178,7 +178,7 @@ function render(reservations, from, to) {
   const byUnit = {}, byPortfolio = { '3700M': {rev:0,nights:0,clean:0,comm:0}, 'Bayou Park': {rev:0,nights:0,clean:0,comm:0}, 'Other': {rev:0,nights:0,clean:0,comm:0} }, byMonth = {};
   const diffDays = Math.max(1, Math.ceil((new Date(to) - new Date(from)) / 86400000));
   confirmed.forEach(r => {
-    const rev = r.money?.fareAccommodation || r.money?.totalPaid || 0;
+    const rev = r.money?.fareAccommodation || r.money?.totalPaid || r.money?.hostPayout || 0;
     const clean = r.money?.cleaningFee || 0;
     const comm = Math.abs(r.money?.hostServiceFee || r.money?.channelCommission || 0);
     const nights = r.nightsCount || r.nights || 0;
@@ -200,16 +200,16 @@ function render(reservations, from, to) {
   const availNights = unitCount * diffDays;
   const occ = availNights > 0 ? totalNights / availNights : 0;
   const revpar = availNights > 0 ? totalRev / availNights : 0;
-  document.getElementById('metricsTop').innerHTML = `<div class="metric"><div class="metric-label">Revenue total</div><div class="metric-value">${$c(totalRev)}</div><div class="metric-sub">${confirmed.length} reservas confirmadas</div></div><div class="metric"><div class="metric-label">Noches vendidas</div><div class="metric-value">${Math.round(totalNights).toLocaleString()}</div><div class="metric-sub">de ${Math.round(availNights).toLocaleString()} disponibles</div></div><div class="metric"><div class="metric-label">Ocupación</div><div class="metric-value">${pct(occ)}</div><div class="metric-sub">${unitCount} unidades activas</div></div><div class="metric"><div class="metric-label">ADR</div><div class="metric-value">${$c(adr)}</div><div class="metric-sub">promedio por reserva</div></div><div class="metric"><div class="metric-label">RevPAR</div><div class="metric-value">${$c(revpar)}</div><div class="metric-sub">por noche disponible</div></div><div class="metric"><div class="metric-label">Cleaning fees</div><div class="metric-value">${$c(totalClean)}</div><div class="metric-sub">Comisiones: ${$c(totalComm)}</div></div>`;
+  document.getElementById('metricsTop').innerHTML = `<div class="metric"><div class="metric-label">Total Revenue</div><div class="metric-value">${$c(totalRev)}</div><div class="metric-sub">${confirmed.length} confirmed bookings</div></div><div class="metric"><div class="metric-label">Nights sold</div><div class="metric-value">${Math.round(totalNights).toLocaleString()}</div><div class="metric-sub">of ${Math.round(availNights).toLocaleString()} available</div></div><div class="metric"><div class="metric-label">Occupancy</div><div class="metric-value">${pct(occ)}</div><div class="metric-sub">${unitCount} active units</div></div><div class="metric"><div class="metric-label">ADR</div><div class="metric-value">${$c(adr)}</div><div class="metric-sub">avg per booking</div></div><div class="metric"><div class="metric-label">RevPAR</div><div class="metric-value">${$c(revpar)}</div><div class="metric-sub">per available night</div></div><div class="metric"><div class="metric-label">Cleaning fees</div><div class="metric-value">${$c(totalClean)}</div><div class="metric-sub">Commissions: ${$c(totalComm)}</div></div>`;
   const portColors = { '3700M': '#185FA5', 'Bayou Park': '#1D9E75' };
   document.getElementById('portfolioCards').innerHTML = ['3700M','Bayou Park'].map(name => {
     const p = byPortfolio[name], pUnits = Object.values(byUnit).filter(u => u.portfolio === name).length || 1;
     const pAvail = pUnits * diffDays, pConf = confirmed.filter(r => getPortfolio(r.listing?.nickname || r.listing?.title || '') === name);
     const pOcc = pAvail > 0 ? p.nights / pAvail : 0, pADR = pConf.length > 0 ? p.rev / pConf.length : 0, pRevpar = pAvail > 0 ? p.rev / pAvail : 0;
-    return `<div class="port-card"><div class="port-title" style="color:${portColors[name]}">${name}</div><div class="port-metrics"><div class="pm"><div class="pm-label">Revenue</div><div class="pm-value">${$c(p.rev)}</div></div><div class="pm"><div class="pm-label">Ocupación</div><div class="pm-value">${pct(pOcc)}</div></div><div class="pm"><div class="pm-label">ADR</div><div class="pm-value">${$c(pADR)}</div></div><div class="pm"><div class="pm-label">RevPAR</div><div class="pm-value">${$c(pRevpar)}</div></div><div class="pm"><div class="pm-label">Noches vendidas</div><div class="pm-value">${Math.round(p.nights).toLocaleString()}</div></div><div class="pm"><div class="pm-label">Cleaning fees</div><div class="pm-value">${$c(p.clean)}</div></div></div></div>`;
+    return `<div class="port-card"><div class="port-title" style="color:${portColors[name]}">${name}</div><div class="port-metrics"><div class="pm"><div class="pm-label">Revenue</div><div class="pm-value">${$c(p.rev)}</div></div><div class="pm"><div class="pm-label">Occupancy</div><div class="pm-value">${pct(pOcc)}</div></div><div class="pm"><div class="pm-label">ADR</div><div class="pm-value">${$c(pADR)}</div></div><div class="pm"><div class="pm-label">RevPAR</div><div class="pm-value">${$c(pRevpar)}</div></div><div class="pm"><div class="pm-label">Nights sold</div><div class="pm-value">${Math.round(p.nights).toLocaleString()}</div></div><div class="pm"><div class="pm-label">Cleaning fees</div><div class="pm-value">${$c(p.clean)}</div></div></div></div>`;
   }).join('');
   const months = Object.keys(byMonth).sort();
-  const monthLabels = months.map(m => { const [y,mo] = m.split('-'); return new Date(y,mo-1).toLocaleString('es',{month:'short',year:'2-digit'}); });
+  const monthLabels = months.map(m => { const [y,mo] = m.split('-'); return new Date(y,mo-1).toLocaleString('en',{month:'short',year:'2-digit'}); });
   document.getElementById('legendRev').innerHTML = `<span><span class="lsq" style="background:#185FA5"></span>3700M</span><span><span class="lsq" style="background:#1D9E75"></span>Bayou Park</span>`;
   if (chartRev) chartRev.destroy();
   chartRev = new Chart(document.getElementById('chartRev'), { type: 'bar', data: { labels: monthLabels, datasets: [{ label: '3700M', data: months.map(m => Math.round(byMonth[m]['3700M'])), backgroundColor: '#185FA5', borderWidth: 0 },{ label: 'Bayou Park', data: months.map(m => Math.round(byMonth[m]['Bayou Park'])), backgroundColor: '#1D9E75', borderWidth: 0 }]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + $c(ctx.parsed.y) } } }, scales: { x: { stacked: true, ticks: { autoSkip: false, maxRotation: 45 } }, y: { stacked: true, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } } } } });
@@ -218,7 +218,7 @@ function render(reservations, from, to) {
   if (chartOcc) chartOcc.destroy();
   chartOcc = new Chart(document.getElementById('chartOcc'), { type: 'line', data: { labels: monthLabels, datasets: [{ label: '3700M', data: occData('3700M'), borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.08)', tension: 0.3, fill: true, pointRadius: 3 },{ label: 'Bayou Park', data: occData('Bayou Park'), borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', tension: 0.3, fill: true, pointRadius: 3, borderDash: [5,3] }]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { autoSkip: false, maxRotation: 45 } }, y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } } } });
   document.querySelector('#tblUnits tbody').innerHTML = Object.entries(byUnit).sort((a,b) => b[1].rev-a[1].rev).map(([name,u]) => { const occ = diffDays > 0 ? u.nights/diffDays : 0; const adr = u.nights > 0 ? u.rev/u.nights : 0; const pc = u.portfolio === '3700M' ? '#185FA5' : '#1D9E75'; return `<tr><td>${name}</td><td style="color:${pc};font-weight:500">${u.portfolio}</td><td class="num">${$c(u.rev)}</td><td class="num">${Math.round(u.nights)}</td><td class="num">${pct(occ)}</td><td class="num">${$c(adr)}</td><td class="num">${$c(u.clean)}</td></tr>`; }).join('');
-  document.querySelector('#tblBookings tbody').innerHTML = reservations.slice(0,500).map(r => { const rev = r.money?.fareAccommodation||r.money?.totalPaid||0; const clean = r.money?.cleaningFee||0; const comm = Math.abs(r.money?.hostServiceFee||r.money?.channelCommission||0); const prop = (r.listing?.nickname||r.listing?.title||'—').split('/')[0].trim(); const guest = r.guest?.fullName||r.guestName||'—'; const ci = r.checkIn?r.checkIn.split('T')[0]:'—'; const co = r.checkOut?r.checkOut.split('T')[0]:'—'; const nights = r.nightsCount||r.nights||'—'; const ch = r.source||r.channelId||'Directo'; const st = r.status||'confirmed'; const badge = st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok'; const stLabel = st==='cancelled'?'Cancelada':st==='inquiry'?'Consulta':'Confirmada'; return `<tr><td>${prop}</td><td>${guest}</td><td>${ci}</td><td>${co}</td><td class="num">${nights}</td><td>${ch}</td><td><span class="badge ${badge}">${stLabel}</span></td><td class="num">${$c(rev)}</td><td class="num">${$c(clean)}</td><td class="num">${$c(comm)}</td></tr>`; }).join('');
+  document.querySelector('#tblBookings tbody').innerHTML = reservations.slice(0,500).map(r => { const rev = r.money?.fareAccommodation||r.money?.totalPaid||r.money?.hostPayout||0; const clean = r.money?.cleaningFee||0; const comm = Math.abs(r.money?.hostServiceFee||r.money?.channelCommission||0); const prop = (r.listing?.nickname||r.listing?.title||'—').split('/')[0].trim(); const guest = r.guest?.fullName||r.guestName||'—'; const ci = r.checkIn?r.checkIn.split('T')[0]:'—'; const co = r.checkOut?r.checkOut.split('T')[0]:'—'; const nights = r.nightsCount||r.nights||'—'; const ch = r.source||r.channelId||'Direct'; const st = r.status||'confirmed'; const badge = st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok'; const stLabel = st==='cancelled'?'Cancelled':st==='inquiry'?'Inquiry':'Confirmed'; return `<tr><td>${prop}</td><td>${guest}</td><td>${ci}</td><td>${co}</td><td class="num">${nights}</td><td>${ch}</td><td><span class="badge ${badge}">${stLabel}</span></td><td class="num">${$c(rev)}</td><td class="num">${$c(clean)}</td><td class="num">${$c(comm)}</td></tr>`; }).join('');
   document.getElementById('main').style.display = 'block';
   document.getElementById('emptyBox').style.display = 'none';
 }
