@@ -361,6 +361,7 @@ tr.total-row td {
       <div class="tab" onclick="showTab('tab3700',this)">3700M</div>
       <div class="tab" onclick="showTab('tabBP',this)">Bayou Park</div>
       <div class="tab" onclick="showTab('bookings',this)">Bookings</div>
+      <div class="tab" onclick="showTab('pipeline',this)">Pipeline</div>
     </div>
 
     <!-- OVERVIEW TAB -->
@@ -562,6 +563,45 @@ tr.total-row td {
     </div>
   </div>
 
+
+    <!-- PIPELINE TAB -->
+    <div id="tab-pipeline" style="display:none">
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpiPipeline"></div>
+      <!-- Revenue chart -->
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-title">Confirmed Revenue Pipeline</div>
+          <div class="chart-subtitle">Room revenue by future month, stacked by portfolio</div>
+          <div class="chart-legend" id="legendPipeline"></div>
+          <div class="chart-wrap"><canvas id="chartPipeline" height="240"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Bookings by Portfolio</div>
+          <div class="chart-subtitle">Upcoming confirmed stays</div>
+          <div id="pipelinePortBars" style="margin-top:8px"></div>
+        </div>
+      </div>
+      <!-- Upcoming table -->
+      <div class="section-label">Upcoming Reservations</div>
+      <div class="table-wrap">
+        <table id="tblPipeline">
+          <thead><tr>
+            <th>Property</th>
+            <th>Guest</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th class="num">Nights</th>
+            <th>Channel</th>
+            <th class="num">Room Rev.</th>
+            <th class="num">Cleaning</th>
+            <th class="num">Total Rev.</th>
+            <th class="num">OTA Comm.</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   <!-- Empty state -->
   <div id="emptyBox" class="empty-box">
     <div class="empty-icon">📊</div>
@@ -583,7 +623,7 @@ document.getElementById('df').value = new Date(now.getFullYear(), now.getMonth()
 document.getElementById('dt').value = now.toISOString().split('T')[0];
 
 function showTab(name, el) {
-  ['overview','tab3700','tabBP','bookings'].forEach(t => {
+  ['overview','tab3700','tabBP','bookings','pipeline'].forEach(t => {
     document.getElementById('tab-'+t).style.display = 'none';
   });
   document.querySelectorAll('.tab').forEach(t => {
@@ -594,6 +634,7 @@ function showTab(name, el) {
   if (name === 'overview') el.classList.add('blue');
   if (name === 'tab3700') el.classList.add('blue');
   if (name === 'tabBP') el.classList.add('green');
+  if (name === 'pipeline') el.classList.add('blue');
 }
 
 function $c(v) { return '$' + Math.round(v).toLocaleString('en-US'); }
@@ -1240,6 +1281,144 @@ function render(reservations, from, to, prev) {
       <td class="num">${$c(roomRev)}</td>
       <td class="num">${$c(clean)}</td>
       <td class="num">${otaAdj !== 0 ? $c(otaAdj) : '—'}</td>
+      <td class="num">${$c(totRev)}</td>
+      <td class="num">${$c(otaComm)}</td>
+    </tr>`;
+  }).join('');
+
+  // ---- PIPELINE TAB ----
+  const today = new Date().toISOString().split('T')[0];
+  const upcoming = reservations.filter(r => r.status !== 'cancelled' && r.checkIn && r.checkIn.split('T')[0] >= today);
+  upcoming.sort((a,b) => (a.checkIn||'').localeCompare(b.checkIn||''));
+
+  // Aggregate by month for pipeline
+  const pipelineByMonth = {};
+  upcoming.forEach(r => {
+    const ym = (r.checkIn||'').substring(0,7);
+    if (!ym) return;
+    const portfolio = getPortfolioFromRes(r);
+    if (!pipelineByMonth[ym]) pipelineByMonth[ym] = {'3700M':0,'Bayou Park':0};
+    if (pipelineByMonth[ym][portfolio] !== undefined)
+      pipelineByMonth[ym][portfolio] += r.money?.fareAccommodation || 0;
+  });
+
+  const pipeMonths = Object.keys(pipelineByMonth).sort();
+  const pipeLabels = pipeMonths.map(monthLabel);
+
+  const pipe3700Rev = upcoming.filter(r => getPortfolioFromRes(r)==='3700M').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
+  const pipeBPRev   = upcoming.filter(r => getPortfolioFromRes(r)==='Bayou Park').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
+  const pipeTotalRev = pipe3700Rev + pipeBPRev;
+  const pipeClean = upcoming.reduce((a,r)=>a+(r.money?.fareCleaning||0),0);
+  const pipeComm  = upcoming.reduce((a,r)=>a+Math.abs(r.money?.hostServiceFee||0),0);
+  const pipeNights = upcoming.reduce((a,r)=>a+(r.nightsCount||0),0);
+
+  // Days until next 30/60/90
+  const rev30 = upcoming.filter(r => { const d = new Date(r.checkIn); const diff = (d-new Date())/86400000; return diff>=0&&diff<=30; }).reduce((a,r)=>a+(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0),0);
+  const rev60 = upcoming.filter(r => { const d = new Date(r.checkIn); const diff = (d-new Date())/86400000; return diff>=0&&diff<=60; }).reduce((a,r)=>a+(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0),0);
+  const rev90 = upcoming.filter(r => { const d = new Date(r.checkIn); const diff = (d-new Date())/86400000; return diff>=0&&diff<=90; }).reduce((a,r)=>a+(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0),0);
+
+  document.getElementById('kpiPipeline').innerHTML = `
+    <div class="kpi" style="--accent:var(--blue)">
+      <div class="kpi-label">Total Pipeline</div>
+      <div class="kpi-value">${$c(pipeTotalRev + pipeClean)}</div>
+      <div class="kpi-sub">${upcoming.length} upcoming bookings</div>
+    </div>
+    <div class="kpi" style="--accent:var(--blue)">
+      <div class="kpi-label">Next 30 Days</div>
+      <div class="kpi-value">${$c(rev30)}</div>
+      <div class="kpi-sub">Confirmed revenue</div>
+    </div>
+    <div class="kpi" style="--accent:var(--blue)">
+      <div class="kpi-label">Next 60 Days</div>
+      <div class="kpi-value">${$c(rev60)}</div>
+      <div class="kpi-sub">Confirmed revenue</div>
+    </div>
+    <div class="kpi" style="--accent:var(--blue)">
+      <div class="kpi-label">Next 90 Days</div>
+      <div class="kpi-value">${$c(rev90)}</div>
+      <div class="kpi-sub">Confirmed revenue</div>
+    </div>
+    <div class="kpi" style="--accent:var(--green)">
+      <div class="kpi-label">Nights Booked</div>
+      <div class="kpi-value">${fmt(pipeNights)}</div>
+      <div class="kpi-sub">Upcoming nights</div>
+    </div>
+    <div class="kpi" style="--accent:var(--red)">
+      <div class="kpi-label">OTA Commission</div>
+      <div class="kpi-value">${$c(pipeComm)}</div>
+      <div class="kpi-sub">On upcoming bookings</div>
+    </div>
+  `;
+
+  // Pipeline revenue chart
+  document.getElementById('legendPipeline').innerHTML = `
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>3700M</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Bayou Park</div>`;
+  destroyChart('pipeline');
+  charts.pipeline = new Chart(document.getElementById('chartPipeline'), {
+    type: 'bar',
+    data: {
+      labels: pipeLabels,
+      datasets: [
+        { label: '3700M', data: pipeMonths.map(m => Math.round(pipelineByMonth[m]['3700M']||0)), backgroundColor: 'rgba(74,158,255,0.85)', borderRadius: 3 },
+        { label: 'Bayou Park', data: pipeMonths.map(m => Math.round(pipelineByMonth[m]['Bayou Park']||0)), backgroundColor: 'rgba(61,214,140,0.85)', borderRadius: 3 }
+      ]
+    },
+    options: { ...CHART_OPTS,
+      plugins: { legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}} },
+      scales: {
+        x: { stacked:true, ticks:{color:'#4D5D72',font:{size:10}}, grid:{display:false} },
+        y: { stacked:true, ticks:{color:'#4D5D72',font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'}, grid:{color:'rgba(42,52,65,0.5)'} }
+      }
+    }
+  });
+
+  // Portfolio bars
+  const portTotal = pipe3700Rev + pipeBPRev || 1;
+  const pipe3700Count = upcoming.filter(r => getPortfolioFromRes(r)==='3700M').length;
+  const pipeBPCount = upcoming.filter(r => getPortfolioFromRes(r)==='Bayou Park').length;
+  document.getElementById('pipelinePortBars').innerHTML = `
+    <div class="channel-bars" style="margin-top:16px">
+      <div class="channel-bar-item">
+        <div class="channel-bar-label" style="color:var(--blue)">3700M</div>
+        <div class="channel-bar-track"><div class="channel-bar-fill" style="width:${pipe3700Rev/portTotal*100}%;background:var(--blue)"></div></div>
+        <div class="channel-bar-val">${$c(pipe3700Rev)}</div>
+        <div class="channel-bar-pct">${pipe3700Count} bkgs</div>
+      </div>
+      <div class="channel-bar-item">
+        <div class="channel-bar-label" style="color:var(--green)">Bayou Park</div>
+        <div class="channel-bar-track"><div class="channel-bar-fill" style="width:${pipeBPRev/portTotal*100}%;background:var(--green)"></div></div>
+        <div class="channel-bar-val">${$c(pipeBPRev)}</div>
+        <div class="channel-bar-pct">${pipeBPCount} bkgs</div>
+      </div>
+    </div>`;
+
+  // Upcoming table
+  document.querySelector('#tblPipeline tbody').innerHTML = upcoming.slice(0,200).map(r => {
+    const roomRev = r.money?.fareAccommodation || 0;
+    const clean = r.money?.fareCleaning || 0;
+    const otaComm = Math.abs(r.money?.hostServiceFee || 0);
+    const totRev = roomRev + clean;
+    const prop = (r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
+    const guest = r.guest?.fullName || '—';
+    const ci = r.checkIn ? r.checkIn.split('T')[0] : '—';
+    const co = r.checkOut ? r.checkOut.split('T')[0] : '—';
+    const nights = r.nightsCount || '—';
+    const ch = r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+    // Days until check-in
+    const daysUntil = Math.ceil((new Date(ci) - new Date()) / 86400000);
+    const daysLabel = daysUntil === 0 ? '<span style="color:var(--amber)">Today</span>' :
+                      daysUntil === 1 ? '<span style="color:var(--amber)">Tomorrow</span>' :
+                      `<span style="color:var(--text3)">in ${daysUntil}d</span>`;
+    return `<tr>
+      <td>${prop}</td>
+      <td style="font-family:'DM Sans',sans-serif">${guest}</td>
+      <td>${ci} ${daysLabel}</td>
+      <td>${co}</td>
+      <td class="num">${nights}</td>
+      <td style="font-family:'DM Sans',sans-serif">${ch}</td>
+      <td class="num">${$c(roomRev)}</td>
+      <td class="num">${$c(clean)}</td>
       <td class="num">${$c(totRev)}</td>
       <td class="num">${$c(otaComm)}</td>
     </tr>`;
