@@ -1257,80 +1257,96 @@ async function exportPDF() {
   btn.textContent = '⏳ Generating...';
   btn.disabled = true;
 
-  // Switch to overview tab
-  showTab('overview', document.querySelector('.tab'));
-  await new Promise(r => setTimeout(r, 400));
-
   try {
     const { jsPDF } = window.jspdf;
-    const element = document.getElementById('tab-overview');
-    const canvas = await html2canvas(element, {
-      scale: 1.5,
-      useCORS: true,
-      backgroundColor: '#0D1117',
-      logging: false,
-      windowWidth: 1280
-    });
-
-    const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
-    const margin = 10;
+    const margin = 8;
     const usableW = pageW - margin * 2;
 
-    // Header
-    pdf.setFillColor(13, 17, 23);
-    pdf.rect(0, 0, pageW, 18, 'F');
-    pdf.setTextColor(232, 237, 243);
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('US Living — Revenue Intelligence', margin, 11);
-    pdf.setFontSize(9);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(139, 155, 180);
-    pdf.text(`Period: ${from}  →  ${to}`, pageW - margin, 11, { align: 'right' });
+    const sections = [
+      { tabName: 'overview', tabEl: document.querySelectorAll('.tab')[0], label: 'Overview' },
+      { tabName: 'tab3700',  tabEl: document.querySelectorAll('.tab')[1], label: '3700M' },
+      { tabName: 'tabBP',    tabEl: document.querySelectorAll('.tab')[2], label: 'Bayou Park' },
+    ];
 
-    // Image scaled to fit page width, paginated
-    const imgW = usableW;
-    const imgH = (canvas.height / canvas.width) * imgW;
-    const startY = 22;
-    const availH = pageH - startY - margin;
+    for (let i = 0; i < sections.length; i++) {
+      const sec = sections[i];
+      btn.textContent = `⏳ ${sec.label}...`;
 
-    if (imgH <= availH) {
-      pdf.addImage(imgData, 'PNG', margin, startY, imgW, imgH);
-    } else {
-      // Multi-page
-      let yOffset = 0;
-      let page = 0;
-      while (yOffset < imgH) {
-        if (page > 0) {
-          pdf.addPage();
-          pdf.setFillColor(13, 17, 23);
-          pdf.rect(0, 0, pageW, 18, 'F');
-          pdf.setTextColor(139, 155, 180);
-          pdf.setFontSize(9);
-          pdf.text(`US Living — Revenue Intelligence  |  ${from} → ${to}`, margin, 11);
+      // Show this tab
+      showTab(sec.tabName, sec.tabEl);
+      await new Promise(r => setTimeout(r, 500));
+
+      const element = document.getElementById('tab-' + sec.tabName);
+      const canvas = await html2canvas(element, {
+        scale: 1.4,
+        useCORS: true,
+        backgroundColor: '#0D1117',
+        logging: false,
+        windowWidth: 1280
+      });
+
+      if (i > 0) pdf.addPage();
+
+      // Header bar
+      pdf.setFillColor(13, 17, 23);
+      pdf.rect(0, 0, pageW, 16, 'F');
+      pdf.setTextColor(232, 237, 243);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('US Living  |  ' + sec.label, margin, 10);
+      pdf.setFontSize(8);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(139, 155, 180);
+      pdf.text(from + ' to ' + to, pageW - margin, 10, { align: 'right' });
+
+      // Draw section image paginated
+      const imgW = usableW;
+      const imgH = (canvas.height / canvas.width) * imgW;
+      const startY = 19;
+      const availH = pageH - startY - margin;
+
+      if (imgH <= availH) {
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, startY, imgW, imgH);
+      } else {
+        let yOffset = 0;
+        let pageNum = 0;
+        while (yOffset < imgH) {
+          if (pageNum > 0) {
+            pdf.addPage();
+            pdf.setFillColor(13, 17, 23);
+            pdf.rect(0, 0, pageW, 16, 'F');
+            pdf.setTextColor(139, 155, 180);
+            pdf.setFontSize(8);
+            pdf.text('US Living  |  ' + sec.label + '  |  ' + from + ' to ' + to, margin, 10);
+          }
+          const sy = pageNum === 0 ? startY : 19;
+          const sliceH = pageH - sy - margin;
+          const ratio = canvas.height / imgH;
+          const srcY = yOffset * ratio;
+          const srcH = sliceH * ratio;
+
+          const sliceCanvas = document.createElement('canvas');
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = Math.min(srcH, canvas.height - srcY);
+          const ctx = sliceCanvas.getContext('2d');
+          ctx.drawImage(canvas, 0, srcY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+          const sliceImgH = (sliceCanvas.height / canvas.height) * imgH;
+          pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', margin, sy, imgW, sliceImgH);
+
+          yOffset += sliceH;
+          pageNum++;
+          if (yOffset >= imgH) break;
         }
-        const sy = page === 0 ? startY : 20;
-        const sliceH = pageH - sy - margin;
-        const srcY = (yOffset / imgH) * canvas.height;
-        const srcH = (sliceH / imgH) * canvas.height;
-
-        const sliceCanvas = document.createElement('canvas');
-        sliceCanvas.width = canvas.width;
-        sliceCanvas.height = Math.min(srcH, canvas.height - srcY);
-        const ctx = sliceCanvas.getContext('2d');
-        ctx.drawImage(canvas, 0, srcY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
-        pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', margin, sy, imgW, sliceH * (sliceCanvas.height / srcH));
-
-        yOffset += sliceH;
-        page++;
-        if (yOffset >= imgH) break;
       }
     }
 
-    pdf.save(`US-Living-Revenue-${from}-${to}.pdf`);
+    // Return to overview
+    showTab('overview', document.querySelectorAll('.tab')[0]);
+    pdf.save('US-Living-Revenue-' + from + '-' + to + '.pdf');
+
   } catch(e) {
     alert('Error generating PDF: ' + e.message);
   } finally {
