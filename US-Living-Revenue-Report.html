@@ -755,12 +755,22 @@ function render(reservations, from, to) {
     <div class="kpi" style="--accent:var(--blue)">
       <div class="kpi-label">Total Revenue</div>
       <div class="kpi-value">${$c(totalRev)}</div>
-      <div class="kpi-sub">Room + Cleaning + OTA Adj.</div>
+      <div class="kpi-sub">${confirmed.length} bookings</div>
     </div>
     <div class="kpi" style="--accent:var(--blue)">
       <div class="kpi-label">Room Revenue</div>
       <div class="kpi-value">${$c(totalRoomRev)}</div>
-      <div class="kpi-sub">${confirmed.length} bookings</div>
+      <div class="kpi-sub">Net accommodation fare</div>
+    </div>
+    <div class="kpi" style="--accent:var(--text2)">
+      <div class="kpi-label">Cleaning Fee</div>
+      <div class="kpi-value">${$c(totalClean)}</div>
+      <div class="kpi-sub">fareCleaning</div>
+    </div>
+    <div class="kpi" style="--accent:var(--red)">
+      <div class="kpi-label">OTA Commission</div>
+      <div class="kpi-value">${$c(totalOtaComm)}</div>
+      <div class="kpi-sub">Channel commission</div>
     </div>
     <div class="kpi" style="--accent:var(--green)">
       <div class="kpi-label">Occupancy</div>
@@ -776,11 +786,6 @@ function render(reservations, from, to) {
       <div class="kpi-label">RevPAR</div>
       <div class="kpi-value">${$c(totalRevPAR)}</div>
       <div class="kpi-sub">Per available night</div>
-    </div>
-    <div class="kpi" style="--accent:var(--red)">
-      <div class="kpi-label">OTA Commission</div>
-      <div class="kpi-value">${$c(totalOtaComm)}</div>
-      <div class="kpi-sub">Cleaning: ${(totalClean)} · Adj: ${(totalOtaAdj)}</div>
     </div>
   `;
 
@@ -1004,12 +1009,22 @@ function render(reservations, from, to) {
       <div class="kpi" style="--accent:${hexColor}">
         <div class="kpi-label">Total Revenue</div>
         <div class="kpi-value">${$c(totalRev)}</div>
-        <div class="kpi-sub">Room + Cleaning + OTA Adj.</div>
+        <div class="kpi-sub">${p.count} bookings</div>
       </div>
       <div class="kpi" style="--accent:${hexColor}">
         <div class="kpi-label">Room Revenue</div>
         <div class="kpi-value">${$c(p.roomRev)}</div>
-        <div class="kpi-sub">${p.count} bookings</div>
+        <div class="kpi-sub">Net accommodation fare</div>
+      </div>
+      <div class="kpi" style="--accent:var(--text2)">
+        <div class="kpi-label">Cleaning Fee</div>
+        <div class="kpi-value">${$c(p.clean)}</div>
+        <div class="kpi-sub">fareCleaning</div>
+      </div>
+      <div class="kpi" style="--accent:var(--red)">
+        <div class="kpi-label">OTA Commission</div>
+        <div class="kpi-value">${$c(p.otaComm)}</div>
+        <div class="kpi-sub">Channel commission</div>
       </div>
       <div class="kpi" style="--accent:var(--green)">
         <div class="kpi-label">Occupancy</div>
@@ -1025,12 +1040,7 @@ function render(reservations, from, to) {
         <div class="kpi-label">RevPAR</div>
         <div class="kpi-value">${$c(revpar)}</div>
         <div class="kpi-sub">Per available night</div>
-      </div>
-      <div class="kpi" style="--accent:var(--red)">
-        <div class="kpi-label">OTA Commission</div>
-        <div class="kpi-value">${$c(p.otaComm)}</div>
-        <div class="kpi-sub">Cleaning: ${$c(p.clean)}</div>
-      </div>`;
+      </div>\`;
 
     // Channel mix for this portfolio
     const portChannel = {};
