@@ -1055,17 +1055,23 @@ function render(reservations, from, to, prev) {
   function renderOccUnits(containerId, portfolio, unitCount) {
     const units = Object.entries(byUnit)
       .filter(([,u]) => u.portfolio === portfolio)
-      .sort((a,b) => b[1].nights - a[1].nights);
-    const color = portfolio === '3700M' ? '#4A9EFF' : '#3DD68C';
+      .sort((a,b) => a[1].nights - b[1].nights); // sort low occ first
+    const defaultColor = portfolio === '3700M' ? '#4A9EFF' : '#3DD68C';
     const avail = diffDays;
     document.getElementById(containerId).innerHTML = units.map(([name, u]) => {
       const occPct = avail > 0 ? Math.min(100, u.nights / avail * 100) : 0;
+      const isLow = occPct < 30;
+      const isMed = occPct >= 30 && occPct < 60;
+      const barColor = isLow ? '#FF5C5C' : isMed ? '#F5A623' : defaultColor;
+      const cardBorder = isLow ? 'border-color:rgba(255,92,92,0.35)' : isMed ? 'border-color:rgba(245,166,35,0.25)' : '';
       const shortName = name.replace(/^(Unit\s+|Apt\s+)/i,'').split('-')[0].trim().split(' ').slice(0,2).join(' ');
+      const alertBadge = isLow ? '<span style="font-size:9px;background:rgba(255,92,92,0.15);color:#FF5C5C;padding:1px 5px;border-radius:3px;margin-left:4px">LOW</span>' :
+                         isMed ? '<span style="font-size:9px;background:rgba(245,166,35,0.15);color:#F5A623;padding:1px 5px;border-radius:3px;margin-left:4px">MED</span>' : '';
       return `
-        <div class="occ-unit-card">
-          <div class="occ-unit-name" title="${name}">${shortName}</div>
-          <div class="occ-unit-bar-track"><div class="occ-unit-bar-fill" style="width:${occPct}%;background:${color}"></div></div>
-          <div class="occ-unit-pct" style="color:${color}">${Math.round(occPct)}%</div>
+        <div class="occ-unit-card" style="${cardBorder}">
+          <div class="occ-unit-name" title="${name}" style="display:flex;align-items:center">${shortName}${alertBadge}</div>
+          <div class="occ-unit-bar-track"><div class="occ-unit-bar-fill" style="width:${occPct}%;background:${barColor}"></div></div>
+          <div class="occ-unit-pct" style="color:${barColor}">${Math.round(occPct)}%</div>
         </div>`;
     }).join('');
   }
@@ -1086,11 +1092,14 @@ function render(reservations, from, to, prev) {
       const revpar = avail > 0 ? u.roomRev/avail : 0;
       const totRev = u.roomRev + u.clean + (u.otaAdj||0);
       totRoomRev+=u.roomRev; totClean+=u.clean; totOtaAdj+=(u.otaAdj||0); totOtaComm+=u.otaComm; totNights+=u.nights;
-      return `<tr>
+      const occPctRow = occ * 100;
+      const rowAlert = occPctRow < 30 ? 'style="background:rgba(255,92,92,0.05)"' : occPctRow < 60 ? 'style="background:rgba(245,166,35,0.04)"' : '';
+      const occColor = occPctRow < 30 ? 'color:#FF5C5C;font-weight:600' : occPctRow < 60 ? 'color:#F5A623' : '';
+      return `<tr ${rowAlert}>
         <td>${name}</td>
         <td class="num">${avail}</td>
         <td class="num">${Math.round(u.nights)}</td>
-        <td class="num">${pct(occ)}</td>
+        <td class="num" style="${occColor}">${pct(occ)}</td>
         <td class="num">${$c(adr)}</td>
         <td class="num">${$c(revpar)}</td>
         <td class="num">${$c(u.roomRev)}</td>
@@ -1125,6 +1134,17 @@ function render(reservations, from, to, prev) {
       <div class="port-header-stat"><div class="port-header-stat-label">ADR</div><div class="port-header-stat-val">${$c(totADR)}</div></div>
       <div class="port-header-stat"><div class="port-header-stat-label">RevPAR</div><div class="port-header-stat-val">${$c(totRevPAR)}</div></div>
       <div class="port-header-stat"><div class="port-header-stat-label">Room Revenue</div><div class="port-header-stat-val">${$c(totRoomRev)}</div></div>`;
+
+    // Alert banner for low occupancy units
+    const lowUnits = units.filter(([,u]) => { const o = avail > 0 ? u.nights/avail*100 : 0; return o < 30; });
+    const medUnits = units.filter(([,u]) => { const o = avail > 0 ? u.nights/avail*100 : 0; return o >= 30 && o < 60; });
+    const alertContainer = document.getElementById(tableId).closest('.table-wrap');
+    if (lowUnits.length > 0) {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#FF5C5C;display:flex;align-items:center;gap:8px';
+      banner.innerHTML = `⚠️ <strong>${lowUnits.length} unit${lowUnits.length>1?'s':''} with low occupancy (&lt;30%):</strong> ${lowUnits.map(([n])=>n.split('-')[0].trim()).join(', ')}`;
+      alertContainer.parentNode.insertBefore(banner, alertContainer);
+    }
   }
 
   buildPortTable('3700M', 'tbl3700', UNITS_3700M, 'portStats3700');
