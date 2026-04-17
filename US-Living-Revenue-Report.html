@@ -1312,10 +1312,28 @@ function render(reservations, from, to, prev) {
   const pipeComm  = upcoming.reduce((a,r)=>a+Math.abs(r.money?.hostServiceFee||0),0);
   const pipeNights = upcoming.reduce((a,r)=>a+(r.nightsCount||0),0);
 
-  // Days until next 30/60/90
-  const rev30 = upcoming.filter(r => { const d = new Date(r.checkIn); const diff = (d-new Date())/86400000; return diff>=0&&diff<=30; }).reduce((a,r)=>a+(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0),0);
-  const rev60 = upcoming.filter(r => { const d = new Date(r.checkIn); const diff = (d-new Date())/86400000; return diff>=0&&diff<=60; }).reduce((a,r)=>a+(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0),0);
-  const rev90 = upcoming.filter(r => { const d = new Date(r.checkIn); const diff = (d-new Date())/86400000; return diff>=0&&diff<=90; }).reduce((a,r)=>a+(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0),0);
+  // Revenue falling exclusively in each window (not cumulative)
+  function revBetweenDays(reservations, fromDay, toDay) {
+    const now = new Date(); now.setHours(0,0,0,0);
+    const start = new Date(now); start.setDate(start.getDate() + fromDay);
+    const end = new Date(now); end.setDate(end.getDate() + toDay);
+    let total = 0;
+    reservations.forEach(r => {
+      const checkIn = new Date(r.checkIn); checkIn.setHours(0,0,0,0);
+      const checkOut = new Date(r.checkOut); checkOut.setHours(0,0,0,0);
+      const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
+      const dailyRate = ((r.money?.fareAccommodation||0) + (r.money?.fareCleaning||0)) / totalNights;
+      let cur = new Date(Math.max(checkIn, start));
+      while (cur < checkOut && cur < end) {
+        total += dailyRate;
+        cur.setDate(cur.getDate() + 1);
+      }
+    });
+    return total;
+  }
+  const rev30 = revBetweenDays(upcoming, 0, 30);
+  const rev60 = revBetweenDays(upcoming, 30, 60);
+  const rev90 = revBetweenDays(upcoming, 60, 90);
 
   document.getElementById('kpiPipeline').innerHTML = `
     <div class="kpi" style="--accent:var(--blue)">
@@ -1324,17 +1342,17 @@ function render(reservations, from, to, prev) {
       <div class="kpi-sub">${upcoming.length} upcoming bookings</div>
     </div>
     <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Next 30 Days</div>
+      <div class="kpi-label">Days 0–30</div>
       <div class="kpi-value">${$c(rev30)}</div>
       <div class="kpi-sub">Confirmed revenue</div>
     </div>
     <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Next 60 Days</div>
+      <div class="kpi-label">Days 31–60</div>
       <div class="kpi-value">${$c(rev60)}</div>
       <div class="kpi-sub">Confirmed revenue</div>
     </div>
     <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Next 90 Days</div>
+      <div class="kpi-label">Days 61–90</div>
       <div class="kpi-value">${$c(rev90)}</div>
       <div class="kpi-sub">Confirmed revenue</div>
     </div>
