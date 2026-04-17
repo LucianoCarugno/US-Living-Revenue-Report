@@ -383,25 +383,55 @@ tr.total-row td {
 
     <!-- 3700M TAB -->
     <div id="tab-tab3700" style="display:none">
-      <div class="port-header" id="portHeader3700">
+      <div class="port-header">
         <div class="dot" style="background:var(--blue);width:10px;height:10px;border-radius:50%"></div>
         <div class="port-header-title" style="color:var(--blue)">3700M</div>
         <div style="font-size:12px;color:var(--text3)">Dallas — McKinney Ave · 10 units</div>
         <div class="port-header-stats" id="portStats3700"></div>
       </div>
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpi3700"></div>
+      <!-- Charts row -->
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-title">Revenue by Month</div>
+          <div class="chart-subtitle">Room revenue accrued daily</div>
+          <div class="chart-wrap"><canvas id="chartRev3700" height="180"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Channel Mix</div>
+          <div class="chart-subtitle">Revenue by booking source</div>
+          <div id="channelBars3700" style="margin-top:8px"></div>
+        </div>
+      </div>
+      <div class="chart-row-3">
+        <div class="chart-card">
+          <div class="chart-title">ADR Trend</div>
+          <div class="chart-wrap"><canvas id="chartADR3700" height="160"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">RevPAR Trend</div>
+          <div class="chart-wrap"><canvas id="chartRevPAR3700" height="160"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Occupancy %</div>
+          <div class="chart-wrap"><canvas id="chartOcc3700" height="160"></canvas></div>
+        </div>
+      </div>
+      <!-- Occupancy by unit -->
+      <div class="section-label">Occupancy by Unit</div>
+      <div class="chart-card" style="margin-bottom:16px">
+        <div class="occ-unit-grid" id="occUnits3700b"></div>
+      </div>
+      <!-- Table -->
+      <div class="section-label">Unit Breakdown</div>
       <div class="table-wrap">
         <table id="tbl3700">
           <thead><tr>
-            <th>Unit</th>
-            <th class="num">Avail. Nights</th>
-            <th class="num">Occ. Nights</th>
-            <th class="num">Occupancy</th>
-            <th class="num">ADR</th>
-            <th class="num">RevPAR</th>
-            <th class="num">Room Revenue</th>
-            <th class="num">Cleaning Fee</th>
-            <th class="num">Total Revenue</th>
-            <th class="num">OTA Commission</th>
+            <th>Unit</th><th class="num">Avail.</th><th class="num">Occ. Nights</th>
+            <th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th>
+            <th class="num">Room Revenue</th><th class="num">Cleaning</th>
+            <th class="num">Total Revenue</th><th class="num">OTA Comm.</th>
           </tr></thead>
           <tbody></tbody>
         </table>
@@ -410,25 +440,55 @@ tr.total-row td {
 
     <!-- BAYOU PARK TAB -->
     <div id="tab-tabBP" style="display:none">
-      <div class="port-header" id="portHeaderBP">
+      <div class="port-header">
         <div class="dot" style="background:var(--green);width:10px;height:10px;border-radius:50%"></div>
         <div class="port-header-title" style="color:var(--green)">Bayou Park</div>
         <div style="font-size:12px;color:var(--text3)">Houston — Montrose / Midtown · 20 units</div>
         <div class="port-header-stats" id="portStatsBP"></div>
       </div>
+      <!-- KPIs -->
+      <div class="kpi-grid" id="kpiBP"></div>
+      <!-- Charts row -->
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-title">Revenue by Month</div>
+          <div class="chart-subtitle">Room revenue accrued daily</div>
+          <div class="chart-wrap"><canvas id="chartRevBP" height="180"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Channel Mix</div>
+          <div class="chart-subtitle">Revenue by booking source</div>
+          <div id="channelBarsBP" style="margin-top:8px"></div>
+        </div>
+      </div>
+      <div class="chart-row-3">
+        <div class="chart-card">
+          <div class="chart-title">ADR Trend</div>
+          <div class="chart-wrap"><canvas id="chartADRBP" height="160"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">RevPAR Trend</div>
+          <div class="chart-wrap"><canvas id="chartRevPARBP" height="160"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Occupancy %</div>
+          <div class="chart-wrap"><canvas id="chartOccBP" height="160"></canvas></div>
+        </div>
+      </div>
+      <!-- Occupancy by unit -->
+      <div class="section-label">Occupancy by Unit</div>
+      <div class="chart-card" style="margin-bottom:16px">
+        <div class="occ-unit-grid" id="occUnitsBPb"></div>
+      </div>
+      <!-- Table -->
+      <div class="section-label">Unit Breakdown</div>
       <div class="table-wrap">
         <table id="tblBP">
           <thead><tr>
-            <th>Unit</th>
-            <th class="num">Avail. Nights</th>
-            <th class="num">Occ. Nights</th>
-            <th class="num">Occupancy</th>
-            <th class="num">ADR</th>
-            <th class="num">RevPAR</th>
-            <th class="num">Room Revenue</th>
-            <th class="num">Cleaning Fee</th>
-            <th class="num">Total Revenue</th>
-            <th class="num">OTA Commission</th>
+            <th>Unit</th><th class="num">Avail.</th><th class="num">Occ. Nights</th>
+            <th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th>
+            <th class="num">Room Revenue</th><th class="num">Cleaning</th>
+            <th class="num">Total Revenue</th><th class="num">OTA Comm.</th>
           </tr></thead>
           <tbody></tbody>
         </table>
@@ -921,6 +981,126 @@ function render(reservations, from, to) {
 
   buildPortTable('3700M', 'tbl3700', UNITS_3700M, 'portStats3700');
   buildPortTable('Bayou Park', 'tblBP', UNITS_BP, 'portStatsBP');
+
+  // ---- PORTFOLIO TAB DASHBOARDS ----
+  function buildPortDashboard(portfolio, color, unitCount, ids) {
+    const p = byPortfolio[portfolio];
+    const avail = unitCount * diffDays;
+    const occ = avail > 0 ? p.nights / avail : 0;
+    const adr = p.nights > 0 ? p.roomRev / p.nights : 0;
+    const revpar = avail > 0 ? p.roomRev / avail : 0;
+    const totalRev = p.roomRev + p.clean;
+    const hexColor = color === 'blue' ? '#4A9EFF' : '#3DD68C';
+    const rgbaColor = color === 'blue' ? 'rgba(74,158,255,0.85)' : 'rgba(61,214,140,0.85)';
+    const rgbaFill = color === 'blue' ? 'rgba(74,158,255,0.06)' : 'rgba(61,214,140,0.06)';
+
+    // KPIs
+    document.getElementById(ids.kpi).innerHTML = `
+      <div class="kpi" style="--accent:${hexColor}">
+        <div class="kpi-label">Total Revenue</div>
+        <div class="kpi-value">${$c(totalRev)}</div>
+        <div class="kpi-sub">Room + Cleaning</div>
+      </div>
+      <div class="kpi" style="--accent:${hexColor}">
+        <div class="kpi-label">Room Revenue</div>
+        <div class="kpi-value">${$c(p.roomRev)}</div>
+        <div class="kpi-sub">${p.count} bookings</div>
+      </div>
+      <div class="kpi" style="--accent:var(--green)">
+        <div class="kpi-label">Occupancy</div>
+        <div class="kpi-value">${pct(occ)}</div>
+        <div class="kpi-sub">${fmt(p.nights)} / ${fmt(avail)} nights</div>
+      </div>
+      <div class="kpi" style="--accent:var(--amber)">
+        <div class="kpi-label">ADR</div>
+        <div class="kpi-value">${$c(adr)}</div>
+        <div class="kpi-sub">Avg. daily rate</div>
+      </div>
+      <div class="kpi" style="--accent:var(--amber)">
+        <div class="kpi-label">RevPAR</div>
+        <div class="kpi-value">${$c(revpar)}</div>
+        <div class="kpi-sub">Per available night</div>
+      </div>
+      <div class="kpi" style="--accent:var(--red)">
+        <div class="kpi-label">OTA Commission</div>
+        <div class="kpi-value">${$c(p.otaComm)}</div>
+        <div class="kpi-sub">Cleaning: ${$c(p.clean)}</div>
+      </div>`;
+
+    // Channel mix for this portfolio
+    const portChannel = {};
+    confirmed.filter(r => getPortfolioFromRes(r) === portfolio).forEach(r => {
+      const ch = r.source === 'airbnb2' ? 'Airbnb' : r.source === 'bookingCom' ? 'Booking.com' : r.source === 'manual' ? 'Direct' : (r.source||'Direct');
+      const rev = (r.money?.fareAccommodation||0) + (r.money?.fareCleaning||0);
+      if (!portChannel[ch]) portChannel[ch] = 0;
+      portChannel[ch] += rev;
+    });
+    const chTotal = Object.values(portChannel).reduce((a,b)=>a+b,0);
+    const channelColors = { 'Airbnb': '#FF5A5F', 'Booking.com': '#4A9EFF', 'Direct': '#F5A623', 'VRBO': '#4B9E3B' };
+    document.getElementById(ids.channels).innerHTML = `<div class="channel-bars">
+      ${Object.entries(portChannel).sort((a,b)=>b[1]-a[1]).map(([ch,rev]) => `
+        <div class="channel-bar-item">
+          <div class="channel-bar-label">${ch}</div>
+          <div class="channel-bar-track"><div class="channel-bar-fill" style="width:${chTotal>0?rev/chTotal*100:0}%;background:${channelColors[ch]||'var(--purple)'}"></div></div>
+          <div class="channel-bar-val">${$c(rev)}</div>
+          <div class="channel-bar-pct">${chTotal>0?Math.round(rev/chTotal*100)+'%':''}</div>
+        </div>`).join('')}
+    </div>`;
+
+    // Monthly stats for this portfolio
+    const portMonthRevData = months.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0));
+    const portMonthADR = months.map(m => Math.round(byMonthADR[m]?.[portfolio]||0));
+    const portMonthRevPAR = months.map(m => Math.round(byMonthRevPAR[m]?.[portfolio]||0));
+    const portMonthOcc = months.map(m => Math.round(byMonthOcc[m]?.[portfolio]||0));
+
+    const scaleOpts = { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { color: 'rgba(42,52,65,0.5)' } } };
+
+    destroyChart(ids.rev);
+    charts[ids.rev] = new Chart(document.getElementById(ids.rev), {
+      type: 'bar',
+      data: { labels: monthLabels, datasets: [{ data: portMonthRevData, backgroundColor: rgbaColor, borderRadius: 3 }] },
+      options: { ...CHART_OPTS, plugins: { legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}} },
+        scales: { x:{...scaleOpts.x,stacked:true}, y:{...scaleOpts.y,ticks:{...scaleOpts.y.ticks,callback:v=>'$'+(v/1000).toFixed(0)+'k'}} } }
+    });
+
+    destroyChart(ids.adr);
+    charts[ids.adr] = new Chart(document.getElementById(ids.adr), {
+      type: 'line',
+      data: { labels: monthLabels, datasets: [{ data: portMonthADR, borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},
+        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
+    });
+
+    destroyChart(ids.revpar);
+    charts[ids.revpar] = new Chart(document.getElementById(ids.revpar), {
+      type: 'line',
+      data: { labels: monthLabels, datasets: [{ data: portMonthRevPAR, borderColor: '#F5A623', backgroundColor: 'rgba(245,166,35,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#F5A623' }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},
+        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
+    });
+
+    destroyChart(ids.occ);
+    charts[ids.occ] = new Chart(document.getElementById(ids.occ), {
+      type: 'line',
+      data: { labels: monthLabels, datasets: [{ data: portMonthOcc, borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},
+        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, min:0, max:100, ticks:{...scaleOpts.y.ticks,callback:v=>v+'%'} } } }
+    });
+
+    // Occ by unit
+    renderOccUnits(ids.occUnits, portfolio, unitCount);
+  }
+
+  buildPortDashboard('3700M', 'blue', UNITS_3700M, {
+    kpi: 'kpi3700', channels: 'channelBars3700',
+    rev: 'chartRev3700', adr: 'chartADR3700', revpar: 'chartRevPAR3700', occ: 'chartOcc3700',
+    occUnits: 'occUnits3700b'
+  });
+  buildPortDashboard('Bayou Park', 'green', UNITS_BP, {
+    kpi: 'kpiBP', channels: 'channelBarsBP',
+    rev: 'chartRevBP', adr: 'chartADRBP', revpar: 'chartRevPARBP', occ: 'chartOccBP',
+    occUnits: 'occUnitsBPb'
+  });
 
   // ---- BOOKINGS TABLE ----
   const sorted = [...reservations].sort((a,b) => (b.checkIn||'').localeCompare(a.checkIn||''));
