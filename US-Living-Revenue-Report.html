@@ -6,6 +6,8 @@
 <title>US Living — Revenue Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1248,14 +1250,93 @@ function render(reservations, from, to, prev) {
   document.getElementById('btnPDF').style.display = '';
 }
 
-function exportPDF() {
+async function exportPDF() {
   const from = document.getElementById('df').value;
   const to = document.getElementById('dt').value;
-  document.title = `US Living Revenue Report ${from} to ${to}`;
-  // Switch to overview tab for printing
-  const overviewTab = document.querySelector('.tab');
-  showTab('overview', overviewTab);
-  setTimeout(() => window.print(), 300);
+  const btn = document.getElementById('btnPDF');
+  btn.textContent = '⏳ Generating...';
+  btn.disabled = true;
+
+  // Switch to overview tab
+  showTab('overview', document.querySelector('.tab'));
+  await new Promise(r => setTimeout(r, 400));
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const element = document.getElementById('tab-overview');
+    const canvas = await html2canvas(element, {
+      scale: 1.5,
+      useCORS: true,
+      backgroundColor: '#0D1117',
+      logging: false,
+      windowWidth: 1280
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 10;
+    const usableW = pageW - margin * 2;
+
+    // Header
+    pdf.setFillColor(13, 17, 23);
+    pdf.rect(0, 0, pageW, 18, 'F');
+    pdf.setTextColor(232, 237, 243);
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('US Living — Revenue Intelligence', margin, 11);
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(139, 155, 180);
+    pdf.text(`Period: ${from}  →  ${to}`, pageW - margin, 11, { align: 'right' });
+
+    // Image scaled to fit page width, paginated
+    const imgW = usableW;
+    const imgH = (canvas.height / canvas.width) * imgW;
+    const startY = 22;
+    const availH = pageH - startY - margin;
+
+    if (imgH <= availH) {
+      pdf.addImage(imgData, 'PNG', margin, startY, imgW, imgH);
+    } else {
+      // Multi-page
+      let yOffset = 0;
+      let page = 0;
+      while (yOffset < imgH) {
+        if (page > 0) {
+          pdf.addPage();
+          pdf.setFillColor(13, 17, 23);
+          pdf.rect(0, 0, pageW, 18, 'F');
+          pdf.setTextColor(139, 155, 180);
+          pdf.setFontSize(9);
+          pdf.text(`US Living — Revenue Intelligence  |  ${from} → ${to}`, margin, 11);
+        }
+        const sy = page === 0 ? startY : 20;
+        const sliceH = pageH - sy - margin;
+        const srcY = (yOffset / imgH) * canvas.height;
+        const srcH = (sliceH / imgH) * canvas.height;
+
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = Math.min(srcH, canvas.height - srcY);
+        const ctx = sliceCanvas.getContext('2d');
+        ctx.drawImage(canvas, 0, srcY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+        pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', margin, sy, imgW, sliceH * (sliceCanvas.height / srcH));
+
+        yOffset += sliceH;
+        page++;
+        if (yOffset >= imgH) break;
+      }
+    }
+
+    pdf.save(`US-Living-Revenue-${from}-${to}.pdf`);
+  } catch(e) {
+    alert('Error generating PDF: ' + e.message);
+  } finally {
+    btn.textContent = '⬇ Export PDF';
+    btn.disabled = false;
+  }
 }
 </script>
 </body>
