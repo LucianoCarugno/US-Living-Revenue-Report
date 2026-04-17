@@ -613,8 +613,9 @@ tr.total-row td {
 
 <script>
 const PROXY = 'https://guesty-proxy.luciano-bd7.workers.dev';
-const UNITS_3700M = 10;
+const UNITS_3700M = 12;
 const UNITS_BP = 20;
+
 let charts = {};
 
 // Init dates
@@ -726,12 +727,14 @@ async function loadData() {
   document.getElementById('btnLoad').disabled = true;
   try {
     const prev = getPrevPeriod(from, to);
-    const [res, prevRes] = await Promise.all([
+    const [res, prevRes, listingsRes] = await Promise.all([
       fetchAll(from, to),
-      fetchAll(prev.from, prev.to)
+      fetchAll(prev.from, prev.to),
+      fetch(`${PROXY}/listings`).then(r=>r.json()).catch(()=>({results:[]}))
     ]);
+    const allListings = (listingsRes.results || []).filter(l => l.nickname && !l.nickname.toLowerCase().includes('test'));
     const prevTotals = calcTotals(prevRes, prev.from, prev.to, UNITS_3700M, UNITS_BP);
-    render(res, from, to, prevTotals);
+    render(res, from, to, prevTotals, allListings);
   } catch(e) {
     showErr('Error loading data: ' + e.message);
   } finally {
@@ -778,7 +781,7 @@ function monthLabel(ym) {
   return new Date(+y, +m-1).toLocaleString('en', {month:'short', year:'2-digit'});
 }
 
-function render(reservations, from, to, prev) {
+function render(reservations, from, to, prev, allListings) {
   const confirmed = reservations.filter(r => r.status !== 'cancelled');
   const diffDays = getDaysInPeriod(from, to);
 
@@ -870,11 +873,15 @@ function render(reservations, from, to, prev) {
     });
   });
 
+  // Dynamic unit counts from listings
+  const dynUnits3700 = allListings ? allListings.filter(l => getPortfolio(l.nickname) === '3700M').length || UNITS_3700M : UNITS_3700M;
+  const dynUnitsBP   = allListings ? allListings.filter(l => getPortfolio(l.nickname) === 'Bayou Park').length || UNITS_BP : UNITS_BP;
+
   const totalRoomRev = byPortfolio['3700M'].roomRev + byPortfolio['Bayou Park'].roomRev;
   const totalClean = byPortfolio['3700M'].clean + byPortfolio['Bayou Park'].clean;
   const totalOtaComm = byPortfolio['3700M'].otaComm + byPortfolio['Bayou Park'].otaComm;
   const totalNights = byPortfolio['3700M'].nights + byPortfolio['Bayou Park'].nights;
-  const totalAvail = (UNITS_3700M + UNITS_BP) * diffDays;
+  const totalAvail = (dynUnits3700 + dynUnitsBP) * diffDays;
   const totalOtaAdj = byPortfolio['3700M'].otaAdj + byPortfolio['Bayou Park'].otaAdj;
   const totalRev = totalRoomRev + totalClean + totalOtaAdj;
   const totalOcc = totalAvail > 0 ? totalNights / totalAvail : 0;
@@ -950,8 +957,8 @@ function render(reservations, from, to, prev) {
       </div>`;
   }
   document.getElementById('portfolioKpis').innerHTML =
-    portKpiHtml('3700M', 'blue', UNITS_3700M) +
-    portKpiHtml('Bayou Park', 'green', UNITS_BP);
+    portKpiHtml('3700M', 'blue', dynUnits3700) +
+    portKpiHtml('Bayou Park', 'green', dynUnitsBP);
 
   // ---- CHARTS ----
   const monthLabels = months.map(monthLabel);
@@ -1053,18 +1060,36 @@ function render(reservations, from, to, prev) {
 
   // ---- OCCUPANCY BY UNIT ----
   function renderOccUnits(containerId, portfolio, unitCount) {
-    const units = Object.entries(byUnit)
-      .filter(([,u]) => u.portfolio === portfolio)
-      .sort((a,b) => a[1].nights - b[1].nights); // sort low occ first
     const defaultColor = portfolio === '3700M' ? '#4A9EFF' : '#3DD68C';
     const avail = diffDays;
-    document.getElementById(containerId).innerHTML = units.map(([name, u]) => {
+
+    // Get all listing nicknames for this portfolio from /listings endpoint
+    const allNames = (allListings || [])
+      .filter(l => getPortfolio(l.nickname) === portfolio)
+      .map(l => l.nickname.trim());
+
+    // Fallback: use units from reservations if listings not available
+    const reservationNames = Object.entries(byUnit)
+      .filter(([,u]) => u.portfolio === portfolio)
+      .map(([name]) => name);
+    const nameSet = new Set([...allNames, ...reservationNames]);
+
+    // Merge with reservation data
+    const unitData = Array.from(nameSet).map(name => {
+      const unitNum = name.match(/\d+/)?.[0];
+      const match = Object.entries(byUnit).find(([k, u]) => {
+        return u.portfolio === portfolio && k.match(/\d+/)?.[0] === unitNum;
+      });
+      return [name, match ? match[1] : {roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0, portfolio, count:0}];
+    }).sort((a,b) => a[1].nights - b[1].nights); // low occ first
+
+    document.getElementById(containerId).innerHTML = unitData.map(([name, u]) => {
       const occPct = avail > 0 ? Math.min(100, u.nights / avail * 100) : 0;
       const isLow = occPct < 30;
       const isMed = occPct >= 30 && occPct < 60;
       const barColor = isLow ? '#FF5C5C' : isMed ? '#F5A623' : defaultColor;
       const cardBorder = isLow ? 'border-color:rgba(255,92,92,0.35)' : isMed ? 'border-color:rgba(245,166,35,0.25)' : '';
-      const shortName = name.replace(/^(Unit\s+|Apt\s+)/i,'').split('-')[0].trim().split(' ').slice(0,2).join(' ');
+      const shortName = name.replace(/^(Unit\s+|Apt\s+|Two Bed,?\s*)/i,'').replace(/[-*].*$/,'').trim().split(' ')[0];
       const alertBadge = isLow ? '<span style="font-size:9px;background:rgba(255,92,92,0.15);color:#FF5C5C;padding:1px 5px;border-radius:3px;margin-left:4px">LOW</span>' :
                          isMed ? '<span style="font-size:9px;background:rgba(245,166,35,0.15);color:#F5A623;padding:1px 5px;border-radius:3px;margin-left:4px">MED</span>' : '';
       return `
@@ -1075,14 +1100,24 @@ function render(reservations, from, to, prev) {
         </div>`;
     }).join('');
   }
-  renderOccUnits('occUnits3700', '3700M', UNITS_3700M);
-  renderOccUnits('occUnitsBP', 'Bayou Park', UNITS_BP);
+  renderOccUnits('occUnits3700', '3700M', dynUnits3700);
+  renderOccUnits('occUnitsBP', 'Bayou Park', dynUnitsBP);
 
   // ---- PORTFOLIO TABLES ----
   function buildPortTable(portfolio, tableId, unitCount, portHeaderStatsId) {
-    const units = Object.entries(byUnit)
+    // Get all listing names for this portfolio
+    const allNames = (allListings || [])
+      .filter(l => getPortfolio(l.nickname) === portfolio)
+      .map(l => l.nickname.trim());
+    const reservationNames = Object.entries(byUnit)
       .filter(([,u]) => u.portfolio === portfolio)
-      .sort((a,b) => b[1].roomRev - a[1].roomRev);
+      .map(([name]) => name);
+    const nameSet = new Set([...allNames, ...reservationNames]);
+    const units = Array.from(nameSet).map(name => {
+      const unitNum = name.match(/\d+/)?.[0];
+      const match = Object.entries(byUnit).find(([k,u]) => u.portfolio === portfolio && k.match(/\d+/)?.[0] === unitNum);
+      return [name, match ? match[1] : {roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,portfolio,count:0}];
+    }).sort((a,b) => b[1].roomRev - a[1].roomRev);
     const avail = diffDays;
     let totRoomRev=0, totClean=0, totOtaAdj=0, totOtaComm=0, totNights=0;
 
@@ -1147,8 +1182,8 @@ function render(reservations, from, to, prev) {
     }
   }
 
-  buildPortTable('3700M', 'tbl3700', UNITS_3700M, 'portStats3700');
-  buildPortTable('Bayou Park', 'tblBP', UNITS_BP, 'portStatsBP');
+  buildPortTable('3700M', 'tbl3700', dynUnits3700, 'portStats3700');
+  buildPortTable('Bayou Park', 'tblBP', dynUnitsBP, 'portStatsBP');
 
   // ---- PORTFOLIO TAB DASHBOARDS ----
   function buildPortDashboard(portfolio, color, unitCount, ids) {
@@ -1264,12 +1299,12 @@ function render(reservations, from, to, prev) {
     renderOccUnits(ids.occUnits, portfolio, unitCount);
   }
 
-  buildPortDashboard('3700M', 'blue', UNITS_3700M, {
+  buildPortDashboard('3700M', 'blue', dynUnits3700, {
     kpi: 'kpi3700', channels: 'channelBars3700',
     rev: 'chartRev3700', adr: 'chartADR3700', revpar: 'chartRevPAR3700', occ: 'chartOcc3700',
     occUnits: 'occUnits3700b'
   });
-  buildPortDashboard('Bayou Park', 'green', UNITS_BP, {
+  buildPortDashboard('Bayou Park', 'green', dynUnitsBP, {
     kpi: 'kpiBP', channels: 'channelBarsBP',
     rev: 'chartRevBP', adr: 'chartADRBP', revpar: 'chartRevPARBP', occ: 'chartOccBP',
     occUnits: 'occUnitsBPb'
