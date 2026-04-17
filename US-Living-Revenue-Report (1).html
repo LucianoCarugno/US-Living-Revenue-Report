@@ -557,6 +557,15 @@ function $c(v) { return '$' + Math.round(v).toLocaleString('en-US'); }
 function pct(v) { return Math.round(v * 100) + '%'; }
 function fmt(v) { return Math.round(v).toLocaleString('en-US'); }
 
+function delta(current, previous) {
+  if (!previous || previous === 0) return '';
+  const pct = ((current - previous) / previous) * 100;
+  const sign = pct >= 0 ? '+' : '';
+  const cls = pct >= 0 ? 'up' : 'down';
+  const arrow = pct >= 0 ? '▲' : '▼';
+  return `<div class="kpi-delta ${cls}">${arrow} ${sign}${Math.round(Math.abs(pct))}% vs prev.</div>`;
+}
+
 function getPortfolio(nickname) {
   const n = (nickname || '').toLowerCase();
   if (n.includes('3700m') || n.includes('3700 m') || n.includes('3700')) return '3700M';
@@ -589,6 +598,39 @@ async function fetchAll(from, to) {
   return d.results || [];
 }
 
+function getPrevPeriod(from, to) {
+  const f = new Date(from + ' 00:00');
+  const t = new Date(to + ' 00:00');
+  const diffMs = t - f + 86400000;
+  const pf = new Date(f - diffMs);
+  const pt = new Date(f - 86400000);
+  return {
+    from: pf.toISOString().split('T')[0],
+    to: pt.toISOString().split('T')[0]
+  };
+}
+
+function calcTotals(reservations, from, to, unitCount3700, unitCountBP) {
+  const confirmed = reservations.filter(r => r.status !== 'cancelled');
+  const diffDays = getDaysInPeriod(from, to);
+  let roomRev=0, clean=0, otaComm=0, nights=0;
+  confirmed.forEach(r => {
+    roomRev += r.money?.fareAccommodation || 0;
+    clean += r.money?.fareCleaning || 0;
+    otaComm += Math.abs(r.money?.hostServiceFee || 0);
+    nights += r.nightsCount || 0;
+  });
+  const totalAvail = (unitCount3700 + unitCountBP) * diffDays;
+  return {
+    totalRev: roomRev + clean,
+    roomRev, clean, otaComm,
+    occ: totalAvail > 0 ? nights / totalAvail : 0,
+    adr: nights > 0 ? roomRev / nights : 0,
+    revpar: totalAvail > 0 ? roomRev / totalAvail : 0,
+    nights, totalAvail
+  };
+}
+
 async function loadData() {
   const from = document.getElementById('df').value;
   const to = document.getElementById('dt').value;
@@ -599,8 +641,13 @@ async function loadData() {
   document.getElementById('loadBox').style.display = 'block';
   document.getElementById('btnLoad').disabled = true;
   try {
-    const res = await fetchAll(from, to);
-    render(res, from, to);
+    const prev = getPrevPeriod(from, to);
+    const [res, prevRes] = await Promise.all([
+      fetchAll(from, to),
+      fetchAll(prev.from, prev.to)
+    ]);
+    const prevTotals = calcTotals(prevRes, prev.from, prev.to, UNITS_3700M, UNITS_BP);
+    render(res, from, to, prevTotals);
   } catch(e) {
     showErr('Error loading data: ' + e.message);
   } finally {
@@ -647,7 +694,7 @@ function monthLabel(ym) {
   return new Date(+y, +m-1).toLocaleString('en', {month:'short', year:'2-digit'});
 }
 
-function render(reservations, from, to) {
+function render(reservations, from, to, prev) {
   const confirmed = reservations.filter(r => r.status !== 'cancelled');
   const diffDays = getDaysInPeriod(from, to);
 
@@ -756,36 +803,43 @@ function render(reservations, from, to) {
       <div class="kpi-label">Total Revenue</div>
       <div class="kpi-value">${$c(totalRev)}</div>
       <div class="kpi-sub">${confirmed.length} bookings</div>
+      ${prev ? delta(totalRev, prev.totalRev) : ''}
     </div>
     <div class="kpi" style="--accent:var(--blue)">
       <div class="kpi-label">Room Revenue</div>
       <div class="kpi-value">${$c(totalRoomRev)}</div>
       <div class="kpi-sub">Net accommodation fare</div>
+      ${prev ? delta(totalRoomRev, prev.roomRev) : ''}
     </div>
     <div class="kpi" style="--accent:var(--text2)">
       <div class="kpi-label">Cleaning Fee</div>
       <div class="kpi-value">${$c(totalClean)}</div>
       <div class="kpi-sub">fareCleaning</div>
+      ${prev ? delta(totalClean, prev.clean) : ''}
     </div>
     <div class="kpi" style="--accent:var(--red)">
       <div class="kpi-label">OTA Commission</div>
       <div class="kpi-value">${$c(totalOtaComm)}</div>
       <div class="kpi-sub">Channel commission</div>
+      ${prev ? delta(totalOtaComm, prev.otaComm) : ''}
     </div>
     <div class="kpi" style="--accent:var(--green)">
       <div class="kpi-label">Occupancy</div>
       <div class="kpi-value">${pct(totalOcc)}</div>
       <div class="kpi-sub">${fmt(totalNights)} / ${fmt(totalAvail)} nights</div>
+      ${prev ? delta(totalOcc, prev.occ) : ''}
     </div>
     <div class="kpi" style="--accent:var(--amber)">
       <div class="kpi-label">ADR</div>
       <div class="kpi-value">${$c(totalADR)}</div>
       <div class="kpi-sub">Avg. daily rate</div>
+      ${prev ? delta(totalADR, prev.adr) : ''}
     </div>
     <div class="kpi" style="--accent:var(--amber)">
       <div class="kpi-label">RevPAR</div>
       <div class="kpi-value">${$c(totalRevPAR)}</div>
       <div class="kpi-sub">Per available night</div>
+      ${prev ? delta(totalRevPAR, prev.revpar) : ''}
     </div>
   `;
 
