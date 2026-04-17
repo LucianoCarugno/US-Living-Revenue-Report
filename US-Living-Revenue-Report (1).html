@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Living — Revenue Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0D1117;
+  --bg2: #161B22;
+  --bg3: #1C2230;
+  --border: #2A3441;
+  --border2: #333F50;
+  --text: #E8EDF3;
+  --text2: #8B9BB4;
+  --text3: #4D5D72;
+  --blue: #4A9EFF;
+  --blue2: #1E6FCC;
+  --blue-bg: rgba(74,158,255,0.08);
+  --green: #3DD68C;
+  --green2: #1A9E62;
+  --green-bg: rgba(61,214,140,0.08);
+  --amber: #F5A623;
+  --amber-bg: rgba(245,166,35,0.08);
+  --red: #FF5C5C;
+  --red-bg: rgba(255,92,92,0.08);
+  --purple: #A78BFA;
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Subtle grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(rgba(74,158,255,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(74,158,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page { max-width: 1280px; margin: 0 auto; padding: 24px 24px 48px; position: relative; z-index: 1; }
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--blue), var(--blue2));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #fff;
+  letter-spacing: -0.5px;
+}
+.brand-name { font-size: 17px; font-weight: 600; color: var(--text); }
+.brand-sub { font-size: 12px; color: var(--text3); font-weight: 400; margin-top: 1px; }
+
+.controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.controls label { font-size: 11px; color: var(--text3); margin-right: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.date-group { display: flex; align-items: center; gap: 6px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 12px; }
+.date-group input[type=date] {
+  background: none; border: none; color: var(--text); font-size: 13px;
+  font-family: 'DM Mono', monospace; outline: none; cursor: pointer;
+  color-scheme: dark;
+}
+.date-sep { color: var(--text3); font-size: 12px; }
+
+.btn {
+  font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+  padding: 8px 18px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg2);
+  color: var(--text2); cursor: pointer; transition: all .15s;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+.btn-primary {
+  background: var(--blue); color: #fff; border-color: var(--blue);
+  box-shadow: 0 0 20px rgba(74,158,255,0.2);
+}
+.btn-primary:hover { background: #5BABFF; border-color: #5BABFF; box-shadow: 0 0 28px rgba(74,158,255,0.35); }
+
+/* Tabs */
+.tabs {
+  display: flex; gap: 1px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 3px;
+  margin-bottom: 24px; width: fit-content;
+}
+.tab {
+  font-size: 13px; font-weight: 500; padding: 7px 18px;
+  cursor: pointer; color: var(--text3); border-radius: 7px;
+  transition: all .15s; white-space: nowrap;
+}
+.tab:hover { color: var(--text2); }
+.tab.active { background: var(--bg3); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+.tab.active.blue { color: var(--blue); }
+.tab.active.green { color: var(--green); }
+
+/* KPI Grid */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.kpi {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px 18px 14px;
+  position: relative; overflow: hidden; transition: border-color .2s;
+}
+.kpi:hover { border-color: var(--border2); }
+.kpi::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent, var(--blue));
+}
+.kpi-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.kpi-value { font-size: 26px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 6px; }
+.kpi-sub { font-size: 11px; color: var(--text3); }
+.kpi-delta { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
+.kpi-delta.up { background: rgba(61,214,140,0.12); color: var(--green); }
+.kpi-delta.down { background: rgba(255,92,92,0.12); color: var(--red); }
+.kpi-delta.neutral { background: var(--bg3); color: var(--text3); }
+
+/* Portfolio KPI rows */
+.portfolio-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.portfolio-kpi-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 18px;
+}
+.portfolio-kpi-card.blue { border-color: rgba(74,158,255,0.2); }
+.portfolio-kpi-card.green { border-color: rgba(61,214,140,0.2); }
+.portfolio-kpi-title { font-size: 12px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.portfolio-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.pstat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.pstat-value { font-size: 15px; font-weight: 600; font-family: 'DM Mono', monospace; }
+
+/* Charts */
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.chart-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.chart-full { margin-bottom: 12px; }
+.chart-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+}
+.chart-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 4px; }
+.chart-subtitle { font-size: 12px; color: var(--text2); margin-bottom: 16px; }
+.chart-wrap { position: relative; width: 100%; }
+.chart-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-line { width: 16px; height: 2px; border-radius: 1px; flex-shrink: 0; }
+
+/* Section divider */
+.section-label {
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 1px;
+  margin: 24px 0 12px; display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Tables */
+.table-wrap {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px;
+}
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead th {
+  padding: 10px 14px; text-align: left;
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  background: var(--bg3); border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+thead th.num { text-align: right; }
+tbody td {
+  padding: 9px 14px; border-bottom: 1px solid rgba(42,52,65,0.6);
+  color: var(--text); white-space: nowrap; font-family: 'DM Mono', monospace; font-size: 12px;
+}
+tbody td:first-child { font-family: 'DM Sans', sans-serif; font-weight: 500; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.num { text-align: right; }
+tr.total-row td {
+  font-weight: 600; background: rgba(74,158,255,0.05);
+  border-top: 1px solid var(--border); color: var(--blue);
+}
+
+/* Badges */
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+.badge-ok { background: rgba(61,214,140,0.12); color: var(--green); }
+.badge-warn { background: var(--amber-bg); color: var(--amber); }
+.badge-cancel { background: var(--red-bg); color: var(--red); }
+
+/* Channel bar */
+.channel-bars { display: flex; flex-direction: column; gap: 10px; }
+.channel-bar-item { display: flex; align-items: center; gap: 10px; }
+.channel-bar-label { font-size: 11px; color: var(--text2); width: 80px; flex-shrink: 0; }
+.channel-bar-track { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.channel-bar-fill { height: 100%; border-radius: 3px; transition: width .6s cubic-bezier(0.4,0,0.2,1); }
+.channel-bar-val { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text2); width: 60px; text-align: right; flex-shrink: 0; }
+.channel-bar-pct { font-size: 10px; color: var(--text3); width: 32px; text-align: right; flex-shrink: 0; }
+
+/* State boxes */
+.loading-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 48px;
+  text-align: center; color: var(--text2); margin-bottom: 16px;
+}
+.spinner {
+  display: inline-block; width: 22px; height: 22px;
+  border: 2px solid var(--border2); border-top-color: var(--blue);
+  border-radius: 50%; animation: spin .7s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.err-box {
+  background: var(--red-bg); border: 1px solid rgba(255,92,92,0.2);
+  border-radius: var(--radius); padding: 12px 16px;
+  font-size: 13px; color: var(--red); margin-bottom: 16px; display: none;
+}
+.empty-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 64px 32px;
+  text-align: center;
+}
+.empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.3; }
+.empty-title { font-size: 15px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+.empty-sub { font-size: 13px; color: var(--text3); }
+
+/* Occupancy unit chart */
+.occ-unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.occ-unit-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px;
+}
+.occ-unit-name { font-size: 10px; color: var(--text3); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.occ-unit-bar-track { height: 4px; background: var(--bg2); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+.occ-unit-bar-fill { height: 100%; border-radius: 2px; }
+.occ-unit-pct { font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; }
+
+/* Portfolio section header */
+.port-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 18px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  margin-bottom: 12px;
+}
+.port-header-title { font-size: 15px; font-weight: 600; }
+.port-header-stats { display: flex; gap: 20px; margin-left: auto; }
+.port-header-stat { text-align: right; }
+.port-header-stat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+.port-header-stat-val { font-size: 14px; font-weight: 600; font-family: 'DM Mono', monospace; }
+
+@media(max-width: 900px) {
+  .chart-row, .chart-row-3, .portfolio-kpis { grid-template-columns: 1fr; }
+  .portfolio-stats { grid-template-columns: repeat(2, 1fr); }
+  .port-header-stats { display: none; }
+}
+@media(max-width: 640px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-mark">US</div>
+      <div>
+        <div class="brand-name">US Living</div>
+        <div class="brand-sub">Revenue Intelligence</div>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="date-group">
+        <input type="date" id="df">
+        <span class="date-sep">—</span>
+        <input type="date" id="dt">
+      </div>
+      <button class="btn btn-primary" id="btnLoad" onclick="loadData()">Load Data</button>
+    </div>
+  </div>
+
+  <div class="err-box" id="errBox"></div>
+
+  <!-- Loading -->
+  <div id="loadBox" style="display:none" class="loading-box">
+    <div class="spinner"></div>
+    <div style="font-size:13px;color:var(--text3)">Fetching reservations from Guesty...</div>
+  </div>
+
+  <!-- Main content -->
+  <div id="main" style="display:none">
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active blue" onclick="showTab('overview',this)">Overview</div>
+      <div class="tab" onclick="showTab('tab3700',this)">3700M</div>
+      <div class="tab" onclick="showTab('tabBP',this)">Bayou Park</div>
+      <div class="tab" onclick="showTab('bookings',this)">Bookings</div>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview">
+      <!-- Top KPIs -->
+      <div class="kpi-grid" id="kpiTop"></div>
+
+      <!-- Portfolio KPIs -->
+      <div class="portfolio-kpis" id="portfolioKpis"></div>
+
+      <!-- Charts row 1: Revenue + Channel Mix -->
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-title">Total Revenue</div>
+          <div class="chart-subtitle">By month, stacked by portfolio</div>
+          <div class="chart-legend" id="legendRev"></div>
+          <div class="chart-wrap"><canvas id="chartRev" height="220"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Channel Mix</div>
+          <div class="chart-subtitle">Revenue by booking source</div>
+          <div id="channelBars" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <!-- Charts row 2: ADR, RevPAR, Occupancy % -->
+      <div class="chart-row-3">
+        <div class="chart-card">
+          <div class="chart-title">ADR Trend</div>
+          <div class="chart-subtitle">Average daily rate by month</div>
+          <div class="chart-legend" id="legendADR"></div>
+          <div class="chart-wrap"><canvas id="chartADR" height="180"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">RevPAR Trend</div>
+          <div class="chart-subtitle">Revenue per available night</div>
+          <div class="chart-legend" id="legendRevPAR"></div>
+          <div class="chart-wrap"><canvas id="chartRevPAR" height="180"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Occupancy %</div>
+          <div class="chart-subtitle">By portfolio per month</div>
+          <div class="chart-legend" id="legendOcc"></div>
+          <div class="chart-wrap"><canvas id="chartOcc" height="180"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Occupancy by unit -->
+      <div class="section-label">Occupancy by Unit</div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-title">3700M</div>
+          <div class="chart-subtitle" style="margin-bottom:14px">Dallas — McKinney Ave</div>
+          <div class="occ-unit-grid" id="occUnits3700"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Bayou Park</div>
+          <div class="chart-subtitle" style="margin-bottom:14px">Houston — Montrose / Midtown</div>
+          <div class="occ-unit-grid" id="occUnitsBP"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3700M TAB -->
+    <div id="tab-tab3700" style="display:none">
+      <div class="port-header" id="portHeader3700">
+        <div class="dot" style="background:var(--blue);width:10px;height:10px;border-radius:50%"></div>
+        <div class="port-header-title" style="color:var(--blue)">3700M</div>
+        <div style="font-size:12px;color:var(--text3)">Dallas — McKinney Ave · 10 units</div>
+        <div class="port-header-stats" id="portStats3700"></div>
+      </div>
+      <div class="table-wrap">
+        <table id="tbl3700">
+          <thead><tr>
+            <th>Unit</th>
+            <th class="num">Avail. Nights</th>
+            <th class="num">Occ. Nights</th>
+            <th class="num">Occupancy</th>
+            <th class="num">ADR</th>
+            <th class="num">RevPAR</th>
+            <th class="num">Room Revenue</th>
+            <th class="num">Cleaning Fee</th>
+            <th class="num">Total Revenue</th>
+            <th class="num">OTA Commission</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BAYOU PARK TAB -->
+    <div id="tab-tabBP" style="display:none">
+      <div class="port-header" id="portHeaderBP">
+        <div class="dot" style="background:var(--green);width:10px;height:10px;border-radius:50%"></div>
+        <div class="port-header-title" style="color:var(--green)">Bayou Park</div>
+        <div style="font-size:12px;color:var(--text3)">Houston — Montrose / Midtown · 20 units</div>
+        <div class="port-header-stats" id="portStatsBP"></div>
+      </div>
+      <div class="table-wrap">
+        <table id="tblBP">
+          <thead><tr>
+            <th>Unit</th>
+            <th class="num">Avail. Nights</th>
+            <th class="num">Occ. Nights</th>
+            <th class="num">Occupancy</th>
+            <th class="num">ADR</th>
+            <th class="num">RevPAR</th>
+            <th class="num">Room Revenue</th>
+            <th class="num">Cleaning Fee</th>
+            <th class="num">Total Revenue</th>
+            <th class="num">OTA Commission</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BOOKINGS TAB -->
+    <div id="tab-bookings" style="display:none">
+      <div class="table-wrap">
+        <table id="tblBookings">
+          <thead><tr>
+            <th>Property</th>
+            <th>Guest</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th class="num">Nights</th>
+            <th>Channel</th>
+            <th>Status</th>
+            <th class="num">Room Rev.</th>
+            <th class="num">Cleaning</th>
+            <th class="num">Total Rev.</th>
+            <th class="num">Commission</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div id="emptyBox" class="empty-box">
+    <div class="empty-icon">📊</div>
+    <div class="empty-title">Select a period to load data</div>
+    <div class="empty-sub">Choose a date range and click Load Data</div>
+  </div>
+
+</div>
+
+<script>
+const PROXY = 'https://guesty-proxy.luciano-bd7.workers.dev';
+const UNITS_3700M = 10;
+const UNITS_BP = 20;
+let charts = {};
+
+// Init dates
+const now = new Date();
+document.getElementById('df').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+document.getElementById('dt').value = now.toISOString().split('T')[0];
+
+function showTab(name, el) {
+  ['overview','tab3700','tabBP','bookings'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = 'none';
+  });
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.remove('active','blue','green');
+  });
+  document.getElementById('tab-'+name).style.display = '';
+  el.classList.add('active');
+  if (name === 'overview') el.classList.add('blue');
+  if (name === 'tab3700') el.classList.add('blue');
+  if (name === 'tabBP') el.classList.add('green');
+}
+
+function $c(v) { return '$' + Math.round(v).toLocaleString('en-US'); }
+function pct(v) { return Math.round(v * 100) + '%'; }
+function fmt(v) { return Math.round(v).toLocaleString('en-US'); }
+
+function getPortfolio(nickname) {
+  const n = (nickname || '').toLowerCase();
+  if (n.includes('3700m') || n.includes('3700 m') || n.includes('3700')) return '3700M';
+  if (n.includes('ubp') || n.includes('bayou') || n.includes('midtown') || n.includes('montrose') || n.includes('unit 1') || n.includes('unit 2') || n.includes('unit 3') || n.includes('two bed')) return 'Bayou Park';
+  // Fallback: check address
+  return null;
+}
+
+function getPortfolioFromRes(r) {
+  const nick = r.listing?.nickname || r.listing?.title || '';
+  const addr = r.listing?.address?.full || '';
+  let p = getPortfolio(nick);
+  if (!p) {
+    if (addr.includes('Dallas') || addr.includes('McKinney')) p = '3700M';
+    else if (addr.includes('Houston')) p = 'Bayou Park';
+    else p = 'Other';
+  }
+  return p;
+}
+
+function getDaysInPeriod(from, to) {
+  return Math.max(1, Math.ceil((new Date(to+' 00:00') - new Date(from+' 00:00')) / 86400000) + 1);
+}
+
+async function fetchAll(from, to) {
+  const r = await fetch(`${PROXY}/reservations?from=${from}&to=${to}`);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const d = await r.json();
+  if (d.error) throw new Error(d.error);
+  return d.results || [];
+}
+
+async function loadData() {
+  const from = document.getElementById('df').value;
+  const to = document.getElementById('dt').value;
+  if (!from || !to) { showErr('Please select a valid period.'); return; }
+  document.getElementById('errBox').style.display = 'none';
+  document.getElementById('main').style.display = 'none';
+  document.getElementById('emptyBox').style.display = 'none';
+  document.getElementById('loadBox').style.display = 'block';
+  document.getElementById('btnLoad').disabled = true;
+  try {
+    const res = await fetchAll(from, to);
+    render(res, from, to);
+  } catch(e) {
+    showErr('Error loading data: ' + e.message);
+  } finally {
+    document.getElementById('loadBox').style.display = 'none';
+    document.getElementById('btnLoad').disabled = false;
+  }
+}
+
+function showErr(m) {
+  document.getElementById('errBox').textContent = m;
+  document.getElementById('errBox').style.display = 'block';
+  document.getElementById('emptyBox').style.display = 'block';
+}
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+function accrueByMonth(reservations, from, to, getVal) {
+  const result = {};
+  reservations.forEach(r => {
+    const checkIn = new Date(r.checkIn);
+    const checkOut = new Date(r.checkOut);
+    const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
+    const val = getVal(r);
+    const daily = val / totalNights;
+    let cur = new Date(checkIn);
+    const start = new Date(from);
+    const end = new Date(to + 'T23:59:59');
+    while (cur < checkOut) {
+      if (cur >= start && cur <= end) {
+        const ym = cur.toISOString().substring(0, 7);
+        if (!result[ym]) result[ym] = 0;
+        result[ym] += daily;
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+  });
+  return result;
+}
+
+function monthLabel(ym) {
+  const [y, m] = ym.split('-');
+  return new Date(+y, +m-1).toLocaleString('en', {month:'short', year:'2-digit'});
+}
+
+function render(reservations, from, to) {
+  const confirmed = reservations.filter(r => r.status !== 'cancelled');
+  const diffDays = getDaysInPeriod(from, to);
+
+  // Aggregate by unit and portfolio
+  const byUnit = {};
+  const byPortfolio = {
+    '3700M': {roomRev:0, clean:0, otaComm:0, nights:0, count:0},
+    'Bayou Park': {roomRev:0, clean:0, otaComm:0, nights:0, count:0}
+  };
+  const byChannel = {};
+  const byMonthPortfolio = {};
+  const byMonthADR = {};
+  const byMonthRevPAR = {};
+  const byMonthOcc = {};
+
+  confirmed.forEach(r => {
+    const roomRev = r.money?.fareAccommodation || 0;
+    const clean = r.money?.fareCleaning || 0;
+    const otaComm = Math.abs(r.money?.hostServiceFee || 0);
+    const nights = r.nightsCount || 0;
+    const portfolio = getPortfolioFromRes(r);
+    const prop = r.listing?.nickname || r.listing?.title || '—';
+    const shortProp = prop.replace(/\*/g,'').trim();
+    const channel = r.source || 'Direct';
+    const channelLabel = channel === 'airbnb2' ? 'Airbnb' :
+                         channel === 'bookingCom' ? 'Booking.com' :
+                         channel === 'manual' ? 'Direct' : channel;
+
+    if (!byUnit[shortProp]) byUnit[shortProp] = {roomRev:0, clean:0, otaComm:0, nights:0, portfolio, count:0};
+    byUnit[shortProp].roomRev += roomRev;
+    byUnit[shortProp].clean += clean;
+    byUnit[shortProp].otaComm += otaComm;
+    byUnit[shortProp].nights += nights;
+    byUnit[shortProp].count++;
+
+    if (byPortfolio[portfolio]) {
+      byPortfolio[portfolio].roomRev += roomRev;
+      byPortfolio[portfolio].clean += clean;
+      byPortfolio[portfolio].otaComm += otaComm;
+      byPortfolio[portfolio].nights += nights;
+      byPortfolio[portfolio].count++;
+    }
+
+    if (!byChannel[channelLabel]) byChannel[channelLabel] = 0;
+    byChannel[channelLabel] += roomRev + clean;
+
+    // By month revenue
+    const checkIn = new Date(r.checkIn);
+    const checkOut = new Date(r.checkOut);
+    const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
+    const dailyRate = roomRev / totalNights;
+    let cur = new Date(checkIn);
+    while (cur < checkOut) {
+      const ym = cur.toISOString().substring(0, 7);
+      if (!byMonthPortfolio[ym]) byMonthPortfolio[ym] = {'3700M':0,'Bayou Park':0};
+      if (byMonthPortfolio[ym][portfolio] !== undefined) byMonthPortfolio[ym][portfolio] += dailyRate;
+      cur.setDate(cur.getDate() + 1);
+    }
+  });
+
+  // Month lists
+  const months = Object.keys(byMonthPortfolio).sort();
+
+  // Compute ADR, RevPAR, Occ by month per portfolio
+  months.forEach(ym => {
+    const [y, m] = ym.split('-');
+    const daysInMonth = new Date(+y, +m, 0).getDate();
+    const monthStart = ym + '-01';
+    const monthEnd = ym + '-' + String(daysInMonth).padStart(2,'0');
+
+    ['3700M','Bayou Park'].forEach(port => {
+      const unitCount = port === '3700M' ? UNITS_3700M : UNITS_BP;
+      const portRes = confirmed.filter(r => {
+        const p = getPortfolioFromRes(r);
+        return p === port && r.checkIn && r.checkIn.substring(0,7) === ym;
+      });
+      const portNights = portRes.reduce((a,r) => a + (r.nightsCount||0), 0);
+      const portRev = portRes.reduce((a,r) => a + (r.money?.fareAccommodation||0), 0);
+      const avail = unitCount * daysInMonth;
+      if (!byMonthADR[ym]) byMonthADR[ym] = {};
+      if (!byMonthRevPAR[ym]) byMonthRevPAR[ym] = {};
+      if (!byMonthOcc[ym]) byMonthOcc[ym] = {};
+      byMonthADR[ym][port] = portNights > 0 ? portRev / portNights : 0;
+      byMonthRevPAR[ym][port] = avail > 0 ? portRev / avail : 0;
+      byMonthOcc[ym][port] = avail > 0 ? portNights / avail * 100 : 0;
+    });
+  });
+
+  const totalRoomRev = byPortfolio['3700M'].roomRev + byPortfolio['Bayou Park'].roomRev;
+  const totalClean = byPortfolio['3700M'].clean + byPortfolio['Bayou Park'].clean;
+  const totalOtaComm = byPortfolio['3700M'].otaComm + byPortfolio['Bayou Park'].otaComm;
+  const totalNights = byPortfolio['3700M'].nights + byPortfolio['Bayou Park'].nights;
+  const totalAvail = (UNITS_3700M + UNITS_BP) * diffDays;
+  const totalRev = totalRoomRev + totalClean;
+  const totalOcc = totalAvail > 0 ? totalNights / totalAvail : 0;
+  const totalADR = totalNights > 0 ? totalRoomRev / totalNights : 0;
+  const totalRevPAR = totalAvail > 0 ? totalRoomRev / totalAvail : 0;
+
+  // ---- TOP KPIs ----
+  document.getElementById('kpiTop').innerHTML = `
+    <div class="kpi" style="--accent:var(--blue)">
+      <div class="kpi-label">Total Revenue</div>
+      <div class="kpi-value">${$c(totalRev)}</div>
+      <div class="kpi-sub">Room + Cleaning fees</div>
+    </div>
+    <div class="kpi" style="--accent:var(--blue)">
+      <div class="kpi-label">Room Revenue</div>
+      <div class="kpi-value">${$c(totalRoomRev)}</div>
+      <div class="kpi-sub">${confirmed.length} bookings</div>
+    </div>
+    <div class="kpi" style="--accent:var(--green)">
+      <div class="kpi-label">Occupancy</div>
+      <div class="kpi-value">${pct(totalOcc)}</div>
+      <div class="kpi-sub">${fmt(totalNights)} / ${fmt(totalAvail)} nights</div>
+    </div>
+    <div class="kpi" style="--accent:var(--amber)">
+      <div class="kpi-label">ADR</div>
+      <div class="kpi-value">${$c(totalADR)}</div>
+      <div class="kpi-sub">Avg. daily rate</div>
+    </div>
+    <div class="kpi" style="--accent:var(--amber)">
+      <div class="kpi-label">RevPAR</div>
+      <div class="kpi-value">${$c(totalRevPAR)}</div>
+      <div class="kpi-sub">Per available night</div>
+    </div>
+    <div class="kpi" style="--accent:var(--red)">
+      <div class="kpi-label">OTA Commission</div>
+      <div class="kpi-value">${$c(totalOtaComm)}</div>
+      <div class="kpi-sub">Cleaning: ${$c(totalClean)}</div>
+    </div>
+  `;
+
+  // ---- PORTFOLIO KPIs ----
+  function portKpiHtml(port, color, unitCount) {
+    const p = byPortfolio[port];
+    const avail = unitCount * diffDays;
+    const occ = avail > 0 ? p.nights / avail : 0;
+    const adr = p.nights > 0 ? p.roomRev / p.nights : 0;
+    const revpar = avail > 0 ? p.roomRev / avail : 0;
+    return `
+      <div class="portfolio-kpi-card ${color}">
+        <div class="portfolio-kpi-title">
+          <div class="dot" style="background:var(--${color})"></div>
+          <span style="color:var(--${color})">${port}</span>
+          <span style="font-size:11px;color:var(--text3);font-weight:400">${unitCount} units · ${p.count} bookings</span>
+        </div>
+        <div class="portfolio-stats">
+          <div><div class="pstat-label">Occ.</div><div class="pstat-value" style="color:var(--${color})">${pct(occ)}</div></div>
+          <div><div class="pstat-label">ADR</div><div class="pstat-value">${$c(adr)}</div></div>
+          <div><div class="pstat-label">RevPAR</div><div class="pstat-value">${$c(revpar)}</div></div>
+          <div><div class="pstat-label">Revenue</div><div class="pstat-value">${$c(p.roomRev)}</div></div>
+        </div>
+      </div>`;
+  }
+  document.getElementById('portfolioKpis').innerHTML =
+    portKpiHtml('3700M', 'blue', UNITS_3700M) +
+    portKpiHtml('Bayou Park', 'green', UNITS_BP);
+
+  // ---- CHARTS ----
+  const monthLabels = months.map(monthLabel);
+  const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+
+  // Revenue chart
+  document.getElementById('legendRev').innerHTML = `
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>3700M</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Bayou Park</div>`;
+  destroyChart('rev');
+  charts.rev = new Chart(document.getElementById('chartRev'), {
+    type: 'bar',
+    data: {
+      labels: monthLabels,
+      datasets: [
+        { label: '3700M', data: months.map(m => Math.round(byMonthPortfolio[m]['3700M'])), backgroundColor: 'rgba(74,158,255,0.85)', borderRadius: 3, borderSkipped: false },
+        { label: 'Bayou Park', data: months.map(m => Math.round(byMonthPortfolio[m]['Bayou Park'])), backgroundColor: 'rgba(61,214,140,0.85)', borderRadius: 3, borderSkipped: false }
+      ]
+    },
+    options: { ...CHART_OPTS, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + $c(ctx.parsed.y) } } },
+      scales: {
+        x: { stacked: true, ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } },
+        y: { stacked: true, ticks: { color: '#4D5D72', font: { size: 10 }, callback: v => '$'+(v/1000).toFixed(0)+'k' }, grid: { color: 'rgba(42,52,65,0.5)' } }
+      }
+    }
+  });
+
+  // Channel mix
+  const channelTotal = Object.values(byChannel).reduce((a,b) => a+b, 0);
+  const channelColors = { 'Airbnb': '#FF5A5F', 'Booking.com': '#003580', 'Direct': '#4A9EFF', 'VRBO': '#4B9E3B' };
+  const sortedChannels = Object.entries(byChannel).sort((a,b) => b[1]-a[1]);
+  document.getElementById('channelBars').innerHTML = `
+    <div class="channel-bars">
+      ${sortedChannels.map(([ch, rev]) => `
+        <div class="channel-bar-item">
+          <div class="channel-bar-label">${ch}</div>
+          <div class="channel-bar-track">
+            <div class="channel-bar-fill" style="width:${channelTotal>0?rev/channelTotal*100:0}%;background:${channelColors[ch]||'var(--purple)'}"></div>
+          </div>
+          <div class="channel-bar-val">${$c(rev)}</div>
+          <div class="channel-bar-pct">${channelTotal>0?Math.round(rev/channelTotal*100)+'%':''}</div>
+        </div>`).join('')}
+    </div>`;
+
+  // ADR chart
+  document.getElementById('legendADR').innerHTML = `
+    <div class="legend-item"><div class="legend-line" style="background:var(--blue)"></div>3700M</div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--green);border-top:2px dashed var(--green)"></div>Bayou Park</div>`;
+  destroyChart('adr');
+  charts.adr = new Chart(document.getElementById('chartADR'), {
+    type: 'line',
+    data: {
+      labels: monthLabels,
+      datasets: [
+        { label: '3700M', data: months.map(m => Math.round(byMonthADR[m]?.['3700M']||0)), borderColor: '#4A9EFF', backgroundColor: 'rgba(74,158,255,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#4A9EFF' },
+        { label: 'Bayou Park', data: months.map(m => Math.round(byMonthADR[m]?.['Bayou Park']||0)), borderColor: '#3DD68C', backgroundColor: 'rgba(61,214,140,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#3DD68C', borderDash: [5,3] }
+      ]
+    },
+    options: { ...CHART_OPTS, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + $c(ctx.parsed.y) } } },
+      scales: { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#4D5D72', font: { size: 10 }, callback: v => '$'+v }, grid: { color: 'rgba(42,52,65,0.5)' } } }
+    }
+  });
+
+  // RevPAR chart
+  document.getElementById('legendRevPAR').innerHTML = document.getElementById('legendADR').innerHTML;
+  destroyChart('revpar');
+  charts.revpar = new Chart(document.getElementById('chartRevPAR'), {
+    type: 'line',
+    data: {
+      labels: monthLabels,
+      datasets: [
+        { label: '3700M', data: months.map(m => Math.round(byMonthRevPAR[m]?.['3700M']||0)), borderColor: '#F5A623', backgroundColor: 'rgba(245,166,35,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#F5A623' },
+        { label: 'Bayou Park', data: months.map(m => Math.round(byMonthRevPAR[m]?.['Bayou Park']||0)), borderColor: '#A78BFA', backgroundColor: 'rgba(167,139,250,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#A78BFA', borderDash: [5,3] }
+      ]
+    },
+    options: { ...CHART_OPTS, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + $c(ctx.parsed.y) } } },
+      scales: { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#4D5D72', font: { size: 10 }, callback: v => '$'+v }, grid: { color: 'rgba(42,52,65,0.5)' } } }
+    }
+  });
+
+  // Occupancy chart
+  document.getElementById('legendOcc').innerHTML = `
+    <div class="legend-item"><div class="legend-line" style="background:var(--blue)"></div>3700M</div>
+    <div class="legend-item"><div class="legend-line" style="background:var(--green)"></div>Bayou Park</div>`;
+  destroyChart('occ');
+  charts.occ = new Chart(document.getElementById('chartOcc'), {
+    type: 'line',
+    data: {
+      labels: monthLabels,
+      datasets: [
+        { label: '3700M', data: months.map(m => Math.round(byMonthOcc[m]?.['3700M']||0)), borderColor: '#4A9EFF', backgroundColor: 'rgba(74,158,255,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#4A9EFF' },
+        { label: 'Bayou Park', data: months.map(m => Math.round(byMonthOcc[m]?.['Bayou Park']||0)), borderColor: '#3DD68C', backgroundColor: 'rgba(61,214,140,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#3DD68C', borderDash: [5,3] }
+      ]
+    },
+    options: { ...CHART_OPTS, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y + '%' } } },
+      scales: { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { min:0, max:100, ticks: { color: '#4D5D72', font: { size: 10 }, callback: v => v+'%' }, grid: { color: 'rgba(42,52,65,0.5)' } } }
+    }
+  });
+
+  // ---- OCCUPANCY BY UNIT ----
+  function renderOccUnits(containerId, portfolio, unitCount) {
+    const units = Object.entries(byUnit)
+      .filter(([,u]) => u.portfolio === portfolio)
+      .sort((a,b) => b[1].nights - a[1].nights);
+    const color = portfolio === '3700M' ? '#4A9EFF' : '#3DD68C';
+    const avail = diffDays;
+    document.getElementById(containerId).innerHTML = units.map(([name, u]) => {
+      const occPct = avail > 0 ? Math.min(100, u.nights / avail * 100) : 0;
+      const shortName = name.replace(/^(Unit\s+|Apt\s+)/i,'').split('-')[0].trim().split(' ').slice(0,2).join(' ');
+      return `
+        <div class="occ-unit-card">
+          <div class="occ-unit-name" title="${name}">${shortName}</div>
+          <div class="occ-unit-bar-track"><div class="occ-unit-bar-fill" style="width:${occPct}%;background:${color}"></div></div>
+          <div class="occ-unit-pct" style="color:${color}">${Math.round(occPct)}%</div>
+        </div>`;
+    }).join('');
+  }
+  renderOccUnits('occUnits3700', '3700M', UNITS_3700M);
+  renderOccUnits('occUnitsBP', 'Bayou Park', UNITS_BP);
+
+  // ---- PORTFOLIO TABLES ----
+  function buildPortTable(portfolio, tableId, unitCount, portHeaderStatsId) {
+    const units = Object.entries(byUnit)
+      .filter(([,u]) => u.portfolio === portfolio)
+      .sort((a,b) => b[1].roomRev - a[1].roomRev);
+    const avail = diffDays;
+    let totRoomRev=0, totClean=0, totOtaComm=0, totNights=0;
+
+    const rows = units.map(([name, u]) => {
+      const occ = avail > 0 ? u.nights/avail : 0;
+      const adr = u.nights > 0 ? u.roomRev/u.nights : 0;
+      const revpar = avail > 0 ? u.roomRev/avail : 0;
+      const totRev = u.roomRev + u.clean;
+      totRoomRev+=u.roomRev; totClean+=u.clean; totOtaComm+=u.otaComm; totNights+=u.nights;
+      return `<tr>
+        <td>${name}</td>
+        <td class="num">${avail}</td>
+        <td class="num">${Math.round(u.nights)}</td>
+        <td class="num">${pct(occ)}</td>
+        <td class="num">${$c(adr)}</td>
+        <td class="num">${$c(revpar)}</td>
+        <td class="num">${$c(u.roomRev)}</td>
+        <td class="num">${$c(u.clean)}</td>
+        <td class="num">${$c(totRev)}</td>
+        <td class="num">${$c(u.otaComm)}</td>
+      </tr>`;
+    }).join('');
+
+    const totalAvailPort = unitCount * diffDays;
+    const totOcc = totalAvailPort > 0 ? totNights/totalAvailPort : 0;
+    const totADR = totNights > 0 ? totRoomRev/totNights : 0;
+    const totRevPAR = totalAvailPort > 0 ? totRoomRev/totalAvailPort : 0;
+    const totRev = totRoomRev + totClean;
+
+    document.querySelector(`#${tableId} tbody`).innerHTML = rows + `
+      <tr class="total-row">
+        <td>TOTAL</td>
+        <td class="num">${totalAvailPort}</td>
+        <td class="num">${Math.round(totNights)}</td>
+        <td class="num">${pct(totOcc)}</td>
+        <td class="num">${$c(totADR)}</td>
+        <td class="num">${$c(totRevPAR)}</td>
+        <td class="num">${$c(totRoomRev)}</td>
+        <td class="num">${$c(totClean)}</td>
+        <td class="num">${$c(totRev)}</td>
+        <td class="num">${$c(totOtaComm)}</td>
+      </tr>`;
+
+    document.getElementById(portHeaderStatsId).innerHTML = `
+      <div class="port-header-stat"><div class="port-header-stat-label">Occupancy</div><div class="port-header-stat-val">${pct(totOcc)}</div></div>
+      <div class="port-header-stat"><div class="port-header-stat-label">ADR</div><div class="port-header-stat-val">${$c(totADR)}</div></div>
+      <div class="port-header-stat"><div class="port-header-stat-label">RevPAR</div><div class="port-header-stat-val">${$c(totRevPAR)}</div></div>
+      <div class="port-header-stat"><div class="port-header-stat-label">Room Revenue</div><div class="port-header-stat-val">${$c(totRoomRev)}</div></div>`;
+  }
+
+  buildPortTable('3700M', 'tbl3700', UNITS_3700M, 'portStats3700');
+  buildPortTable('Bayou Park', 'tblBP', UNITS_BP, 'portStatsBP');
+
+  // ---- BOOKINGS TABLE ----
+  const sorted = [...reservations].sort((a,b) => (b.checkIn||'').localeCompare(a.checkIn||''));
+  document.querySelector('#tblBookings tbody').innerHTML = sorted.slice(0, 500).map(r => {
+    const roomRev = r.money?.fareAccommodation || 0;
+    const clean = r.money?.fareCleaning || 0;
+    const otaComm = Math.abs(r.money?.hostServiceFee || 0);
+    const totRev = roomRev + clean;
+    const prop = (r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
+    const guest = r.guest?.fullName || '—';
+    const ci = r.checkIn ? r.checkIn.split('T')[0] : '—';
+    const co = r.checkOut ? r.checkOut.split('T')[0] : '—';
+    const nights = r.nightsCount || '—';
+    const ch = r.source === 'airbnb2' ? 'Airbnb' : r.source === 'bookingCom' ? 'Booking.com' : r.source === 'manual' ? 'Direct' : (r.source||'Direct');
+    const st = r.status || 'confirmed';
+    const badge = st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok';
+    const stLabel = st==='cancelled'?'Cancelled':st==='inquiry'?'Inquiry':'Confirmed';
+    return `<tr>
+      <td>${prop}</td><td style="font-family:'DM Sans',sans-serif">${guest}</td>
+      <td>${ci}</td><td>${co}</td>
+      <td class="num">${nights}</td>
+      <td style="font-family:'DM Sans',sans-serif">${ch}</td>
+      <td><span class="badge ${badge}">${stLabel}</span></td>
+      <td class="num">${$c(roomRev)}</td>
+      <td class="num">${$c(clean)}</td>
+      <td class="num">${$c(totRev)}</td>
+      <td class="num">${$c(otaComm)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('main').style.display = 'block';
+  document.getElementById('emptyBox').style.display = 'none';
+}
+</script>
+</body>
+</html>
