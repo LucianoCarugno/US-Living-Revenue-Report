@@ -341,11 +341,18 @@ tr.total-row td {
         <input type="date" id="dt">
       </div>
       <button class="btn btn-primary" id="btnLoad" onclick="loadData()">Load Data</button>
+      <label class="btn" id="btnCSV" style="cursor:pointer" title="Upload Guesty CSV export">📂 Upload CSV
+        <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="loadCSV(this)">
+      </label>
       <button class="btn" id="btnPDF" onclick="exportPDF()" style="display:none">⬇ Export PDF</button>
     </div>
   </div>
 
   <div class="err-box" id="errBox"></div>
+  <div id="csvBanner" style="display:none;background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.2);border-radius:10px;padding:10px 16px;margin-bottom:12px;font-size:12px;color:var(--blue);display:none;align-items:center;gap:8px">
+    📂 <strong>CSV mode</strong> — usando datos del archivo Guesty. <span id="csvInfo"></span>
+    <button onclick="clearCSV()" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px">✕ Limpiar</button>
+  </div>
 
   <!-- Loading -->
   <div id="loadBox" style="display:none" class="loading-box">
@@ -675,6 +682,85 @@ function getDaysInPeriod(from, to) {
   return Math.max(1, Math.ceil((new Date(to+' 00:00') - new Date(from+' 00:00')) / 86400000) + 1);
 }
 
+// CSV data store
+let csvReservations = null;
+
+function clearCSV() {
+  csvReservations = null;
+  document.getElementById('csvBanner').style.display = 'none';
+  document.getElementById('csvFile').value = '';
+}
+
+function parseCSV(text) {
+  const lines = text.split('\n').slice(1).filter(l => l.trim());
+  const reservations = [];
+  
+  lines.forEach(line => {
+    // Handle quoted CSV fields
+    const cols = [];
+    let cur = '', inQuote = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') { inQuote = !inQuote; }
+      else if (line[i] === ',' && !inQuote) { cols.push(cur.trim()); cur = ''; }
+      else { cur += line[i]; }
+    }
+    cols.push(cur.trim());
+    
+    const clean = c => (c||'').replace(/^"|"$/g,'').trim();
+    const ciStr  = clean(cols[5]);
+    const coStr  = clean(cols[6]);
+    const status = clean(cols[9]);
+    const nick   = clean(cols[11]);
+    const source = clean(cols[7]);
+    const guest  = clean(cols[4]);
+    const roomRev  = parseFloat(clean(cols[12])) || 0;
+    const cleanFee = parseFloat(clean(cols[13])) || 0;
+    const comm     = Math.abs(parseFloat(clean(cols[14])) || 0);
+    const otaAdj   = parseFloat(clean(cols[15])) || 0;
+    const confirmCode = clean(cols[2]);
+    
+    if (!ciStr || !coStr) return;
+    
+    const ci = new Date(ciStr + 'T00:00:00');
+    const co = new Date(coStr + 'T00:00:00');
+    const nights = Math.max(1, Math.round((co - ci) / 86400000));
+    
+    // Build a reservation object compatible with our render function
+    reservations.push({
+      checkIn: ci.toISOString(),
+      checkOut: co.toISOString(),
+      nightsCount: nights,
+      status: status,
+      source: source === 'airbnb2' ? 'airbnb2' : source === 'Booking.com' ? 'bookingCom' : source === 'manual' ? 'manual' : source,
+      confirmationCode: confirmCode,
+      guest: { fullName: guest || '—' },
+      listing: { nickname: nick, title: nick, address: { full: '' } },
+      money: {
+        fareAccommodation: roomRev,
+        fareCleaning: cleanFee,
+        hostServiceFee: comm,
+        resolutionAmount: otaAdj
+      }
+    });
+  });
+  
+  return reservations;
+}
+
+async function loadCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  const text = await file.text();
+  csvReservations = parseCSV(text);
+  
+  document.getElementById('csvInfo').textContent = `${csvReservations.length} reservas cargadas de ${file.name}`;
+  document.getElementById('csvBanner').style.display = 'flex';
+  
+  // Auto-load with current dates
+  loadData();
+}
+
 async function fetchAll(from, to) {
   // Expand from by 90 days to catch long stays that started before the period
   const expandedFrom = new Date(from + ' 00:00');
@@ -740,8 +826,8 @@ async function loadData() {
   try {
     const prev = getPrevPeriod(from, to);
     const [res, prevRes, listingsRes] = await Promise.all([
-      fetchAll(from, to),
-      fetchAll(prev.from, prev.to),
+      csvReservations ? Promise.resolve(csvReservations) : fetchAll(from, to),
+      csvReservations ? Promise.resolve(csvReservations) : fetchAll(prev.from, prev.to),
       fetch(`${PROXY}/listings`).then(r=>r.json()).catch(()=>({results:[]}))
     ]);
     const allListings = (listingsRes.results || []).filter(l => l.nickname && !l.nickname.toLowerCase().includes('test'));
