@@ -1270,18 +1270,18 @@ function redrawPortChart(portfolio, chartType) {
 
   const DATALABEL_OPTS = {
     display: true,
-    color: 'rgba(232,237,243,0.75)',
-    font: { size: 9, family: 'DM Mono' },
+    color: 'rgba(232,237,243,0.85)',
+    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
     anchor: 'end',
     align: 'top',
     offset: 2,
-    formatter: v => v > 0 ? '$' + Math.round(v) : null
+    formatter: v => v > 0 ? '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : Math.round(v)) : null
   };
 
   const DATALABEL_PCT = {
     display: true,
-    color: 'rgba(232,237,243,0.75)',
-    font: { size: 9, family: 'DM Mono' },
+    color: 'rgba(232,237,243,0.85)',
+    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
     anchor: 'end',
     align: 'top',
     offset: 2,
@@ -1356,18 +1356,18 @@ function redrawChart(chartId) {
 
   const DATALABEL_OPTS = {
     display: true,
-    color: 'rgba(232,237,243,0.75)',
-    font: { size: 9, family: 'DM Mono' },
+    color: 'rgba(232,237,243,0.85)',
+    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
     anchor: 'end',
     align: 'top',
     offset: 2,
-    formatter: v => v > 0 ? '$' + Math.round(v) : null
+    formatter: v => v > 0 ? '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : Math.round(v)) : null
   };
 
   const DATALABEL_PCT = {
     display: true,
-    color: 'rgba(232,237,243,0.75)',
-    font: { size: 9, family: 'DM Mono' },
+    color: 'rgba(232,237,243,0.85)',
+    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
     anchor: 'end',
     align: 'top',
     offset: 2,
@@ -1697,18 +1697,18 @@ function render(reservations, from, to, prev, allListings) {
 
   const DATALABEL_OPTS = {
     display: true,
-    color: 'rgba(232,237,243,0.75)',
-    font: { size: 9, family: 'DM Mono' },
+    color: 'rgba(232,237,243,0.85)',
+    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
     anchor: 'end',
     align: 'top',
     offset: 2,
-    formatter: v => v > 0 ? '$' + Math.round(v) : null
+    formatter: v => v > 0 ? '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : Math.round(v)) : null
   };
 
   const DATALABEL_PCT = {
     display: true,
-    color: 'rgba(232,237,243,0.75)',
-    font: { size: 9, family: 'DM Mono' },
+    color: 'rgba(232,237,243,0.85)',
+    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
     anchor: 'end',
     align: 'top',
     offset: 2,
