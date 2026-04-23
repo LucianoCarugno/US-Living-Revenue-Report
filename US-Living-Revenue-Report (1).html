@@ -503,8 +503,18 @@ tr.total-row td {
       <!-- Charts row -->
       <div class="chart-row">
         <div class="chart-card">
-          <div class="chart-title">Revenue by Month</div>
-          <div class="chart-subtitle">Room revenue accrued daily</div>
+          <div class="chart-header">
+            <div class="chart-header-left">
+              <div class="chart-title">Revenue by Month</div>
+              <div class="chart-subtitle">Room revenue accrued daily</div>
+            </div>
+            <div class="period-btns" id="periodRev3700">
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','rev',6,this)">6M</button>
+              <button class="period-btn active" onclick="setPortChartPeriod('3700M','rev',12,this)">12M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','rev',24,this)">24M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','rev',0,this)">All</button>
+            </div>
+          </div>
           <div class="chart-wrap"><canvas id="chartRev3700" height="180"></canvas></div>
         </div>
         <div class="chart-card">
@@ -515,15 +525,39 @@ tr.total-row td {
       </div>
       <div class="chart-row-3">
         <div class="chart-card">
-          <div class="chart-title">ADR Trend</div>
+          <div class="chart-header">
+            <div class="chart-header-left"><div class="chart-title">ADR Trend</div></div>
+            <div class="period-btns" id="periodADR3700">
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','adr',6,this)">6M</button>
+              <button class="period-btn active" onclick="setPortChartPeriod('3700M','adr',12,this)">12M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','adr',24,this)">24M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','adr',0,this)">All</button>
+            </div>
+          </div>
           <div class="chart-wrap"><canvas id="chartADR3700" height="160"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">RevPAR Trend</div>
+          <div class="chart-header">
+            <div class="chart-header-left"><div class="chart-title">RevPAR Trend</div></div>
+            <div class="period-btns" id="periodRevPAR3700">
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','revpar',6,this)">6M</button>
+              <button class="period-btn active" onclick="setPortChartPeriod('3700M','revpar',12,this)">12M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','revpar',24,this)">24M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','revpar',0,this)">All</button>
+            </div>
+          </div>
           <div class="chart-wrap"><canvas id="chartRevPAR3700" height="160"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">Occupancy %</div>
+          <div class="chart-header">
+            <div class="chart-header-left"><div class="chart-title">Occupancy %</div></div>
+            <div class="period-btns" id="periodOcc3700">
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','occ',6,this)">6M</button>
+              <button class="period-btn active" onclick="setPortChartPeriod('3700M','occ',12,this)">12M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','occ',24,this)">24M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('3700M','occ',0,this)">All</button>
+            </div>
+          </div>
           <div class="chart-wrap"><canvas id="chartOcc3700" height="160"></canvas></div>
         </div>
       </div>
@@ -560,8 +594,18 @@ tr.total-row td {
       <!-- Charts row -->
       <div class="chart-row">
         <div class="chart-card">
-          <div class="chart-title">Revenue by Month</div>
-          <div class="chart-subtitle">Room revenue accrued daily</div>
+          <div class="chart-header">
+            <div class="chart-header-left">
+              <div class="chart-title">Revenue by Month</div>
+              <div class="chart-subtitle">Room revenue accrued daily</div>
+            </div>
+            <div class="period-btns" id="periodRevBP">
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','rev',6,this)">6M</button>
+              <button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','rev',12,this)">12M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','rev',24,this)">24M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','rev',0,this)">All</button>
+            </div>
+          </div>
           <div class="chart-wrap"><canvas id="chartRevBP" height="180"></canvas></div>
         </div>
         <div class="chart-card">
@@ -572,15 +616,39 @@ tr.total-row td {
       </div>
       <div class="chart-row-3">
         <div class="chart-card">
-          <div class="chart-title">ADR Trend</div>
+          <div class="chart-header">
+            <div class="chart-header-left"><div class="chart-title">ADR Trend</div></div>
+            <div class="period-btns" id="periodADRBP">
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','adr',6,this)">6M</button>
+              <button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','adr',12,this)">12M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','adr',24,this)">24M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','adr',0,this)">All</button>
+            </div>
+          </div>
           <div class="chart-wrap"><canvas id="chartADRBP" height="160"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">RevPAR Trend</div>
+          <div class="chart-header">
+            <div class="chart-header-left"><div class="chart-title">RevPAR Trend</div></div>
+            <div class="period-btns" id="periodRevPARBP">
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','revpar',6,this)">6M</button>
+              <button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','revpar',12,this)">12M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','revpar',24,this)">24M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','revpar',0,this)">All</button>
+            </div>
+          </div>
           <div class="chart-wrap"><canvas id="chartRevPARBP" height="160"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">Occupancy %</div>
+          <div class="chart-header">
+            <div class="chart-header-left"><div class="chart-title">Occupancy %</div></div>
+            <div class="period-btns" id="periodOccBP">
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','occ',6,this)">6M</button>
+              <button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','occ',12,this)">12M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','occ',24,this)">24M</button>
+              <button class="period-btn" onclick="setPortChartPeriod('Bayou Park','occ',0,this)">All</button>
+            </div>
+          </div>
           <div class="chart-wrap"><canvas id="chartOccBP" height="160"></canvas></div>
         </div>
       </div>
@@ -1015,6 +1083,66 @@ function setChartPeriod(chartId, months, btn) {
   redrawChart(chartId);
 }
 
+// Portfolio chart period state
+const portChartPeriods = {
+  '3700M':      { rev: 12, adr: 12, revpar: 12, occ: 12 },
+  'Bayou Park': { rev: 12, adr: 12, revpar: 12, occ: 12 }
+};
+
+function setPortChartPeriod(portfolio, chartType, months, btn) {
+  portChartPeriods[portfolio][chartType] = months;
+  const container = btn.parentElement;
+  container.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  redrawPortChart(portfolio, chartType);
+}
+
+function redrawPortChart(portfolio, chartType) {
+  if (!_lastPortRenderData) return;
+  const portData = _lastPortRenderData[portfolio];
+  if (!portData) return;
+  const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc, hexColor, rgbaColor, rgbaFill, ids } = portData;
+  const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+  const scaleOpts = { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { color: 'rgba(42,52,65,0.5)' } } };
+
+  const filteredMonths = filterMonths(months, portChartPeriods[portfolio][chartType]);
+  const labels = filteredMonths.map(monthLabel);
+
+  if (chartType === 'rev') {
+    destroyChart(ids.rev);
+    charts[ids.rev] = new Chart(document.getElementById(ids.rev), {
+      type: 'bar',
+      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0)), backgroundColor: rgbaColor, borderRadius: 3 }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+Math.round(ctx.parsed.y).toLocaleString()}}},
+        scales: { x:{...scaleOpts.x,stacked:true}, y:{...scaleOpts.y,ticks:{...scaleOpts.y.ticks,callback:v=>'$'+(v/1000).toFixed(0)+'k'}} } }
+    });
+  } else if (chartType === 'adr') {
+    destroyChart(ids.adr);
+    charts[ids.adr] = new Chart(document.getElementById(ids.adr), {
+      type: 'line',
+      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthADR[m]?.[portfolio]||0)), borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y}}},
+        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
+    });
+  } else if (chartType === 'revpar') {
+    destroyChart(ids.revpar);
+    charts[ids.revpar] = new Chart(document.getElementById(ids.revpar), {
+      type: 'line',
+      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthRevPAR[m]?.[portfolio]||0)), borderColor: '#F5A623', backgroundColor: 'rgba(245,166,35,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#F5A623' }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y}}},
+        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
+    });
+  } else if (chartType === 'occ') {
+    destroyChart(ids.occ);
+    charts[ids.occ] = new Chart(document.getElementById(ids.occ), {
+      type: 'line',
+      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthOcc[m]?.[portfolio]||0)), borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},
+        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, min:0, max:100, ticks:{...scaleOpts.y.ticks,callback:v=>v+'%'} } } }
+    });
+  }
+}
+
 function filterMonths(months, periodMonths) {
   if (!periodMonths) return months;
   if (months.length <= periodMonths) return months;
@@ -1022,6 +1150,7 @@ function filterMonths(months, periodMonths) {
 }
 
 let _lastRenderData = null; // store last render data for redraw
+let _lastPortRenderData = {}; // store per-portfolio render data for redraw
 
 function redrawChart(chartId) {
   if (!_lastRenderData) return;
@@ -1520,6 +1649,9 @@ function render(reservations, from, to, prev, allListings) {
         </div>`).join('')}
     </div>`;
 
+    // Store for period filter redraw
+    _lastPortRenderData[portfolio] = { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc, hexColor, rgbaColor, rgbaFill, ids };
+
     // Monthly stats for this portfolio
     const portMonthRevData = months.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0));
     const portMonthADR = months.map(m => Math.round(byMonthADR[m]?.[portfolio]||0));
@@ -1528,34 +1660,38 @@ function render(reservations, from, to, prev, allListings) {
 
     const scaleOpts = { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { color: 'rgba(42,52,65,0.5)' } } };
 
+    const filteredRev = filterMonths(months, portChartPeriods[portfolio].rev);
     destroyChart(ids.rev);
     charts[ids.rev] = new Chart(document.getElementById(ids.rev), {
       type: 'bar',
-      data: { labels: monthLabels, datasets: [{ data: portMonthRevData, backgroundColor: rgbaColor, borderRadius: 3 }] },
+      data: { labels: filteredRev.map(monthLabel), datasets: [{ data: filteredRev.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0)), backgroundColor: rgbaColor, borderRadius: 3 }] },
       options: { ...CHART_OPTS, plugins: { legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}} },
         scales: { x:{...scaleOpts.x,stacked:true}, y:{...scaleOpts.y,ticks:{...scaleOpts.y.ticks,callback:v=>'$'+(v/1000).toFixed(0)+'k'}} } }
     });
 
+    const filteredADR = filterMonths(months, portChartPeriods[portfolio].adr);
     destroyChart(ids.adr);
     charts[ids.adr] = new Chart(document.getElementById(ids.adr), {
       type: 'line',
-      data: { labels: monthLabels, datasets: [{ data: portMonthADR, borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
+      data: { labels: filteredADR.map(monthLabel), datasets: [{ data: filteredADR.map(m => Math.round(byMonthADR[m]?.[portfolio]||0)), borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
       options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},
         scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
     });
 
+    const filteredRevPAR = filterMonths(months, portChartPeriods[portfolio].revpar);
     destroyChart(ids.revpar);
     charts[ids.revpar] = new Chart(document.getElementById(ids.revpar), {
       type: 'line',
-      data: { labels: monthLabels, datasets: [{ data: portMonthRevPAR, borderColor: '#F5A623', backgroundColor: 'rgba(245,166,35,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#F5A623' }] },
+      data: { labels: filteredRevPAR.map(monthLabel), datasets: [{ data: filteredRevPAR.map(m => Math.round(byMonthRevPAR[m]?.[portfolio]||0)), borderColor: '#F5A623', backgroundColor: 'rgba(245,166,35,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#F5A623' }] },
       options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},
         scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
     });
 
+    const filteredOcc = filterMonths(months, portChartPeriods[portfolio].occ);
     destroyChart(ids.occ);
     charts[ids.occ] = new Chart(document.getElementById(ids.occ), {
       type: 'line',
-      data: { labels: monthLabels, datasets: [{ data: portMonthOcc, borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
+      data: { labels: filteredOcc.map(monthLabel), datasets: [{ data: filteredOcc.map(m => Math.round(byMonthOcc[m]?.[portfolio]||0)), borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
       options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},
         scales: { x: scaleOpts.x, y: { ...scaleOpts.y, min:0, max:100, ticks:{...scaleOpts.y.ticks,callback:v=>v+'%'} } } }
     });
