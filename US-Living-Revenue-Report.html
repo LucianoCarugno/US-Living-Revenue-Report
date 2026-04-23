@@ -1133,9 +1133,8 @@ function setSummaryPeriod(months, btn) {
 }
 
 function renderSummaryTable() {
-  if (!_lastRenderData) return;
+  if (!_lastRenderData || !_lastSummaryData) return;
   const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc } = _lastRenderData;
-  if (!_lastSummaryData) return;
   const { byMonthClean3700, byMonthCleanBP, byMonthOtaAdj3700, byMonthOtaAdjBP,
           byMonthOtaComm3700, byMonthOtaCommBP, byMonthNights3700, byMonthNightsBP,
           units3700, unitsBP } = _lastSummaryData;
