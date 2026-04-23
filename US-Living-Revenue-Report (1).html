@@ -897,7 +897,7 @@ function parseCSV(text) {
     const roomRev  = parseFloat(clean(cols[12])) || 0;
     const cleanFee = parseFloat(clean(cols[13])) || 0;
     const comm     = Math.abs(parseFloat(clean(cols[14])) || 0);
-    const otaAdj   = parseFloat(clean(cols[15])) || 0;
+    const otaAdj   = parseFloat(clean(cols[15])) || 0;  // resolution center — negative = cost
     const confirmCode = clean(cols[2]);
     
     if (!ciStr || !coStr) return;
@@ -905,6 +905,11 @@ function parseCSV(text) {
     const ci = new Date(ciStr + 'T00:00:00');
     const co = new Date(coStr + 'T00:00:00');
     const nights = Math.max(1, Math.round((co - ci) / 86400000));
+    
+    // Fold OTA adjustment into fareAccommodation so it gets prorated correctly
+    // Resolution center applies to the whole reservation, so we add it to room rev
+    // (it's already negative when it's a cost, positive when it's a credit)
+    const adjustedRoomRev = roomRev + otaAdj;
     
     // Build a reservation object compatible with our render function
     reservations.push({
@@ -917,7 +922,7 @@ function parseCSV(text) {
       guest: { fullName: guest || '—' },
       listing: { nickname: nick, title: nick, address: { full: '' } },
       money: {
-        fareAccommodation: roomRev,
+        fareAccommodation: adjustedRoomRev,
         fareCleaning: cleanFee,
         hostServiceFee: comm,
         resolutionAmount: otaAdj
@@ -990,7 +995,9 @@ function calcTotals(reservations, from, to, unitCount3700, unitCountBP) {
     let cur = new Date(ci);
     while (cur < co) { if (cur >= pStart && cur <= pEnd) nin++; cur.setDate(cur.getDate()+1); }
     roomRev += (r.money?.fareAccommodation || 0) * nin / tn;
-    clean   += (r.money?.fareCleaning      || 0) * nin / tn;
+    // Cleaning at checkout date
+    const coDate = new Date(r.checkOut);
+    if (coDate >= pStart && coDate <= pEnd) clean += (r.money?.fareCleaning || 0);
     otaComm += Math.abs(r.money?.hostServiceFee || 0) * nin / tn;
     nights  += nin;
   });
@@ -1243,20 +1250,23 @@ function render(reservations, from, to, prev, allListings) {
                          channel === 'bookingCom' ? 'Booking.com' :
                          channel === 'manual' ? 'Direct' : channel;
 
-    // Devengo: distribute revenue across actual nights
+    // Devengo: room revenue distributed by night, cleaning/resolution at checkout
     const checkIn  = new Date(r.checkIn);
     const checkOut = new Date(r.checkOut);
     const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
     const dailyRoom  = roomRevTotal / totalNights;
-    const dailyClean = cleanTotal   / totalNights;
     const dailyComm  = otaComm      / totalNights;
 
-    // Count nights inside the selected period
+    // Checkout date determines when cleaning fee and OTA adj are booked
+    const coYm = checkOut.toISOString().substring(0, 7);
+    const checkoutInPeriod = checkOut >= periodStart && checkOut <= periodEnd;
+
+    // Count nights inside the selected period (for room revenue)
     let nightsInPeriod = 0;
     let cur = new Date(checkIn);
     while (cur < checkOut) {
       const ym = cur.toISOString().substring(0, 7);
-      // For charts: accrue to every month regardless of period
+      // For charts: accrue room revenue to every month
       if (!byMonthPortfolio[ym]) byMonthPortfolio[ym] = {'3700M':0,'Bayou Park':0};
       if (byMonthPortfolio[ym][portfolio] !== undefined) byMonthPortfolio[ym][portfolio] += dailyRoom;
 
@@ -1265,30 +1275,35 @@ function render(reservations, from, to, prev, allListings) {
       cur.setDate(cur.getDate() + 1);
     }
 
+    // Cleaning fee: attribute to checkout month in charts, to period if checkout is in period
+    if (!byMonthPortfolio[coYm]) byMonthPortfolio[coYm] = {'3700M':0,'Bayou Park':0};
+    // (cleaning added to channel mix separately below)
+
     const roomRev = dailyRoom  * nightsInPeriod;
-    const clean   = dailyClean * nightsInPeriod;
+    const clean   = checkoutInPeriod ? cleanTotal : 0;
     const comm    = dailyComm  * nightsInPeriod;
     const nights  = nightsInPeriod;
+    const otaAdjInPeriod = checkoutInPeriod ? (r.money?.resolutionAmount || 0) : 0;
 
     if (!byUnit[shortProp]) byUnit[shortProp] = {roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0, portfolio, count:0};
     byUnit[shortProp].roomRev += roomRev;
     byUnit[shortProp].clean   += clean;
-    byUnit[shortProp].otaAdj  += otaAdj * (nightsInPeriod / totalNights);
+    byUnit[shortProp].otaAdj  += otaAdjInPeriod;
     byUnit[shortProp].otaComm += comm;
     byUnit[shortProp].nights  += nights;
-    if (nightsInPeriod > 0) byUnit[shortProp].count++;
+    if (nightsInPeriod > 0 || checkoutInPeriod) byUnit[shortProp].count++;
 
     if (byPortfolio[portfolio]) {
       byPortfolio[portfolio].roomRev += roomRev;
       byPortfolio[portfolio].clean   += clean;
-      byPortfolio[portfolio].otaAdj  += otaAdj * (nightsInPeriod / totalNights);
+      byPortfolio[portfolio].otaAdj  += otaAdjInPeriod;
       byPortfolio[portfolio].otaComm += comm;
       byPortfolio[portfolio].nights  += nights;
-      if (nightsInPeriod > 0) byPortfolio[portfolio].count++;
+      if (nightsInPeriod > 0 || checkoutInPeriod) byPortfolio[portfolio].count++;
     }
 
     if (!byChannel[channelLabel]) byChannel[channelLabel] = 0;
-    byChannel[channelLabel] += roomRev;
+    byChannel[channelLabel] += roomRev + clean;
   });
 
   // Month lists
