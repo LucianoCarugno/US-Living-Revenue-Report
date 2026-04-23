@@ -6,6 +6,7 @@
 <title>US Living — Revenue Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -1254,7 +1255,30 @@ function redrawPortChart(portfolio, chartType) {
   const portData = _lastPortRenderData[portfolio];
   if (!portData) return;
   const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc, hexColor, rgbaColor, rgbaFill, ids } = portData;
+  // Register datalabels plugin
+  if (window.ChartDataLabels) Chart.register(ChartDataLabels);
+
   const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+
+  const DATALABEL_OPTS = {
+    display: true,
+    color: 'rgba(232,237,243,0.75)',
+    font: { size: 9, family: 'DM Mono' },
+    anchor: 'end',
+    align: 'top',
+    offset: 2,
+    formatter: v => v > 0 ? '$' + Math.round(v) : null
+  };
+
+  const DATALABEL_PCT = {
+    display: true,
+    color: 'rgba(232,237,243,0.75)',
+    font: { size: 9, family: 'DM Mono' },
+    anchor: 'end',
+    align: 'top',
+    offset: 2,
+    formatter: v => v > 0 ? Math.round(v) + '%' : null
+  };
   const scaleOpts = { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { color: 'rgba(42,52,65,0.5)' } } };
 
   const filteredMonths = filterMonths(months, portChartPeriods[portfolio][chartType]);
@@ -1317,7 +1341,30 @@ let _lastPortRenderData = {}; // store per-portfolio render data for redraw
 function redrawChart(chartId) {
   if (!_lastRenderData) return;
   const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc } = _lastRenderData;
+  // Register datalabels plugin
+  if (window.ChartDataLabels) Chart.register(ChartDataLabels);
+
   const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+
+  const DATALABEL_OPTS = {
+    display: true,
+    color: 'rgba(232,237,243,0.75)',
+    font: { size: 9, family: 'DM Mono' },
+    anchor: 'end',
+    align: 'top',
+    offset: 2,
+    formatter: v => v > 0 ? '$' + Math.round(v) : null
+  };
+
+  const DATALABEL_PCT = {
+    display: true,
+    color: 'rgba(232,237,243,0.75)',
+    font: { size: 9, family: 'DM Mono' },
+    anchor: 'end',
+    align: 'top',
+    offset: 2,
+    formatter: v => v > 0 ? Math.round(v) + '%' : null
+  };
 
   const filteredMonths = filterMonths(months, chartPeriods[chartId]);
   const labels = filteredMonths.map(monthLabel);
@@ -1342,10 +1389,10 @@ function redrawChart(chartId) {
     charts.adr = new Chart(document.getElementById('chartADR'), {
       type: 'line',
       data: { labels, datasets: [
-        { label:'3700M', data:filteredMonths.map(m=>Math.round(byMonthADR[m]?.['3700M']||0)), borderColor:'#4A9EFF', backgroundColor:'rgba(74,158,255,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#4A9EFF' },
-        { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthADR[m]?.['Bayou Park']||0)), borderColor:'#3DD68C', backgroundColor:'rgba(61,214,140,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#3DD68C', borderDash:[5,3] }
+        { label:'3700M', data:filteredMonths.map(m=>Math.round(byMonthADR[m]?.['3700M']||0)), borderColor:'#4A9EFF', backgroundColor:'rgba(74,158,255,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#4A9EFF', datalabels:{...DATALABEL_OPTS,color:'#4A9EFF'} },
+        { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthADR[m]?.['Bayou Park']||0)), borderColor:'#3DD68C', backgroundColor:'rgba(61,214,140,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#3DD68C', borderDash:[5,3], datalabels:{...DATALABEL_OPTS,color:'#3DD68C',align:'bottom'} }
       ]},
-      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}},datalabels:DATALABEL_OPTS},
         scales: { x:{ticks:{color:'#4D5D72',font:{size:10}},grid:{display:false}}, y:{ticks:{color:'#4D5D72',font:{size:10},callback:v=>'$'+v},grid:{color:'rgba(42,52,65,0.5)'}} } }
     });
   } else if (chartId === 'revpar') {
@@ -1353,10 +1400,10 @@ function redrawChart(chartId) {
     charts.revpar = new Chart(document.getElementById('chartRevPAR'), {
       type: 'line',
       data: { labels, datasets: [
-        { label:'3700M', data:filteredMonths.map(m=>Math.round(byMonthRevPAR[m]?.['3700M']||0)), borderColor:'#F5A623', backgroundColor:'rgba(245,166,35,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#F5A623' },
-        { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthRevPAR[m]?.['Bayou Park']||0)), borderColor:'#A78BFA', backgroundColor:'rgba(167,139,250,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#A78BFA', borderDash:[5,3] }
+        { label:'3700M', data:filteredMonths.map(m=>Math.round(byMonthRevPAR[m]?.['3700M']||0)), borderColor:'#F5A623', backgroundColor:'rgba(245,166,35,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#F5A623', datalabels:{...DATALABEL_OPTS,color:'#F5A623'} },
+        { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthRevPAR[m]?.['Bayou Park']||0)), borderColor:'#A78BFA', backgroundColor:'rgba(167,139,250,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#A78BFA', borderDash:[5,3], datalabels:{...DATALABEL_OPTS,color:'#A78BFA',align:'bottom'} }
       ]},
-      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}},datalabels:DATALABEL_OPTS},
         scales: { x:{ticks:{color:'#4D5D72',font:{size:10}},grid:{display:false}}, y:{ticks:{color:'#4D5D72',font:{size:10},callback:v=>'$'+v},grid:{color:'rgba(42,52,65,0.5)'}} } }
     });
   } else if (chartId === 'occ') {
@@ -1364,10 +1411,10 @@ function redrawChart(chartId) {
     charts.occ = new Chart(document.getElementById('chartOcc'), {
       type: 'line',
       data: { labels, datasets: [
-        { label:'3700M', data:filteredMonths.map(m=>Math.round(byMonthOcc[m]?.['3700M']||0)), borderColor:'#4A9EFF', backgroundColor:'rgba(74,158,255,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#4A9EFF' },
-        { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthOcc[m]?.['Bayou Park']||0)), borderColor:'#3DD68C', backgroundColor:'rgba(61,214,140,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#3DD68C', borderDash:[5,3] }
+        { label:'3700M', data:filteredMonths.map(m=>Math.round(byMonthOcc[m]?.['3700M']||0)), borderColor:'#4A9EFF', backgroundColor:'rgba(74,158,255,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#4A9EFF', datalabels:{...DATALABEL_PCT,color:'#4A9EFF'} },
+        { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthOcc[m]?.['Bayou Park']||0)), borderColor:'#3DD68C', backgroundColor:'rgba(61,214,140,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#3DD68C', borderDash:[5,3], datalabels:{...DATALABEL_PCT,color:'#3DD68C',align:'bottom'} }
       ]},
-      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}},datalabels:DATALABEL_PCT},
         scales: { x:{ticks:{color:'#4D5D72',font:{size:10}},grid:{display:false}}, y:{min:0,max:100,ticks:{color:'#4D5D72',font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(42,52,65,0.5)'}} } }
     });
   }
@@ -1635,7 +1682,30 @@ function render(reservations, from, to, prev, allListings) {
 
   // ---- CHARTS ----
   const monthLabels = months.map(monthLabel);
+  // Register datalabels plugin
+  if (window.ChartDataLabels) Chart.register(ChartDataLabels);
+
   const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+
+  const DATALABEL_OPTS = {
+    display: true,
+    color: 'rgba(232,237,243,0.75)',
+    font: { size: 9, family: 'DM Mono' },
+    anchor: 'end',
+    align: 'top',
+    offset: 2,
+    formatter: v => v > 0 ? '$' + Math.round(v) : null
+  };
+
+  const DATALABEL_PCT = {
+    display: true,
+    color: 'rgba(232,237,243,0.75)',
+    font: { size: 9, family: 'DM Mono' },
+    anchor: 'end',
+    align: 'top',
+    offset: 2,
+    formatter: v => v > 0 ? Math.round(v) + '%' : null
+  };
 
   // Revenue chart
   document.getElementById('legendRev').innerHTML = `
