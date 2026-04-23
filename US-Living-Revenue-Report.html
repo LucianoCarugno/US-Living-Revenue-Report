@@ -1378,6 +1378,11 @@ function render(reservations, from, to, prev, allListings) {
       <div class="kpi-sub">Channel commission</div>
       ${prev ? delta(totalOtaComm, prev.otaComm) : ''}
     </div>
+    <div class="kpi" style="--accent:var(--amber)">
+      <div class="kpi-label">OTA Adjustment</div>
+      <div class="kpi-value">${totalOtaAdj < 0 ? '-$' + Math.round(Math.abs(totalOtaAdj)).toLocaleString('en-US') : $c(totalOtaAdj)}</div>
+      <div class="kpi-sub">Resolution center</div>
+    </div>
     <div class="kpi" style="--accent:var(--green)">
       <div class="kpi-label">Occupancy</div>
       <div class="kpi-value">${pct(totalOcc)}</div>
@@ -1627,6 +1632,11 @@ function render(reservations, from, to, prev, allListings) {
         <div class="kpi-label">OTA Commission</div>
         <div class="kpi-value">${$c(p.otaComm)}</div>
         <div class="kpi-sub">Channel commission</div>
+      </div>
+      <div class="kpi" style="--accent:var(--amber)">
+        <div class="kpi-label">OTA Adjustment</div>
+        <div class="kpi-value">${p.otaAdj < 0 ? '-$' + Math.round(Math.abs(p.otaAdj)).toLocaleString('en-US') : $c(p.otaAdj)}</div>
+        <div class="kpi-sub">Resolution center</div>
       </div>
       <div class="kpi" style="--accent:var(--green)">
         <div class="kpi-label">Occupancy</div>
