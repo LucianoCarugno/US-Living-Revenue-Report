@@ -321,6 +321,35 @@ tr.total-row td {
 }
 @media(max-width: 640px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
 
+/* Summary table */
+.summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.summary-table th {
+  padding: 7px 12px; text-align: right; font-size: 10px; font-weight: 600;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px;
+  background: var(--bg3); border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.summary-table th:first-child { text-align: left; width: 160px; }
+.summary-table td {
+  padding: 6px 12px; text-align: right; border-bottom: 1px solid rgba(42,52,65,0.4);
+  color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; white-space: nowrap;
+}
+.summary-table td:first-child { 
+  text-align: left; font-family: 'DM Sans', sans-serif; font-size: 11px;
+  color: var(--text2); font-weight: 500;
+}
+.summary-section-header td {
+  background: var(--bg3); color: var(--text2) !important;
+  font-family: 'DM Sans', sans-serif !important; font-size: 11px !important;
+  font-weight: 700 !important; padding: 8px 12px !important; letter-spacing: 0.3px;
+}
+.summary-total-row td {
+  font-weight: 700 !important; background: rgba(74,158,255,0.05);
+  border-top: 1px solid var(--border); color: var(--blue) !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+.summary-negative { color: var(--red) !important; }
+.summary-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow-x: auto; margin-bottom: 16px; }
+
 /* Period selector buttons */
 .chart-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
 .chart-header-left {}
@@ -383,6 +412,7 @@ tr.total-row td {
     <!-- Tabs -->
     <div class="tabs">
       <div class="tab active blue" onclick="showTab('overview',this)">Overview</div>
+      <div class="tab" onclick="showTab('summary',this)">Summary</div>
       <div class="tab" onclick="showTab('tab3700',this)">3700M</div>
       <div class="tab" onclick="showTab('tabBP',this)">Bayou Park</div>
       <div class="tab" onclick="showTab('bookings',this)">Bookings</div>
@@ -488,6 +518,20 @@ tr.total-row td {
           <div class="occ-unit-grid" id="occUnitsBP"></div>
         </div>
       </div>
+    </div>
+
+    <!-- SUMMARY TAB -->
+    <div id="tab-summary" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:13px;color:var(--text2)">Monthly summary by portfolio</div>
+        <div class="period-btns" id="periodSummary">
+          <button class="period-btn" onclick="setSummaryPeriod(6,this)">6M</button>
+          <button class="period-btn active" onclick="setSummaryPeriod(12,this)">12M</button>
+          <button class="period-btn" onclick="setSummaryPeriod(24,this)">24M</button>
+          <button class="period-btn" onclick="setSummaryPeriod(0,this)">All</button>
+        </div>
+      </div>
+      <div id="summaryTable"></div>
     </div>
 
     <!-- 3700M TAB -->
@@ -758,7 +802,7 @@ document.getElementById('df').value = new Date(now.getFullYear(), now.getMonth()
 document.getElementById('dt').value = now.toISOString().split('T')[0];
 
 function showTab(name, el) {
-  ['overview','tab3700','tabBP','bookings','pipeline'].forEach(t => {
+  ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t => {
     document.getElementById('tab-'+t).style.display = 'none';
   });
   document.querySelectorAll('.tab').forEach(t => {
@@ -1077,6 +1121,108 @@ function monthLabel(ym) {
   return new Date(+y, +m-1).toLocaleString('en', {month:'short', year:'2-digit'});
 }
 
+// Summary period state
+let summaryPeriod = 12;
+
+function setSummaryPeriod(months, btn) {
+  summaryPeriod = months;
+  const container = btn.parentElement;
+  container.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSummaryTable();
+}
+
+function renderSummaryTable() {
+  if (!_lastRenderData) return;
+  const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc } = _lastRenderData;
+  if (!_lastSummaryData) return;
+  const { byMonthClean3700, byMonthCleanBP, byMonthOtaAdj3700, byMonthOtaAdjBP,
+          byMonthOtaComm3700, byMonthOtaCommBP, byMonthNights3700, byMonthNightsBP,
+          units3700, unitsBP } = _lastSummaryData;
+
+  const filteredMonths = filterMonths(months, summaryPeriod);
+
+  const fmt$ = v => v === 0 ? '-' : '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
+  const fmtPct = v => v === 0 ? '-' : Math.round(v * 100) + '%';
+  const fmtN = v => v === 0 ? '-' : Math.round(v).toLocaleString('en-US');
+  const fmtNeg = v => {
+    if (v === 0) return '-';
+    const s = '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
+    return v < 0 ? '<span class="summary-negative">(' + s + ')</span>' : s;
+  };
+
+  const monthCols = filteredMonths.map(m => {
+    const [y, mo] = m.split('-');
+    const d = new Date(+y, +mo-1);
+    return d.toLocaleString('en', {month:'2-digit', year:'2-digit'}).replace(' ', '/');
+  });
+
+  const daysInMonth = filteredMonths.map(m => {
+    const [y, mo] = m.split('-');
+    return new Date(+y, +mo, 0).getDate();
+  });
+
+  const header = `<tr>
+    <th>Monthly</th>
+    ${filteredMonths.map((m, i) => `<th>${daysInMonth[i]}<br><span style="font-weight:400">${monthCols[i]}</span></th>`).join('')}
+  </tr>`;
+
+  function portRows(port, color, hexColor, unitCount,
+      byMonthRev, byMonthClean, byMonthOtaAdj, byMonthOtaComm, byMonthNights, byMonthAvail) {
+
+    const rows = [
+      { label: 'Units', vals: filteredMonths.map(() => unitCount), fmt: v => v },
+      { label: 'Available Nights', vals: filteredMonths.map((m,i) => daysInMonth[i] * unitCount), fmt: fmtN },
+      { label: 'Occupied Nights', vals: filteredMonths.map(m => byMonthNights[m]||0), fmt: fmtN },
+      { label: 'Occupancy', vals: filteredMonths.map((m,i) => {
+          const avail = daysInMonth[i] * unitCount;
+          return avail > 0 ? (byMonthNights[m]||0) / avail : 0;
+        }), fmt: fmtPct },
+      { label: 'ADR', vals: filteredMonths.map(m => byMonthADR[m]?.[port]||0), fmt: fmt$ },
+      { label: 'RevPAR', vals: filteredMonths.map(m => byMonthRevPAR[m]?.[port]||0), fmt: fmt$ },
+      { label: 'Room Revenue', vals: filteredMonths.map(m => byMonthRev[m]?.[port]||0), fmt: fmt$, bold: true, prefix: '$' },
+      { label: 'Cleaning Fee', vals: filteredMonths.map(m => byMonthClean[m]||0), fmt: fmt$ },
+      { label: 'OTA Adjustment', vals: filteredMonths.map(m => byMonthOtaAdj[m]||0), fmt: fmtNeg, html: true },
+      { label: 'Total Revenue', vals: filteredMonths.map(m => (byMonthRev[m]?.[port]||0) + (byMonthClean[m]||0) + (byMonthOtaAdj[m]||0)), fmt: fmt$, total: true },
+      { label: 'OTA Commission', vals: filteredMonths.map(m => byMonthOtaComm[m]||0), fmt: fmtNeg, html: true },
+    ];
+
+    const sectionHeader = `<tr class="summary-section-header">
+      <td colspan="${filteredMonths.length + 1}" style="color:${hexColor} !important">${port}</td>
+    </tr>`;
+
+    const dataRows = rows.map(row => {
+      const cls = row.total ? 'summary-total-row' : '';
+      const cells = row.vals.map(v => {
+        const formatted = row.fmt(v);
+        return `<td>${typeof formatted === 'string' ? formatted : formatted}</td>`;
+      }).join('');
+      const labelStyle = row.bold ? 'font-weight:600;color:var(--text)' : '';
+      return `<tr class="${cls}"><td style="${labelStyle}">${row.label}</td>${cells}</tr>`;
+    }).join('');
+
+    return sectionHeader + dataRows;
+  }
+
+  const table3700 = portRows('3700M', 'blue', 'var(--blue)', units3700,
+    byMonthPortfolio, byMonthClean3700, byMonthOtaAdj3700, byMonthOtaComm3700, byMonthNights3700);
+  const tableBP = portRows('Bayou Park', 'green', 'var(--green)', unitsBP,
+    byMonthPortfolio, byMonthCleanBP, byMonthOtaAdjBP, byMonthOtaCommBP, byMonthNightsBP);
+
+  const spacer = `<tr><td colspan="${filteredMonths.length + 1}" style="height:12px;background:var(--bg)"></td></tr>`;
+
+  document.getElementById('summaryTable').innerHTML = `
+    <div class="summary-wrap">
+      <table class="summary-table">
+        <thead>${header}</thead>
+        <tbody>${table3700}${spacer}${tableBP}</tbody>
+      </table>
+    </div>`;
+}
+
+// Store last summary data for period filter
+let _lastSummaryData = null;
+
 // Chart period state (months to show, 0 = all)
 const chartPeriods = { rev: 12, adr: 12, revpar: 12, occ: 12 };
 
@@ -1311,6 +1457,55 @@ function render(reservations, from, to, prev, allListings) {
 
   // Store for redraw
   _lastRenderData = { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc };
+
+  // Collect per-portfolio monthly data for Summary tab
+  const byMonthClean3700 = {}, byMonthCleanBP = {};
+  const byMonthOtaAdj3700 = {}, byMonthOtaAdjBP = {};
+  const byMonthOtaComm3700 = {}, byMonthOtaCommBP = {};
+  const byMonthNights3700 = {}, byMonthNightsBP = {};
+
+  confirmed.forEach(r => {
+    const portfolio = getPortfolioFromRes(r);
+    if (portfolio !== '3700M' && portfolio !== 'Bayou Park') return;
+    const checkOut = new Date(r.checkOut);
+    const coYm = checkOut.toISOString().substring(0, 7);
+    const checkIn = new Date(r.checkIn);
+    const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
+    const cleanTotal = r.money?.fareCleaning || 0;
+    const otaAdj = r.money?.resolutionAmount || 0;
+    const otaComm = Math.abs(r.money?.hostServiceFee || 0);
+    const dailyComm = otaComm / totalNights;
+
+    // Count nights per month for this reservation
+    let cur = new Date(checkIn);
+    while (cur < checkOut) {
+      const ym = cur.toISOString().substring(0, 7);
+      if (portfolio === '3700M') {
+        byMonthNights3700[ym] = (byMonthNights3700[ym] || 0) + 1;
+        byMonthOtaComm3700[ym] = (byMonthOtaComm3700[ym] || 0) + dailyComm;
+      } else {
+        byMonthNightsBP[ym] = (byMonthNightsBP[ym] || 0) + 1;
+        byMonthOtaCommBP[ym] = (byMonthOtaCommBP[ym] || 0) + dailyComm;
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+    // Cleaning and OTA adj at checkout month
+    if (portfolio === '3700M') {
+      byMonthClean3700[coYm] = (byMonthClean3700[coYm] || 0) + cleanTotal;
+      byMonthOtaAdj3700[coYm] = (byMonthOtaAdj3700[coYm] || 0) + otaAdj;
+    } else {
+      byMonthCleanBP[coYm] = (byMonthCleanBP[coYm] || 0) + cleanTotal;
+      byMonthOtaAdjBP[coYm] = (byMonthOtaAdjBP[coYm] || 0) + otaAdj;
+    }
+  });
+
+  _lastSummaryData = {
+    byMonthClean3700, byMonthCleanBP,
+    byMonthOtaAdj3700, byMonthOtaAdjBP,
+    byMonthOtaComm3700, byMonthOtaCommBP,
+    byMonthNights3700, byMonthNightsBP,
+    units3700: dynUnits3700, unitsBP: dynUnitsBP
+  };
 
   // Compute ADR, RevPAR, Occ by month per portfolio
   months.forEach(ym => {
@@ -1926,6 +2121,7 @@ function render(reservations, from, to, prev, allListings) {
   document.getElementById('main').style.display = 'block';
   document.getElementById('emptyBox').style.display = 'none';
   document.getElementById('btnPDF').style.display = '';
+  renderSummaryTable();
 }
 
 async function exportPDF() {
