@@ -1297,7 +1297,17 @@ function redrawPortChart(portfolio, chartType) {
 
 function filterMonths(months, periodMonths) {
   if (!periodMonths) return months;
-  if (months.length <= periodMonths) return months;
+  // Anchor to the selected "to" date if available
+  const toYm = _lastRenderData?.toDate ? _lastRenderData.toDate.substring(0, 7) : null;
+  if (toYm) {
+    // Find index of toYm in months (or last month <= toYm)
+    let endIdx = months.length - 1;
+    for (let i = months.length - 1; i >= 0; i--) {
+      if (months[i] <= toYm) { endIdx = i; break; }
+    }
+    const startIdx = Math.max(0, endIdx - periodMonths + 1);
+    return months.slice(startIdx, endIdx + 1);
+  }
   return months.slice(months.length - periodMonths);
 }
 
@@ -1455,7 +1465,7 @@ function render(reservations, from, to, prev, allListings) {
   const months = Object.keys(byMonthPortfolio).sort();
 
   // Store for redraw
-  _lastRenderData = { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc };
+  _lastRenderData = { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc, toDate: to };
 
   // Collect per-portfolio monthly data for Summary tab
   const byMonthClean3700 = {}, byMonthCleanBP = {};
