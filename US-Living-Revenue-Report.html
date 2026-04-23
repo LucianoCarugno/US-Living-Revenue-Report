@@ -2212,96 +2212,308 @@ async function exportPDF() {
 
   try {
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const margin = 8;
-    const usableW = pageW - margin * 2;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const W = pdf.internal.pageSize.getWidth();
+    const H = pdf.internal.pageSize.getHeight();
+    const margin = 14;
+    const col = (W - margin * 2) / 2;
 
-    const sections = [
-      { tabName: 'overview', tabEl: document.querySelectorAll('.tab')[0], label: 'Overview' },
-      { tabName: 'tab3700',  tabEl: document.querySelectorAll('.tab')[1], label: '3700M' },
-      { tabName: 'tabBP',    tabEl: document.querySelectorAll('.tab')[2], label: 'Bayou Park' },
-    ];
+    // Colors
+    const DARK = [13, 17, 23];
+    const BLUE = [74, 158, 255];
+    const GREEN = [61, 214, 140];
+    const AMBER = [245, 166, 35];
+    const RED = [255, 92, 92];
+    const TEXT = [232, 237, 243];
+    const TEXT2 = [139, 155, 180];
+    const TEXT3 = [77, 93, 114];
+    const BG2 = [22, 27, 34];
+    const BG3 = [28, 34, 48];
+    const BORDER = [42, 52, 65];
 
-    for (let i = 0; i < sections.length; i++) {
-      const sec = sections[i];
-      btn.textContent = `⏳ ${sec.label}...`;
+    const fmt$ = v => '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
+    const fmtPct = v => Math.round(v * 100) + '%';
 
-      // Show this tab
-      showTab(sec.tabName, sec.tabEl);
-      await new Promise(r => setTimeout(r, 500));
-
-      const element = document.getElementById('tab-' + sec.tabName);
-      const canvas = await html2canvas(element, {
-        scale: 1.4,
-        useCORS: true,
-        backgroundColor: '#0D1117',
-        logging: false,
-        windowWidth: 1280
-      });
-
-      if (i > 0) pdf.addPage();
-
+    function addPage(title, subtitle) {
+      pdf.setFillColor(...DARK);
+      pdf.rect(0, 0, W, H, 'F');
       // Header bar
-      pdf.setFillColor(13, 17, 23);
-      pdf.rect(0, 0, pageW, 16, 'F');
-      pdf.setTextColor(232, 237, 243);
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('US Living  |  ' + sec.label, margin, 10);
-      pdf.setFontSize(8);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(139, 155, 180);
-      pdf.text(from + ' to ' + to, pageW - margin, 10, { align: 'right' });
+      pdf.setFillColor(...BG2);
+      pdf.rect(0, 0, W, 14, 'F');
+      // Logo mark
+      pdf.setFillColor(...BLUE);
+      pdf.roundedRect(margin, 3, 8, 8, 1.5, 1.5, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(6); pdf.setFont('helvetica', 'bold');
+      pdf.text('US', margin + 4, 8.2, { align: 'center' });
+      // Brand
+      pdf.setTextColor(...TEXT);
+      pdf.setFontSize(8); pdf.setFont('helvetica', 'bold');
+      pdf.text('US Living', margin + 11, 7.5);
+      pdf.setTextColor(...TEXT3);
+      pdf.setFontSize(6); pdf.setFont('helvetica', 'normal');
+      pdf.text('Revenue Intelligence', margin + 11, 11);
+      // Title
+      pdf.setTextColor(...TEXT);
+      pdf.setFontSize(9); pdf.setFont('helvetica', 'bold');
+      pdf.text(title, W / 2, 8, { align: 'center' });
+      if (subtitle) {
+        pdf.setTextColor(...TEXT3);
+        pdf.setFontSize(6); pdf.setFont('helvetica', 'normal');
+        pdf.text(subtitle, W / 2, 12, { align: 'center' });
+      }
+      // Date range
+      pdf.setTextColor(...TEXT2);
+      pdf.setFontSize(6.5);
+      pdf.text(from + '  →  ' + to, W - margin, 8, { align: 'right' });
+      // Divider
+      pdf.setDrawColor(...BORDER);
+      pdf.setLineWidth(0.3);
+      pdf.line(margin, 14, W - margin, 14);
+    }
 
-      // Draw section image paginated
-      const imgW = usableW;
-      const imgH = (canvas.height / canvas.width) * imgW;
-      const startY = 19;
-      const availH = pageH - startY - margin;
-
-      if (imgH <= availH) {
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, startY, imgW, imgH);
-      } else {
-        let yOffset = 0;
-        let pageNum = 0;
-        while (yOffset < imgH) {
-          if (pageNum > 0) {
-            pdf.addPage();
-            pdf.setFillColor(13, 17, 23);
-            pdf.rect(0, 0, pageW, 16, 'F');
-            pdf.setTextColor(139, 155, 180);
-            pdf.setFontSize(8);
-            pdf.text('US Living  |  ' + sec.label + '  |  ' + from + ' to ' + to, margin, 10);
-          }
-          const sy = pageNum === 0 ? startY : 19;
-          const sliceH = pageH - sy - margin;
-          const ratio = canvas.height / imgH;
-          const srcY = yOffset * ratio;
-          const srcH = sliceH * ratio;
-
-          const sliceCanvas = document.createElement('canvas');
-          sliceCanvas.width = canvas.width;
-          sliceCanvas.height = Math.min(srcH, canvas.height - srcY);
-          const ctx = sliceCanvas.getContext('2d');
-          ctx.drawImage(canvas, 0, srcY, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
-          const sliceImgH = (sliceCanvas.height / canvas.height) * imgH;
-          pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', margin, sy, imgW, sliceImgH);
-
-          yOffset += sliceH;
-          pageNum++;
-          if (yOffset >= imgH) break;
-        }
+    function kpiCard(x, y, w, h, label, value, sub, accentColor) {
+      pdf.setFillColor(...BG2);
+      pdf.roundedRect(x, y, w, h, 2, 2, 'F');
+      pdf.setFillColor(...accentColor);
+      pdf.rect(x, y, w, 0.8, 'F');
+      pdf.setTextColor(...TEXT3);
+      pdf.setFontSize(5.5); pdf.setFont('helvetica', 'bold');
+      pdf.text(label.toUpperCase(), x + 4, y + 5);
+      pdf.setTextColor(...TEXT);
+      pdf.setFontSize(11); pdf.setFont('helvetica', 'bold');
+      pdf.text(value, x + 4, y + 12);
+      if (sub) {
+        pdf.setTextColor(...TEXT3);
+        pdf.setFontSize(5); pdf.setFont('helvetica', 'normal');
+        pdf.text(sub, x + 4, y + 16);
       }
     }
 
-    // Return to overview
-    showTab('overview', document.querySelectorAll('.tab')[0]);
+    function sectionTitle(x, y, text) {
+      pdf.setTextColor(...TEXT3);
+      pdf.setFontSize(6); pdf.setFont('helvetica', 'bold');
+      pdf.text(text.toUpperCase(), x, y);
+      pdf.setDrawColor(...BORDER);
+      pdf.setLineWidth(0.2);
+      pdf.line(x + pdf.getTextWidth(text.toUpperCase()) + 2, y - 1, W - margin, y - 1);
+    }
+
+    function portCard(x, y, w, port, color, data) {
+      pdf.setFillColor(...BG2);
+      pdf.roundedRect(x, y, w, 22, 2, 2, 'F');
+      pdf.setDrawColor(...color);
+      pdf.setLineWidth(0.5);
+      pdf.roundedRect(x, y, w, 22, 2, 2, 'S');
+      // dot
+      pdf.setFillColor(...color);
+      pdf.circle(x + 5, y + 5, 1.5, 'F');
+      pdf.setTextColor(...color);
+      pdf.setFontSize(7); pdf.setFont('helvetica', 'bold');
+      pdf.text(port, x + 9, y + 6);
+      pdf.setTextColor(...TEXT3);
+      pdf.setFontSize(5.5); pdf.setFont('helvetica', 'normal');
+      pdf.text(data.sub, x + 9, y + 10);
+      // Stats
+      const stats = data.stats;
+      const sw = (w - 10) / stats.length;
+      stats.forEach((s, i) => {
+        const sx = x + 5 + i * sw;
+        pdf.setTextColor(...TEXT3); pdf.setFontSize(5);
+        pdf.text(s.label, sx, y + 15);
+        pdf.setTextColor(...TEXT); pdf.setFontSize(7); pdf.setFont('helvetica', 'bold');
+        pdf.text(s.value, sx, y + 20);
+        pdf.setFont('helvetica', 'normal');
+      });
+    }
+
+    function summaryTable(x, y, portLabel, portColor, rows, months) {
+      const colW = (W - margin * 2 - 32) / months.length;
+      const rowH = 6.5;
+      // Header
+      pdf.setFillColor(...BG3);
+      pdf.rect(x, y, W - margin * 2, rowH, 'F');
+      pdf.setTextColor(...portColor);
+      pdf.setFontSize(6); pdf.setFont('helvetica', 'bold');
+      pdf.text(portLabel, x + 2, y + 4.5);
+      months.forEach((m, i) => {
+        pdf.setTextColor(...TEXT3); pdf.setFontSize(5.5); pdf.setFont('helvetica', 'normal');
+        pdf.text(m, x + 32 + i * colW + colW / 2, y + 4.5, { align: 'center' });
+      });
+      y += rowH;
+
+      rows.forEach((row, ri) => {
+        const isTotal = row.isTotal;
+        if (isTotal) {
+          pdf.setFillColor(15, 25, 45);
+          pdf.rect(x, y, W - margin * 2, rowH, 'F');
+        } else if (ri % 2 === 0) {
+          pdf.setFillColor(...BG2);
+          pdf.rect(x, y, W - margin * 2, rowH, 'F');
+        }
+        pdf.setTextColor(...(isTotal ? BLUE : TEXT2));
+        pdf.setFontSize(5.5);
+        pdf.setFont('helvetica', isTotal ? 'bold' : 'normal');
+        pdf.text(row.label, x + 2, y + 4.5);
+        row.values.forEach((v, i) => {
+          const txt = v === null ? '-' : v;
+          pdf.setTextColor(...(isTotal ? BLUE : (typeof v === 'string' && v.startsWith('(') ? RED : TEXT)));
+          pdf.text(String(txt), x + 32 + i * colW + colW / 2, y + 4.5, { align: 'center' });
+        });
+        y += rowH;
+        pdf.setDrawColor(...BORDER); pdf.setLineWidth(0.15);
+        pdf.line(x, y, x + W - margin * 2, y);
+      });
+      return y;
+    }
+
+    // ---- Get data ----
+    if (!_lastRenderData || !_lastSummaryData) { alert('Load data first'); return; }
+    const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc } = _lastRenderData;
+    const { byMonthClean3700, byMonthCleanBP, byMonthOtaAdj3700, byMonthOtaAdjBP,
+            byMonthOtaComm3700, byMonthOtaCommBP, byMonthNights3700, byMonthNightsBP } = _lastSummaryData;
+
+    const totalRoomRev = Object.values(byMonthPortfolio).reduce((a,m) => a + (m['3700M']||0) + (m['Bayou Park']||0), 0);
+    const p3700 = { roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0 };
+    const pBP   = { roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0 };
+    months.forEach(m => {
+      p3700.roomRev += byMonthPortfolio[m]?.['3700M']||0;
+      p3700.clean   += byMonthClean3700[m]||0;
+      p3700.otaAdj  += byMonthOtaAdj3700[m]||0;
+      p3700.otaComm += byMonthOtaComm3700[m]||0;
+      p3700.nights  += byMonthNights3700[m]||0;
+      pBP.roomRev   += byMonthPortfolio[m]?.['Bayou Park']||0;
+      pBP.clean     += byMonthCleanBP[m]||0;
+      pBP.otaAdj    += byMonthOtaAdjBP[m]||0;
+      pBP.otaComm   += byMonthOtaCommBP[m]||0;
+      pBP.nights    += byMonthNightsBP[m]||0;
+    });
+    const days = Math.max(1, Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1);
+    const avail3700 = UNITS_3700M * days, availBP = UNITS_BP * days;
+    const occ3700 = avail3700 > 0 ? p3700.nights / avail3700 : 0;
+    const occBP   = availBP   > 0 ? pBP.nights   / availBP   : 0;
+    const adr3700 = p3700.nights > 0 ? p3700.roomRev / p3700.nights : 0;
+    const adrBP   = pBP.nights   > 0 ? pBP.roomRev   / pBP.nights   : 0;
+
+    // ======= PAGE 1: OVERVIEW =======
+    addPage('Revenue Overview', 'Combined Portfolio Performance');
+    let cy = 20;
+
+    // KPI cards row 1 — 4 wide cards
+    const kpiW = (W - margin * 2 - 9) / 4;
+    const kpiH = 20;
+    const kpiData = [
+      { label: 'Total Revenue', value: fmt$(p3700.roomRev+p3700.clean+p3700.otaAdj+pBP.roomRev+pBP.clean+pBP.otaAdj), sub: 'Room + Cleaning + Adj', color: BLUE },
+      { label: 'Room Revenue', value: fmt$(p3700.roomRev+pBP.roomRev), sub: 'Net accommodation fare', color: BLUE },
+      { label: 'Cleaning Fee', value: fmt$(p3700.clean+pBP.clean), sub: 'At checkout', color: TEXT2 },
+      { label: 'OTA Commission', value: fmt$(p3700.otaComm+pBP.otaComm), sub: 'Channel commission', color: RED },
+    ];
+    kpiData.forEach((k, i) => kpiCard(margin + i * (kpiW + 3), cy, kpiW, kpiH, k.label, k.value, k.sub, k.color));
+    cy += kpiH + 3;
+
+    const kpiData2 = [
+      { label: 'OTA Adjustment', value: (p3700.otaAdj+pBP.otaAdj) < 0 ? '(' + fmt$(p3700.otaAdj+pBP.otaAdj) + ')' : fmt$(p3700.otaAdj+pBP.otaAdj), sub: 'Resolution center', color: AMBER },
+      { label: 'Occupancy', value: fmtPct((p3700.nights+pBP.nights)/(avail3700+availBP)), sub: (p3700.nights+pBP.nights) + ' / ' + (avail3700+availBP) + ' nights', color: GREEN },
+      { label: 'ADR', value: fmt$((p3700.nights+pBP.nights)>0?(p3700.roomRev+pBP.roomRev)/(p3700.nights+pBP.nights):0), sub: 'Avg daily rate', color: AMBER },
+      { label: 'RevPAR', value: fmt$((p3700.roomRev+pBP.roomRev)/(avail3700+availBP)), sub: 'Per available night', color: AMBER },
+    ];
+    kpiData2.forEach((k, i) => kpiCard(margin + i * (kpiW + 3), cy, kpiW, kpiH, k.label, k.value, k.sub, k.color));
+    cy += kpiH + 6;
+
+    // Portfolio cards
+    sectionTitle(margin, cy, 'Portfolio Summary');
+    cy += 4;
+    const portW = (W - margin * 2 - 4) / 2;
+    portCard(margin, cy, portW, '3700M', BLUE, {
+      sub: 'Dallas — McKinney Ave · ' + UNITS_3700M + ' units',
+      stats: [
+        { label: 'OCC', value: fmtPct(occ3700) },
+        { label: 'ADR', value: fmt$(adr3700) },
+        { label: 'RevPAR', value: fmt$(avail3700>0?p3700.roomRev/avail3700:0) },
+        { label: 'Room Revenue', value: fmt$(p3700.roomRev) },
+        { label: 'Cleaning', value: fmt$(p3700.clean) },
+        { label: 'Total Revenue', value: fmt$(p3700.roomRev+p3700.clean+p3700.otaAdj) },
+        { label: 'OTA Comm.', value: fmt$(p3700.otaComm) },
+      ]
+    });
+    portCard(margin + portW + 4, cy, portW, 'Bayou Park', GREEN, {
+      sub: 'Houston — Montrose / Midtown · ' + UNITS_BP + ' units',
+      stats: [
+        { label: 'OCC', value: fmtPct(occBP) },
+        { label: 'ADR', value: fmt$(adrBP) },
+        { label: 'RevPAR', value: fmt$(availBP>0?pBP.roomRev/availBP:0) },
+        { label: 'Room Revenue', value: fmt$(pBP.roomRev) },
+        { label: 'Cleaning', value: fmt$(pBP.clean) },
+        { label: 'Total Revenue', value: fmt$(pBP.roomRev+pBP.clean+pBP.otaAdj) },
+        { label: 'OTA Comm.', value: fmt$(pBP.otaComm) },
+      ]
+    });
+    cy += 26;
+
+    // Summary table — filtered months
+    pdf.addPage();
+    addPage('Monthly Summary', 'Revenue by portfolio by month');
+    cy = 20;
+
+    const sumMonths = filterMonths(months, summaryPeriod);
+    const sumLabels = sumMonths.map(m => {
+      const [y, mo] = m.split('-');
+      return new Date(+y, +mo-1).toLocaleString('en', {month:'short', year:'2-digit'});
+    });
+
+    const fmtV = v => v === 0 ? '-' : '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
+    const fmtAdj = v => v === 0 ? '-' : v < 0 ? '(' + fmtV(v) + ')' : fmtV(v);
+    const fmtO = v => v === 0 ? '-' : Math.round(v) + '%';
+
+    const dIM = m => { const [y,mo] = m.split('-'); return new Date(+y,+mo,0).getDate(); };
+
+    const rows3700 = [
+      { label: 'Units', values: sumMonths.map(() => UNITS_3700M) },
+      { label: 'Available Nights', values: sumMonths.map((m,i) => dIM(m)*UNITS_3700M) },
+      { label: 'Occupied Nights', values: sumMonths.map(m => Math.round(byMonthNights3700[m]||0)) },
+      { label: 'Occupancy', values: sumMonths.map((m,i) => fmtO(dIM(m)*UNITS_3700M>0?(byMonthNights3700[m]||0)/(dIM(m)*UNITS_3700M)*100:0)) },
+      { label: 'ADR', values: sumMonths.map(m => fmtV(byMonthADR[m]?.['3700M']||0)) },
+      { label: 'RevPAR', values: sumMonths.map(m => fmtV(byMonthRevPAR[m]?.['3700M']||0)) },
+      { label: 'Room Revenue', values: sumMonths.map(m => fmtV(byMonthPortfolio[m]?.['3700M']||0)) },
+      { label: 'Cleaning Fee', values: sumMonths.map(m => fmtV(byMonthClean3700[m]||0)) },
+      { label: 'OTA Adjustment', values: sumMonths.map(m => fmtAdj(byMonthOtaAdj3700[m]||0)) },
+      { label: 'Total Revenue', values: sumMonths.map(m => fmtV((byMonthPortfolio[m]?.['3700M']||0)+(byMonthClean3700[m]||0)+(byMonthOtaAdj3700[m]||0))), isTotal: true },
+      { label: 'OTA Commission', values: sumMonths.map(m => fmtAdj(-(byMonthOtaComm3700[m]||0))) },
+    ];
+
+    const rowsBP = [
+      { label: 'Units', values: sumMonths.map(() => UNITS_BP) },
+      { label: 'Available Nights', values: sumMonths.map((m,i) => dIM(m)*UNITS_BP) },
+      { label: 'Occupied Nights', values: sumMonths.map(m => Math.round(byMonthNightsBP[m]||0)) },
+      { label: 'Occupancy', values: sumMonths.map((m,i) => fmtO(dIM(m)*UNITS_BP>0?(byMonthNightsBP[m]||0)/(dIM(m)*UNITS_BP)*100:0)) },
+      { label: 'ADR', values: sumMonths.map(m => fmtV(byMonthADR[m]?.['Bayou Park']||0)) },
+      { label: 'RevPAR', values: sumMonths.map(m => fmtV(byMonthRevPAR[m]?.['Bayou Park']||0)) },
+      { label: 'Room Revenue', values: sumMonths.map(m => fmtV(byMonthPortfolio[m]?.['Bayou Park']||0)) },
+      { label: 'Cleaning Fee', values: sumMonths.map(m => fmtV(byMonthCleanBP[m]||0)) },
+      { label: 'OTA Adjustment', values: sumMonths.map(m => fmtAdj(byMonthOtaAdjBP[m]||0)) },
+      { label: 'Total Revenue', values: sumMonths.map(m => fmtV((byMonthPortfolio[m]?.['Bayou Park']||0)+(byMonthCleanBP[m]||0)+(byMonthOtaAdjBP[m]||0))), isTotal: true },
+      { label: 'OTA Commission', values: sumMonths.map(m => fmtAdj(-(byMonthOtaCommBP[m]||0))) },
+    ];
+
+    cy = summaryTable(margin, cy, '3700M  ·  Dallas — McKinney Ave', BLUE, rows3700, sumLabels);
+    cy += 6;
+    summaryTable(margin, cy, 'Bayou Park  ·  Houston — Montrose / Midtown', GREEN, rowsBP, sumLabels);
+
+    // Footer
+    const pageCount = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      pdf.setPage(i);
+      pdf.setTextColor(...TEXT3);
+      pdf.setFontSize(5.5);
+      pdf.text('US Living — Revenue Intelligence  |  Confidential', margin, H - 5);
+      pdf.text('Page ' + i + ' of ' + pageCount, W - margin, H - 5, { align: 'right' });
+    }
+
     pdf.save('US-Living-Revenue-' + from + '-' + to + '.pdf');
 
   } catch(e) {
     alert('Error generating PDF: ' + e.message);
+    console.error(e);
   } finally {
     btn.textContent = '⬇ Export PDF';
     btn.disabled = false;
