@@ -1384,8 +1384,10 @@ function redrawChart(chartId) {
       data: {
         labels,
         datasets: [
-          { label: '3700M', data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]['3700M']||0)), backgroundColor: 'rgba(74,158,255,0.85)', borderRadius: 3, borderSkipped: false },
-          { label: 'Bayou Park', data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]['Bayou Park']||0)), backgroundColor: 'rgba(61,214,140,0.85)', borderRadius: 3, borderSkipped: false }
+          { label: '3700M', data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]['3700M']||0)), backgroundColor: 'rgba(59,158,255,0.85)', borderRadius: 3, borderSkipped: false,
+            datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } },
+          { label: 'Bayou Park', data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]['Bayou Park']||0)), backgroundColor: 'rgba(45,212,160,0.85)', borderRadius: 3, borderSkipped: false,
+            datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } }
         ]
       },
       options: { ...CHART_OPTS, plugins: { legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}} },
