@@ -1296,7 +1296,8 @@ function redrawPortChart(portfolio, chartType) {
     destroyChart(ids.rev);
     charts[ids.rev] = new Chart(document.getElementById(ids.rev), {
       type: 'bar',
-      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0)), backgroundColor: rgbaColor, borderRadius: 3 }] },
+      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0)), backgroundColor: rgbaColor, borderRadius: 3,
+            datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } }] },
       options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+Math.round(ctx.parsed.y).toLocaleString()}}},
         scales: { x:{...scaleOpts.x,stacked:true}, y:{...scaleOpts.y,ticks:{...scaleOpts.y.ticks,callback:v=>'$'+(v/1000).toFixed(0)+'k'}} } }
     });
@@ -1973,7 +1974,8 @@ function render(reservations, from, to, prev, allListings) {
     destroyChart(ids.rev);
     charts[ids.rev] = new Chart(document.getElementById(ids.rev), {
       type: 'bar',
-      data: { labels: filteredRev.map(monthLabel), datasets: [{ data: filteredRev.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0)), backgroundColor: rgbaColor, borderRadius: 3 }] },
+      data: { labels: filteredRev.map(monthLabel), datasets: [{ data: filteredRev.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0)), backgroundColor: rgbaColor, borderRadius: 3,
+            datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } }] },
       options: { ...CHART_OPTS, plugins: { legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}} },
         scales: { x:{...scaleOpts.x,stacked:true}, y:{...scaleOpts.y,ticks:{...scaleOpts.y.ticks,callback:v=>'$'+(v/1000).toFixed(0)+'k'}} } }
     });
@@ -2143,8 +2145,8 @@ function render(reservations, from, to, prev, allListings) {
     data: {
       labels: pipeLabels,
       datasets: [
-        { label: '3700M', data: pipeMonths.map(m => Math.round(pipelineByMonth[m]['3700M']||0)), backgroundColor: 'rgba(74,158,255,0.85)', borderRadius: 3 },
-        { label: 'Bayou Park', data: pipeMonths.map(m => Math.round(pipelineByMonth[m]['Bayou Park']||0)), backgroundColor: 'rgba(61,214,140,0.85)', borderRadius: 3 }
+        { label: '3700M', data: pipeMonths.map(m => Math.round(pipelineByMonth[m]['3700M']||0)), backgroundColor: 'rgba(59,158,255,0.85)', borderRadius: 3, datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } },
+        { label: 'Bayou Park', data: pipeMonths.map(m => Math.round(pipelineByMonth[m]['Bayou Park']||0)), backgroundColor: 'rgba(45,212,160,0.85)', borderRadius: 3, datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } }
       ]
     },
     options: { ...CHART_OPTS,
