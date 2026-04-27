@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>US Living — Revenue Dashboard</title>
+<!-- v5 -->
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
@@ -19,8 +20,8 @@
   --border: #1E2A38;
   --border2: #273545;
   --text: #EDF2F7;
-  --text2: #7E93AC;
-  --text3: #3D5168;
+  --text2: #A8BDD0;
+  --text3: #7E99B8;
   --blue: #3B9EFF;
   --blue2: #1462CC;
   --blue-bg: rgba(59,158,255,0.08);
@@ -396,7 +397,7 @@ tr.total-row td {
 
   <div id="loadBox" style="display:none" class="loading-box">
     <div class="spinner"></div>
-    <div style="font-size:13px;color:var(--text3)">Fetching reservations from Guesty...</div>
+    <div style="font-size:13px;color:#8BAAC4">Fetching reservations from Guesty...</div>
   </div>
 
   <div id="main" style="display:none">
@@ -1472,7 +1473,7 @@ function render(reservations, from, to, prev, allListings) {
     const ci=r.checkIn?r.checkIn.split('T')[0]:'—',co=r.checkOut?r.checkOut.split('T')[0]:'—';
     const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
     const daysUntil=Math.ceil((new Date(ci)-new Date())/86400000);
-    const daysLabel=daysUntil===0?'<span style="color:var(--amber)">Today</span>':daysUntil===1?'<span style="color:var(--amber)">Tomorrow</span>':`<span style="color:var(--text3)">in ${daysUntil}d</span>`;
+    const daysLabel=daysUntil===0?'<span style="color:var(--amber)">Today</span>':daysUntil===1?'<span style="color:var(--amber)">Tomorrow</span>':`<span style="color:#8BAAC4">in ${daysUntil}d</span>`;
     return `<tr><td>${prop}</td><td>${r.guest?.fullName||'—'}</td><td>${ci} ${daysLabel}</td><td>${co}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td class="num">${$c(roomRev)}</td><td class="num">${$c(clean)}</td><td class="num">${$c(roomRev+clean)}</td><td class="num">${$c(otaComm)}</td></tr>`;
   }).join('');
 
