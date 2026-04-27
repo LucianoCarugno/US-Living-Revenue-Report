@@ -47,7 +47,6 @@ body {
   line-height: 1.5;
 }
 
-/* Subtle grid background */
 body::before {
   content: '';
   position: fixed;
@@ -64,7 +63,6 @@ body::before {
 
 .page { max-width: 1280px; margin: 0 auto; padding: 24px 24px 48px; position: relative; z-index: 1; }
 
-/* Header */
 .header {
   display: flex;
   align-items: center;
@@ -113,7 +111,6 @@ body::before {
 }
 .btn-primary:hover { background: #5BABFF; border-color: #5BABFF; box-shadow: 0 0 28px rgba(74,158,255,0.35); }
 
-/* Tabs */
 .tabs {
   display: flex; gap: 2px;
   background: var(--bg2); border: 1px solid var(--border);
@@ -130,7 +127,6 @@ body::before {
 .tab.active.blue { color: var(--blue); }
 .tab.active.green { color: var(--green); }
 
-/* KPI Grid */
 .kpi-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-bottom: 16px; }
 .kpi {
   background: var(--bg2); border: 1px solid var(--border);
@@ -150,7 +146,6 @@ body::before {
 .kpi-delta.down { background: rgba(255,92,92,0.12); color: var(--red); }
 .kpi-delta.neutral { background: var(--bg3); color: var(--text3); }
 
-/* Portfolio KPI rows */
 .portfolio-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 .portfolio-kpi-card {
   background: var(--bg2); border: 1px solid var(--border);
@@ -164,7 +159,6 @@ body::before {
 .pstat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
 .pstat-value { font-size: 15px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
 
-/* Charts */
 .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 .chart-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 .chart-full { margin-bottom: 12px; }
@@ -182,7 +176,6 @@ body::before {
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .legend-line { width: 16px; height: 2px; border-radius: 1px; flex-shrink: 0; }
 
-/* Section divider */
 .section-label {
   font-size: 9.5px; font-weight: 700; color: var(--text3);
   text-transform: uppercase; letter-spacing: 1.5px;
@@ -190,7 +183,6 @@ body::before {
 }
 .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
 
-/* Tables */
 .table-wrap {
   background: var(--bg2); border: 1px solid var(--border);
   border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px;
@@ -217,13 +209,11 @@ tr.total-row td {
   border-top: 1px solid var(--border); color: var(--blue);
 }
 
-/* Badges */
 .badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; font-family: 'Plus Jakarta Sans', sans-serif; }
 .badge-ok { background: rgba(61,214,140,0.12); color: var(--green); }
 .badge-warn { background: var(--amber-bg); color: var(--amber); }
 .badge-cancel { background: var(--red-bg); color: var(--red); }
 
-/* Channel bar */
 .channel-bars { display: flex; flex-direction: column; gap: 10px; }
 .channel-bar-item { display: flex; align-items: center; gap: 10px; }
 .channel-bar-label { font-size: 11px; color: var(--text2); width: 80px; flex-shrink: 0; }
@@ -232,7 +222,6 @@ tr.total-row td {
 .channel-bar-val { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text2); width: 60px; text-align: right; flex-shrink: 0; }
 .channel-bar-pct { font-size: 10px; color: var(--text3); width: 32px; text-align: right; flex-shrink: 0; }
 
-/* State boxes */
 .loading-box {
   background: var(--bg2); border: 1px solid var(--border);
   border-radius: var(--radius-lg); padding: 48px;
@@ -259,7 +248,6 @@ tr.total-row td {
 .empty-title { font-size: 15px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
 .empty-sub { font-size: 13px; color: var(--text3); }
 
-/* Occupancy unit chart */
 .occ-unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
 .occ-unit-card {
   background: var(--bg3); border: 1px solid var(--border);
@@ -310,7 +298,6 @@ tr.total-row td {
   .chart-row, .chart-row-3 { break-inside: avoid; }
 }
 
-/* Portfolio section header */
 .port-header {
   display: flex; align-items: center; gap: 10px;
   padding: 16px 18px; background: var(--bg2);
@@ -330,7 +317,6 @@ tr.total-row td {
 }
 @media(max-width: 640px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
 
-/* Summary table */
 .summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .summary-table th {
   padding: 7px 12px; text-align: right; font-size: 10px; font-weight: 600;
@@ -359,7 +345,6 @@ tr.total-row td {
 .summary-negative { color: var(--red) !important; }
 .summary-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow-x: auto; margin-bottom: 16px; }
 
-/* Period selector buttons */
 .chart-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
 .chart-header-left {}
 .period-btns { display: flex; gap: 2px; }
@@ -376,7 +361,6 @@ tr.total-row td {
 <body>
 <div class="page">
 
-  <!-- Header -->
   <div class="header">
     <div class="brand">
       <div class="brand-mark">US</div>
@@ -410,15 +394,12 @@ tr.total-row td {
     <button onclick="clearCSV()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:0 4px" title="Volver a API">✕</button>
   </div>
 
-  <!-- Loading -->
   <div id="loadBox" style="display:none" class="loading-box">
     <div class="spinner"></div>
     <div style="font-size:13px;color:var(--text3)">Fetching reservations from Guesty...</div>
   </div>
 
-  <!-- Main content -->
   <div id="main" style="display:none">
-    <!-- Tabs -->
     <div class="tabs">
       <div class="tab active blue" onclick="showTab('overview',this)">Overview</div>
       <div class="tab" onclick="showTab('summary',this)">Summary</div>
@@ -428,15 +409,9 @@ tr.total-row td {
       <div class="tab" onclick="showTab('pipeline',this)">Pipeline</div>
     </div>
 
-    <!-- OVERVIEW TAB -->
     <div id="tab-overview">
-      <!-- Top KPIs -->
       <div class="kpi-grid" id="kpiTop"></div>
-
-      <!-- Portfolio KPIs -->
       <div class="portfolio-kpis" id="portfolioKpis"></div>
-
-      <!-- Charts row 1: Revenue + Channel Mix -->
       <div class="chart-row">
         <div class="chart-card">
           <div class="chart-header">
@@ -461,7 +436,6 @@ tr.total-row td {
         </div>
       </div>
 
-      <!-- Charts row 2: ADR, RevPAR, Occupancy % -->
       <div class="chart-row-3">
         <div class="chart-card">
           <div class="chart-header">
@@ -513,7 +487,6 @@ tr.total-row td {
         </div>
       </div>
 
-      <!-- Occupancy by unit -->
       <div class="section-label">Occupancy by Unit</div>
       <div class="chart-row">
         <div class="chart-card">
@@ -529,7 +502,6 @@ tr.total-row td {
       </div>
     </div>
 
-    <!-- SUMMARY TAB -->
     <div id="tab-summary" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <div style="font-size:13px;color:var(--text2)">Monthly summary by portfolio</div>
@@ -543,7 +515,6 @@ tr.total-row td {
       <div id="summaryTable"></div>
     </div>
 
-    <!-- 3700M TAB -->
     <div id="tab-tab3700" style="display:none">
       <div class="port-header">
         <div class="dot" style="background:var(--blue);width:10px;height:10px;border-radius:50%"></div>
@@ -551,9 +522,7 @@ tr.total-row td {
         <div style="font-size:12px;color:var(--text3)">Dallas — McKinney Ave · 10 units</div>
         <div class="port-header-stats" id="portStats3700"></div>
       </div>
-      <!-- KPIs -->
       <div class="kpi-grid" id="kpi3700"></div>
-      <!-- Charts row -->
       <div class="chart-row">
         <div class="chart-card">
           <div class="chart-header">
@@ -614,12 +583,10 @@ tr.total-row td {
           <div class="chart-wrap"><canvas id="chartOcc3700" height="160"></canvas></div>
         </div>
       </div>
-      <!-- Occupancy by unit -->
       <div class="section-label">Occupancy by Unit</div>
       <div class="chart-card" style="margin-bottom:16px">
         <div class="occ-unit-grid" id="occUnits3700b"></div>
       </div>
-      <!-- Table -->
       <div class="section-label">Unit Breakdown</div>
       <div class="table-wrap">
         <table id="tbl3700">
@@ -634,7 +601,6 @@ tr.total-row td {
       </div>
     </div>
 
-    <!-- BAYOU PARK TAB -->
     <div id="tab-tabBP" style="display:none">
       <div class="port-header">
         <div class="dot" style="background:var(--green);width:10px;height:10px;border-radius:50%"></div>
@@ -642,9 +608,7 @@ tr.total-row td {
         <div style="font-size:12px;color:var(--text3)">Houston — Montrose / Midtown · 20 units</div>
         <div class="port-header-stats" id="portStatsBP"></div>
       </div>
-      <!-- KPIs -->
       <div class="kpi-grid" id="kpiBP"></div>
-      <!-- Charts row -->
       <div class="chart-row">
         <div class="chart-card">
           <div class="chart-header">
@@ -705,12 +669,10 @@ tr.total-row td {
           <div class="chart-wrap"><canvas id="chartOccBP" height="160"></canvas></div>
         </div>
       </div>
-      <!-- Occupancy by unit -->
       <div class="section-label">Occupancy by Unit</div>
       <div class="chart-card" style="margin-bottom:16px">
         <div class="occ-unit-grid" id="occUnitsBPb"></div>
       </div>
-      <!-- Table -->
       <div class="section-label">Unit Breakdown</div>
       <div class="table-wrap">
         <table id="tblBP">
@@ -725,23 +687,14 @@ tr.total-row td {
       </div>
     </div>
 
-    <!-- BOOKINGS TAB -->
     <div id="tab-bookings" style="display:none">
       <div class="table-wrap">
         <table id="tblBookings">
           <thead><tr>
-            <th>Property</th>
-            <th>Guest</th>
-            <th>Check-in</th>
-            <th>Check-out</th>
-            <th class="num">Nights</th>
-            <th>Channel</th>
-            <th>Status</th>
-            <th class="num">Room Rev.</th>
-            <th class="num">Cleaning</th>
-            <th class="num">OTA Adj.</th>
-            <th class="num">Total Rev.</th>
-            <th class="num">OTA Comm.</th>
+            <th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th>
+            <th class="num">Nights</th><th>Channel</th><th>Status</th>
+            <th class="num">Room Rev.</th><th class="num">Cleaning</th>
+            <th class="num">OTA Adj.</th><th class="num">Total Rev.</th><th class="num">OTA Comm.</th>
           </tr></thead>
           <tbody></tbody>
         </table>
@@ -749,46 +702,35 @@ tr.total-row td {
     </div>
   </div>
 
-
-    <!-- PIPELINE TAB -->
-    <div id="tab-pipeline" style="display:none">
-      <!-- KPIs -->
-      <div class="kpi-grid" id="kpiPipeline"></div>
-      <!-- Revenue chart -->
-      <div class="chart-row">
-        <div class="chart-card">
-          <div class="chart-title">Confirmed Revenue Pipeline</div>
-          <div class="chart-subtitle">Room revenue by future month, stacked by portfolio</div>
-          <div class="chart-legend" id="legendPipeline"></div>
-          <div class="chart-wrap"><canvas id="chartPipeline" height="240"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Bookings by Portfolio</div>
-          <div class="chart-subtitle">Upcoming confirmed stays</div>
-          <div id="pipelinePortBars" style="margin-top:8px"></div>
-        </div>
+  <div id="tab-pipeline" style="display:none">
+    <div class="kpi-grid" id="kpiPipeline"></div>
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-title">Confirmed Revenue Pipeline</div>
+        <div class="chart-subtitle">Room revenue by future month, stacked by portfolio</div>
+        <div class="chart-legend" id="legendPipeline"></div>
+        <div class="chart-wrap"><canvas id="chartPipeline" height="240"></canvas></div>
       </div>
-      <!-- Upcoming table -->
-      <div class="section-label">Upcoming Reservations</div>
-      <div class="table-wrap">
-        <table id="tblPipeline">
-          <thead><tr>
-            <th>Property</th>
-            <th>Guest</th>
-            <th>Check-in</th>
-            <th>Check-out</th>
-            <th class="num">Nights</th>
-            <th>Channel</th>
-            <th class="num">Room Rev.</th>
-            <th class="num">Cleaning</th>
-            <th class="num">Total Rev.</th>
-            <th class="num">OTA Comm.</th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
+      <div class="chart-card">
+        <div class="chart-title">Bookings by Portfolio</div>
+        <div class="chart-subtitle">Upcoming confirmed stays</div>
+        <div id="pipelinePortBars" style="margin-top:8px"></div>
       </div>
     </div>
-  <!-- Empty state -->
+    <div class="section-label">Upcoming Reservations</div>
+    <div class="table-wrap">
+      <table id="tblPipeline">
+        <thead><tr>
+          <th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th>
+          <th class="num">Nights</th><th>Channel</th>
+          <th class="num">Room Rev.</th><th class="num">Cleaning</th>
+          <th class="num">Total Rev.</th><th class="num">OTA Comm.</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
   <div id="emptyBox" class="empty-box">
     <div class="empty-icon">📊</div>
     <div class="empty-title">Select a period to load data</div>
@@ -804,9 +746,16 @@ const UNITS_BP = 20;
 
 let charts = {};
 
-// Init dates
+// ─── AXIS SCALE OPTIONS — improved visibility ────────────────────────────────
+// X axis: brighter labels, slightly larger font
+// Y axis: brighter labels, monospace weight 500
+// Grid: subtler, lighter lines
+const AXIS_X = { color: '#9BB5CC', font: { size: 11, weight: '500' } };
+const AXIS_Y = { color: '#A8BFCF', font: { size: 11, weight: '500' } };
+const GRID_COLOR = 'rgba(80,110,140,0.2)';
+
 const now = new Date();
-setTimeout(updateDataSourceUI, 100); // update UI after DOM ready
+setTimeout(updateDataSourceUI, 100);
 document.getElementById('df').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
 document.getElementById('dt').value = now.toISOString().split('T')[0];
 
@@ -814,9 +763,7 @@ function showTab(name, el) {
   ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t => {
     document.getElementById('tab-'+t).style.display = 'none';
   });
-  document.querySelectorAll('.tab').forEach(t => {
-    t.classList.remove('active','blue','green');
-  });
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active','blue','green'));
   document.getElementById('tab-'+name).style.display = '';
   el.classList.add('active');
   if (name === 'overview') el.classList.add('blue');
@@ -831,18 +778,17 @@ function fmt(v) { return Math.round(v).toLocaleString('en-US'); }
 
 function delta(current, previous) {
   if (!previous || previous === 0) return '';
-  const pct = ((current - previous) / previous) * 100;
-  const sign = pct >= 0 ? '+' : '';
-  const cls = pct >= 0 ? 'up' : 'down';
-  const arrow = pct >= 0 ? '▲' : '▼';
-  return `<div class="kpi-delta ${cls}">${arrow} ${sign}${Math.round(Math.abs(pct))}% vs prev.</div>`;
+  const p = ((current - previous) / previous) * 100;
+  const sign = p >= 0 ? '+' : '';
+  const cls = p >= 0 ? 'up' : 'down';
+  const arrow = p >= 0 ? '▲' : '▼';
+  return `<div class="kpi-delta ${cls}">${arrow} ${sign}${Math.round(Math.abs(p))}% vs prev.</div>`;
 }
 
 function getPortfolio(nickname) {
   const n = (nickname || '').toLowerCase();
   if (n.includes('3700m') || n.includes('3700 m') || n.includes('3700')) return '3700M';
   if (n.includes('ubp') || n.includes('bayou') || n.includes('midtown') || n.includes('montrose') || n.includes('unit 1') || n.includes('unit 2') || n.includes('unit 3') || n.includes('two bed')) return 'Bayou Park';
-  // Fallback: check address
   return null;
 }
 
@@ -862,12 +808,10 @@ function getDaysInPeriod(from, to) {
   return Math.max(1, Math.ceil((new Date(to+' 00:00') - new Date(from+' 00:00')) / 86400000) + 1);
 }
 
-// CSV data store - persisted in localStorage
 let csvReservations = null;
 let csvFileName = null;
-let csvMode = false; // false = API, true = CSV
+let csvMode = false;
 
-// Load saved CSV from localStorage on startup
 (function initCSV() {
   try {
     const saved = localStorage.getItem('guesty_csv');
@@ -876,9 +820,8 @@ let csvMode = false; // false = API, true = CSV
       csvReservations = JSON.parse(saved);
       csvFileName = savedName || 'archivo guardado';
       csvMode = true;
-      console.log('CSV cargado desde localStorage:', csvReservations.length, 'reservas');
     }
-  } catch(e) { console.log('No CSV guardado'); }
+  } catch(e) {}
 })();
 
 function updateDataSourceUI() {
@@ -894,32 +837,14 @@ function updateDataSourceUI() {
   }
 }
 
-function switchToAPI() {
-  csvMode = false;
-  updateDataSourceUI();
-  loadData();
-}
-
+function switchToAPI() { csvMode = false; updateDataSourceUI(); loadData(); }
 function switchToCSV() {
-  if (csvReservations) {
-    // Already have CSV - just switch mode
-    csvMode = true;
-    updateDataSourceUI();
-    loadData();
-  } else {
-    // No CSV saved - open file picker
-    document.getElementById('csvFile').click();
-  }
+  if (csvReservations) { csvMode = true; updateDataSourceUI(); loadData(); }
+  else { document.getElementById('csvFile').click(); }
 }
-
-function uploadNewCSV() {
-  document.getElementById('csvFile').click();
-}
-
+function uploadNewCSV() { document.getElementById('csvFile').click(); }
 function clearCSV() {
-  csvReservations = null;
-  csvFileName = null;
-  csvMode = false;
+  csvReservations = null; csvFileName = null; csvMode = false;
   try { localStorage.removeItem('guesty_csv'); localStorage.removeItem('guesty_csv_name'); } catch(e) {}
   document.getElementById('csvFile').value = '';
   updateDataSourceUI();
@@ -928,9 +853,7 @@ function clearCSV() {
 function parseCSV(text) {
   const lines = text.split('\n').slice(1).filter(l => l.trim());
   const reservations = [];
-  
   lines.forEach(line => {
-    // Handle quoted CSV fields
     const cols = [];
     let cur = '', inQuote = false;
     for (let i = 0; i < line.length; i++) {
@@ -939,79 +862,45 @@ function parseCSV(text) {
       else { cur += line[i]; }
     }
     cols.push(cur.trim());
-    
     const clean = c => (c||'').replace(/^"|"$/g,'').trim();
-    const ciStr  = clean(cols[5]);
-    const coStr  = clean(cols[6]);
-    const status = clean(cols[9]);
-    const nick   = clean(cols[11]);
-    const source = clean(cols[7]);
-    const guest  = clean(cols[4]);
-    const roomRev  = parseFloat(clean(cols[12])) || 0;
+    const ciStr = clean(cols[5]), coStr = clean(cols[6]);
+    const status = clean(cols[9]), nick = clean(cols[11]), source = clean(cols[7]), guest = clean(cols[4]);
+    const roomRev = parseFloat(clean(cols[12])) || 0;
     const cleanFee = parseFloat(clean(cols[13])) || 0;
-    const comm     = Math.abs(parseFloat(clean(cols[14])) || 0);
-    const otaAdj   = parseFloat(clean(cols[15])) || 0;  // resolution center — negative = cost
+    const comm = Math.abs(parseFloat(clean(cols[14])) || 0);
+    const otaAdj = parseFloat(clean(cols[15])) || 0;
     const confirmCode = clean(cols[2]);
-    
     if (!ciStr || !coStr) return;
-    
     const ci = new Date(ciStr + 'T00:00:00');
     const co = new Date(coStr + 'T00:00:00');
     const nights = Math.max(1, Math.round((co - ci) / 86400000));
-    
-    // Fold OTA adjustment into fareAccommodation so it gets prorated correctly
-    // Resolution center applies to the whole reservation, so we add it to room rev
-    // (it's already negative when it's a cost, positive when it's a credit)
-    const adjustedRoomRev = roomRev + otaAdj;
-    
-    // Build a reservation object compatible with our render function
     reservations.push({
-      checkIn: ci.toISOString(),
-      checkOut: co.toISOString(),
-      nightsCount: nights,
-      status: status,
+      checkIn: ci.toISOString(), checkOut: co.toISOString(), nightsCount: nights, status,
       source: source === 'airbnb2' ? 'airbnb2' : source === 'Booking.com' ? 'bookingCom' : source === 'manual' ? 'manual' : source,
       confirmationCode: confirmCode,
       guest: { fullName: guest || '—' },
       listing: { nickname: nick, title: nick, address: { full: '' } },
-      money: {
-        fareAccommodation: adjustedRoomRev,
-        fareCleaning: cleanFee,
-        hostServiceFee: comm,
-        resolutionAmount: otaAdj
-      }
+      money: { fareAccommodation: roomRev + otaAdj, fareCleaning: cleanFee, hostServiceFee: comm, resolutionAmount: otaAdj }
     });
   });
-  
   return reservations;
 }
 
 async function loadCSV(input) {
   const file = input.files[0];
   if (!file) return;
-  
   const btnCSVLabel = document.getElementById('btnCSVLabel');
   if (btnCSVLabel) btnCSVLabel.textContent = '⏳ Cargando...';
-  
   const text = await file.text();
   csvReservations = parseCSV(text);
   csvFileName = file.name;
   csvMode = true;
-  
-  // Save to localStorage for persistence
-  try {
-    localStorage.setItem('guesty_csv', JSON.stringify(csvReservations));
-    localStorage.setItem('guesty_csv_name', file.name);
-  } catch(e) {
-    console.log('No se pudo guardar en localStorage (archivo muy grande?)');
-  }
-  
+  try { localStorage.setItem('guesty_csv', JSON.stringify(csvReservations)); localStorage.setItem('guesty_csv_name', file.name); } catch(e) {}
   updateDataSourceUI();
   loadData();
 }
 
 async function fetchAll(from, to) {
-  // Expand from by 90 days to catch long stays that started before the period
   const expandedFrom = new Date(from + ' 00:00');
   expandedFrom.setDate(expandedFrom.getDate() - 90);
   const wideFrom = expandedFrom.toISOString().split('T')[0];
@@ -1023,51 +912,32 @@ async function fetchAll(from, to) {
 }
 
 function getPrevPeriod(from, to) {
-  const f = new Date(from + ' 00:00');
-  const t = new Date(to + ' 00:00');
+  const f = new Date(from + ' 00:00'), t = new Date(to + ' 00:00');
   const diffMs = t - f + 86400000;
-  const pf = new Date(f - diffMs);
-  const pt = new Date(f - 86400000);
-  return {
-    from: pf.toISOString().split('T')[0],
-    to: pt.toISOString().split('T')[0]
-  };
+  return { from: new Date(f - diffMs).toISOString().split('T')[0], to: new Date(f - 86400000).toISOString().split('T')[0] };
 }
 
-function calcTotals(reservations, from, to, unitCount3700, unitCountBP) {
+function calcTotals(reservations, from, to, u3700, uBP) {
   const confirmed = reservations.filter(r => r.status !== 'cancelled');
   const diffDays = getDaysInPeriod(from, to);
   let roomRev=0, clean=0, otaComm=0, nights=0;
-  const pStart = new Date(from + 'T00:00:00');
-  const pEnd   = new Date(to   + 'T23:59:59');
+  const pStart = new Date(from + 'T00:00:00'), pEnd = new Date(to + 'T23:59:59');
   confirmed.forEach(r => {
-    const ci = new Date(r.checkIn);
-    const co = new Date(r.checkOut);
+    const ci = new Date(r.checkIn), co = new Date(r.checkOut);
     const tn = Math.max(1, Math.round((co - ci) / 86400000));
-    let nin = 0;
-    let cur = new Date(ci);
+    let nin = 0; let cur = new Date(ci);
     while (cur < co) { if (cur >= pStart && cur <= pEnd) nin++; cur.setDate(cur.getDate()+1); }
     roomRev += (r.money?.fareAccommodation || 0) * nin / tn;
-    // Cleaning at checkout date
-    const coDate = new Date(r.checkOut);
-    if (coDate >= pStart && coDate <= pEnd) clean += (r.money?.fareCleaning || 0);
+    if (new Date(r.checkOut) >= pStart && new Date(r.checkOut) <= pEnd) clean += (r.money?.fareCleaning || 0);
     otaComm += Math.abs(r.money?.hostServiceFee || 0) * nin / tn;
-    nights  += nin;
+    nights += nin;
   });
-  const totalAvail = (unitCount3700 + unitCountBP) * diffDays;
-  return {
-    totalRev: roomRev + clean,
-    roomRev, clean, otaComm,
-    occ: totalAvail > 0 ? nights / totalAvail : 0,
-    adr: nights > 0 ? roomRev / nights : 0,
-    revpar: totalAvail > 0 ? roomRev / totalAvail : 0,
-    nights, totalAvail
-  };
+  const totalAvail = (u3700 + uBP) * diffDays;
+  return { totalRev: roomRev+clean, roomRev, clean, otaComm, occ: totalAvail>0?nights/totalAvail:0, adr: nights>0?roomRev/nights:0, revpar: totalAvail>0?roomRev/totalAvail:0, nights, totalAvail };
 }
 
 async function loadData() {
-  const from = document.getElementById('df').value;
-  const to = document.getElementById('dt').value;
+  const from = document.getElementById('df').value, to = document.getElementById('dt').value;
   if (!from || !to) { showErr('Please select a valid period.'); return; }
   document.getElementById('errBox').style.display = 'none';
   document.getElementById('main').style.display = 'none';
@@ -1082,14 +952,9 @@ async function loadData() {
       fetch(`${PROXY}/listings`).then(r=>r.json()).catch(()=>({results:[]}))
     ]);
     const allListings = (listingsRes.results || []).filter(l => l.nickname && !l.nickname.toLowerCase().includes('test'));
-    const prevTotals = calcTotals(prevRes, prev.from, prev.to, UNITS_3700M, UNITS_BP);
-    render(res, from, to, prevTotals, allListings);
-  } catch(e) {
-    showErr('Error loading data: ' + e.message);
-  } finally {
-    document.getElementById('loadBox').style.display = 'none';
-    document.getElementById('btnLoad').disabled = false;
-  }
+    render(res, from, to, calcTotals(prevRes, prev.from, prev.to, UNITS_3700M, UNITS_BP), allListings);
+  } catch(e) { showErr('Error loading data: ' + e.message); }
+  finally { document.getElementById('loadBox').style.display = 'none'; document.getElementById('btnLoad').disabled = false; }
 }
 
 function showErr(m) {
@@ -1098,45 +963,13 @@ function showErr(m) {
   document.getElementById('emptyBox').style.display = 'block';
 }
 
-function destroyChart(id) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
-}
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+function monthLabel(ym) { const [y,m] = ym.split('-'); return new Date(+y,+m-1).toLocaleString('en',{month:'short',year:'2-digit'}); }
 
-function accrueByMonth(reservations, from, to, getVal) {
-  const result = {};
-  reservations.forEach(r => {
-    const checkIn = new Date(r.checkIn);
-    const checkOut = new Date(r.checkOut);
-    const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
-    const val = getVal(r);
-    const daily = val / totalNights;
-    let cur = new Date(checkIn);
-    const start = new Date(from);
-    const end = new Date(to + 'T23:59:59');
-    while (cur < checkOut) {
-      if (cur >= start && cur <= end) {
-        const ym = cur.toISOString().substring(0, 7);
-        if (!result[ym]) result[ym] = 0;
-        result[ym] += daily;
-      }
-      cur.setDate(cur.getDate() + 1);
-    }
-  });
-  return result;
-}
-
-function monthLabel(ym) {
-  const [y, m] = ym.split('-');
-  return new Date(+y, +m-1).toLocaleString('en', {month:'short', year:'2-digit'});
-}
-
-// Summary period state
 let summaryPeriod = 12;
-
 function setSummaryPeriod(months, btn) {
   summaryPeriod = months;
-  const container = btn.parentElement;
-  container.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.parentElement.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderSummaryTable();
 }
@@ -1145,117 +978,80 @@ function renderSummaryTable() {
   if (!_lastRenderData || !_lastSummaryData) return;
   const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc } = _lastRenderData;
   const { byMonthClean3700, byMonthCleanBP, byMonthOtaAdj3700, byMonthOtaAdjBP,
-          byMonthOtaComm3700, byMonthOtaCommBP, byMonthNights3700, byMonthNightsBP,
-          units3700, unitsBP } = _lastSummaryData;
-
+          byMonthOtaComm3700, byMonthOtaCommBP, byMonthNights3700, byMonthNightsBP, units3700, unitsBP } = _lastSummaryData;
   const filteredMonths = filterMonths(months, summaryPeriod);
-
   const fmt$ = v => v === 0 ? '-' : '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
   const fmtPct = v => v === 0 ? '-' : Math.round(v * 100) + '%';
   const fmtN = v => v === 0 ? '-' : Math.round(v).toLocaleString('en-US');
-  const fmtNeg = v => {
-    if (v === 0) return '-';
-    const s = '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
-    return v < 0 ? '<span class="summary-negative">(' + s + ')</span>' : s;
-  };
+  const fmtNeg = v => { if (v === 0) return '-'; const s = '$' + Math.round(Math.abs(v)).toLocaleString('en-US'); return v < 0 ? '<span class="summary-negative">(' + s + ')</span>' : s; };
+  const monthCols = filteredMonths.map(m => { const [y,mo] = m.split('-'); return new Date(+y,+mo-1).toLocaleString('en',{month:'2-digit',year:'2-digit'}).replace(' ','/'); });
+  const daysInMonth = filteredMonths.map(m => { const [y,mo] = m.split('-'); return new Date(+y,+mo,0).getDate(); });
+  const header = `<tr><th>Monthly</th>${filteredMonths.map((m,i)=>`<th>${daysInMonth[i]}<br><span style="font-weight:400">${monthCols[i]}</span></th>`).join('')}</tr>`;
 
-  const monthCols = filteredMonths.map(m => {
-    const [y, mo] = m.split('-');
-    const d = new Date(+y, +mo-1);
-    return d.toLocaleString('en', {month:'2-digit', year:'2-digit'}).replace(' ', '/');
-  });
-
-  const daysInMonth = filteredMonths.map(m => {
-    const [y, mo] = m.split('-');
-    return new Date(+y, +mo, 0).getDate();
-  });
-
-  const header = `<tr>
-    <th>Monthly</th>
-    ${filteredMonths.map((m, i) => `<th>${daysInMonth[i]}<br><span style="font-weight:400">${monthCols[i]}</span></th>`).join('')}
-  </tr>`;
-
-  function portRows(port, color, hexColor, unitCount,
-      byMonthRev, byMonthClean, byMonthOtaAdj, byMonthOtaComm, byMonthNights, byMonthAvail) {
-
+  function portRows(port, hexColor, unitCount, byMonthRev, byMonthClean, byMonthOtaAdj, byMonthOtaComm, byMonthNights) {
     const rows = [
-      { label: 'Units', vals: filteredMonths.map(() => unitCount), fmt: v => v },
-      { label: 'Available Nights', vals: filteredMonths.map((m,i) => daysInMonth[i] * unitCount), fmt: fmtN },
-      { label: 'Occupied Nights', vals: filteredMonths.map(m => byMonthNights[m]||0), fmt: fmtN },
-      { label: 'Occupancy', vals: filteredMonths.map((m,i) => {
-          const avail = daysInMonth[i] * unitCount;
-          return avail > 0 ? (byMonthNights[m]||0) / avail : 0;
-        }), fmt: fmtPct },
-      { label: 'ADR', vals: filteredMonths.map(m => byMonthADR[m]?.[port]||0), fmt: fmt$ },
-      { label: 'RevPAR', vals: filteredMonths.map(m => byMonthRevPAR[m]?.[port]||0), fmt: fmt$ },
-      { label: 'Room Revenue', vals: filteredMonths.map(m => byMonthRev[m]?.[port]||0), fmt: fmt$, bold: true, prefix: '$' },
-      { label: 'Cleaning Fee', vals: filteredMonths.map(m => byMonthClean[m]||0), fmt: fmt$ },
-      { label: 'OTA Adjustment', vals: filteredMonths.map(m => byMonthOtaAdj[m]||0), fmt: fmtNeg, html: true },
-      { label: 'Total Revenue', vals: filteredMonths.map(m => (byMonthRev[m]?.[port]||0) + (byMonthClean[m]||0) + (byMonthOtaAdj[m]||0)), fmt: fmt$, total: true },
-      { label: 'OTA Commission', vals: filteredMonths.map(m => byMonthOtaComm[m]||0), fmt: fmtNeg, html: true },
+      { label: 'Units', vals: filteredMonths.map(()=>unitCount), fmt: v=>v },
+      { label: 'Available Nights', vals: filteredMonths.map((m,i)=>daysInMonth[i]*unitCount), fmt: fmtN },
+      { label: 'Occupied Nights', vals: filteredMonths.map(m=>byMonthNights[m]||0), fmt: fmtN },
+      { label: 'Occupancy', vals: filteredMonths.map((m,i)=>{ const avail=daysInMonth[i]*unitCount; return avail>0?(byMonthNights[m]||0)/avail:0; }), fmt: fmtPct },
+      { label: 'ADR', vals: filteredMonths.map(m=>byMonthADR[m]?.[port]||0), fmt: fmt$ },
+      { label: 'RevPAR', vals: filteredMonths.map(m=>byMonthRevPAR[m]?.[port]||0), fmt: fmt$ },
+      { label: 'Room Revenue', vals: filteredMonths.map(m=>byMonthRev[m]?.[port]||0), fmt: fmt$, bold: true },
+      { label: 'Cleaning Fee', vals: filteredMonths.map(m=>byMonthClean[m]||0), fmt: fmt$ },
+      { label: 'OTA Adjustment', vals: filteredMonths.map(m=>byMonthOtaAdj[m]||0), fmt: fmtNeg, html: true },
+      { label: 'Total Revenue', vals: filteredMonths.map(m=>(byMonthRev[m]?.[port]||0)+(byMonthClean[m]||0)+(byMonthOtaAdj[m]||0)), fmt: fmt$, total: true },
+      { label: 'OTA Commission', vals: filteredMonths.map(m=>byMonthOtaComm[m]||0), fmt: fmtNeg, html: true },
     ];
-
-    const sectionHeader = `<tr class="summary-section-header">
-      <td colspan="${filteredMonths.length + 1}" style="color:${hexColor} !important">${port}</td>
-    </tr>`;
-
-    const dataRows = rows.map(row => {
-      const cls = row.total ? 'summary-total-row' : '';
-      const cells = row.vals.map(v => {
-        const formatted = row.fmt(v);
-        return `<td>${typeof formatted === 'string' ? formatted : formatted}</td>`;
-      }).join('');
-      const labelStyle = row.bold ? 'font-weight:600;color:var(--text)' : '';
-      return `<tr class="${cls}"><td style="${labelStyle}">${row.label}</td>${cells}</tr>`;
-    }).join('');
-
-    return sectionHeader + dataRows;
+    return `<tr class="summary-section-header"><td colspan="${filteredMonths.length+1}" style="color:${hexColor} !important">${port}</td></tr>` +
+      rows.map(row => `<tr class="${row.total?'summary-total-row':''}"><td style="${row.bold?'font-weight:600;color:var(--text)':''}">${row.label}</td>${row.vals.map(v=>`<td>${row.fmt(v)}</td>`).join('')}</tr>`).join('');
   }
 
-  const table3700 = portRows('3700M', 'blue', 'var(--blue)', units3700,
-    byMonthPortfolio, byMonthClean3700, byMonthOtaAdj3700, byMonthOtaComm3700, byMonthNights3700);
-  const tableBP = portRows('Bayou Park', 'green', 'var(--green)', unitsBP,
-    byMonthPortfolio, byMonthCleanBP, byMonthOtaAdjBP, byMonthOtaCommBP, byMonthNightsBP);
-
-  const spacer = `<tr><td colspan="${filteredMonths.length + 1}" style="height:12px;background:var(--bg)"></td></tr>`;
-
-  document.getElementById('summaryTable').innerHTML = `
-    <div class="summary-wrap">
-      <table class="summary-table">
-        <thead>${header}</thead>
-        <tbody>${table3700}${spacer}${tableBP}</tbody>
-      </table>
-    </div>`;
+  const spacer = `<tr><td colspan="${filteredMonths.length+1}" style="height:12px;background:var(--bg)"></td></tr>`;
+  document.getElementById('summaryTable').innerHTML = `<div class="summary-wrap"><table class="summary-table"><thead>${header}</thead><tbody>
+    ${portRows('3700M','var(--blue)',units3700,byMonthPortfolio,byMonthClean3700,byMonthOtaAdj3700,byMonthOtaComm3700,byMonthNights3700)}
+    ${spacer}
+    ${portRows('Bayou Park','var(--green)',unitsBP,byMonthPortfolio,byMonthCleanBP,byMonthOtaAdjBP,byMonthOtaCommBP,byMonthNightsBP)}
+  </tbody></table></div>`;
 }
 
-// Store last summary data for period filter
 let _lastSummaryData = null;
-
-// Chart period state (months to show, 0 = all)
 const chartPeriods = { rev: 12, adr: 12, revpar: 12, occ: 12 };
+const portChartPeriods = { '3700M': {rev:12,adr:12,revpar:12,occ:12}, 'Bayou Park': {rev:12,adr:12,revpar:12,occ:12} };
 
 function setChartPeriod(chartId, months, btn) {
   chartPeriods[chartId] = months;
-  // Update active button
-  const container = btn.parentElement;
-  container.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.parentElement.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  // Redraw the specific chart
   redrawChart(chartId);
 }
 
-// Portfolio chart period state
-const portChartPeriods = {
-  '3700M':      { rev: 12, adr: 12, revpar: 12, occ: 12 },
-  'Bayou Park': { rev: 12, adr: 12, revpar: 12, occ: 12 }
-};
-
 function setPortChartPeriod(portfolio, chartType, months, btn) {
   portChartPeriods[portfolio][chartType] = months;
-  const container = btn.parentElement;
-  container.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.parentElement.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   redrawPortChart(portfolio, chartType);
+}
+
+function filterMonths(months, periodMonths) {
+  if (!periodMonths) return months;
+  const toYm = _lastRenderData?.toDate ? _lastRenderData.toDate.substring(0,7) : null;
+  if (toYm) {
+    let endIdx = months.length - 1;
+    for (let i = months.length-1; i >= 0; i--) { if (months[i] <= toYm) { endIdx = i; break; } }
+    return months.slice(Math.max(0, endIdx-periodMonths+1), endIdx+1);
+  }
+  return months.slice(months.length - periodMonths);
+}
+
+let _lastRenderData = null;
+let _lastPortRenderData = {};
+
+// ─── SHARED CHART SCALE BUILDER ───────────────────────────────────────────────
+function mkScales(xExtra, yExtra, yCallback) {
+  return {
+    x: { ticks: { color: '#9BB5CC', font: { size: 11, weight: '500' } }, grid: { display: false }, ...xExtra },
+    y: { ticks: { color: '#A8BFCF', font: { size: 11, weight: '500' }, callback: yCallback }, grid: { color: 'rgba(80,110,140,0.2)' }, ...yExtra }
+  };
 }
 
 function redrawPortChart(portfolio, chartType) {
@@ -1263,52 +1059,8 @@ function redrawPortChart(portfolio, chartType) {
   const portData = _lastPortRenderData[portfolio];
   if (!portData) return;
   const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc, hexColor, rgbaColor, rgbaFill, ids } = portData;
-  // Register datalabels plugin with safe defaults
-  if (window.ChartDataLabels) {
-    Chart.register(ChartDataLabels);
-    // Disable datalabels globally by default - only enable per-dataset
-    Chart.defaults.plugins.datalabels = { display: false };
-  }
-
+  if (window.ChartDataLabels) { Chart.register(ChartDataLabels); Chart.defaults.plugins.datalabels = { display: false }; }
   const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
-
-  const DATALABEL_OPTS = {
-    display: ctx => {
-      const data = ctx.dataset.data;
-      const i = ctx.dataIndex;
-      const n = data.length;
-      if (n <= 5) return true;
-      const valid = data.filter(v => v > 0);
-      const max = Math.max(...valid);
-      const min = Math.min(...valid);
-      return i === n - 1 || data[i] === max || data[i] === min;
-    },
-    color: 'rgba(232,237,243,0.9)',
-    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
-    anchor: 'end',
-    align: 'top',
-    offset: 3,
-    formatter: v => v > 0 ? '$' + Math.round(v) : null,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    borderRadius: 3,
-    padding: { top: 2, bottom: 2, left: 4, right: 4 }
-  };
-
-  const DATALABEL_PCT = {
-    display: true,
-    color: '#EDF2F7',
-    font: { size: 9, family: 'JetBrains Mono', weight: '600' },
-    anchor: 'end',
-    align: 'top',
-    offset: 4,
-    formatter: v => v > 0 ? Math.round(v) + '%' : null,
-    backgroundColor: 'rgba(8,12,16,0.82)',
-    borderRadius: 3,
-    borderWidth: 0,
-    padding: { top: 2, bottom: 2, left: 5, right: 5 }
-  };
-  const scaleOpts = { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { color: 'rgba(42,52,65,0.5)' } } };
-
   const filteredMonths = filterMonths(months, portChartPeriods[portfolio][chartType]);
   const labels = filteredMonths.map(monthLabel);
 
@@ -1316,103 +1068,51 @@ function redrawPortChart(portfolio, chartType) {
     destroyChart(ids.rev);
     charts[ids.rev] = new Chart(document.getElementById(ids.rev), {
       type: 'bar',
-      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0)), backgroundColor: rgbaColor, borderRadius: 3,
-            datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } }] },
+      data: { labels, datasets: [{ data: filteredMonths.map(m=>Math.round(byMonthPortfolio[m]?.[portfolio]||0)), backgroundColor: rgbaColor, borderRadius: 3,
+        datalabels: { display:'auto', color:'rgba(232,237,243,0.85)', font:{size:9,family:'JetBrains Mono',weight:'500'}, anchor:'center', align:'center', formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null), clamp:true } }] },
       options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+Math.round(ctx.parsed.y).toLocaleString()}}},
-        scales: { x:{...scaleOpts.x,stacked:true}, y:{...scaleOpts.y,ticks:{...scaleOpts.y.ticks,callback:v=>'$'+(v/1000).toFixed(0)+'k'}} } }
+        scales: mkScales({stacked:true},{stacked:true}, v=>'$'+(v/1000).toFixed(0)+'k') }
     });
   } else if (chartType === 'adr') {
     destroyChart(ids.adr);
     charts[ids.adr] = new Chart(document.getElementById(ids.adr), {
       type: 'line',
-      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthADR[m]?.[portfolio]||0)), borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
-      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y}}},
-        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
+      data: { labels, datasets: [{ data:filteredMonths.map(m=>Math.round(byMonthADR[m]?.[portfolio]||0)), borderColor:hexColor, backgroundColor:rgbaFill, tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:hexColor }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y}}}, scales: mkScales({},{}, v=>'$'+v) }
     });
   } else if (chartType === 'revpar') {
     destroyChart(ids.revpar);
     charts[ids.revpar] = new Chart(document.getElementById(ids.revpar), {
       type: 'line',
-      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthRevPAR[m]?.[portfolio]||0)), borderColor: '#F5A623', backgroundColor: 'rgba(245,166,35,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#F5A623' }] },
-      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y}}},
-        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
+      data: { labels, datasets: [{ data:filteredMonths.map(m=>Math.round(byMonthRevPAR[m]?.[portfolio]||0)), borderColor:'#F5A623', backgroundColor:'rgba(245,166,35,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#F5A623' }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y}}}, scales: mkScales({},{}, v=>'$'+v) }
     });
   } else if (chartType === 'occ') {
     destroyChart(ids.occ);
     charts[ids.occ] = new Chart(document.getElementById(ids.occ), {
       type: 'line',
-      data: { labels, datasets: [{ data: filteredMonths.map(m => Math.round(byMonthOcc[m]?.[portfolio]||0)), borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
-      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},
-        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, min:0, max:100, ticks:{...scaleOpts.y.ticks,callback:v=>v+'%'} } } }
+      data: { labels, datasets: [{ data:filteredMonths.map(m=>Math.round(byMonthOcc[m]?.[portfolio]||0)), borderColor:hexColor, backgroundColor:rgbaFill, tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:hexColor }] },
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}}, scales: mkScales({},{min:0,max:100}, v=>v+'%') }
     });
   }
 }
 
-function filterMonths(months, periodMonths) {
-  if (!periodMonths) return months;
-  // Anchor to the selected "to" date if available
-  const toYm = _lastRenderData?.toDate ? _lastRenderData.toDate.substring(0, 7) : null;
-  if (toYm) {
-    // Find index of toYm in months (or last month <= toYm)
-    let endIdx = months.length - 1;
-    for (let i = months.length - 1; i >= 0; i--) {
-      if (months[i] <= toYm) { endIdx = i; break; }
-    }
-    const startIdx = Math.max(0, endIdx - periodMonths + 1);
-    return months.slice(startIdx, endIdx + 1);
-  }
-  return months.slice(months.length - periodMonths);
-}
-
-let _lastRenderData = null; // store last render data for redraw
-let _lastPortRenderData = {}; // store per-portfolio render data for redraw
-
 function redrawChart(chartId) {
   if (!_lastRenderData) return;
   const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc } = _lastRenderData;
-  // Register datalabels plugin with safe defaults
-  if (window.ChartDataLabels) {
-    Chart.register(ChartDataLabels);
-    // Disable datalabels globally by default - only enable per-dataset
-    Chart.defaults.plugins.datalabels = { display: false };
-  }
-
+  if (window.ChartDataLabels) { Chart.register(ChartDataLabels); Chart.defaults.plugins.datalabels = { display: false }; }
   const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
   const DATALABEL_OPTS = {
-    display: ctx => {
-      const data = ctx.dataset.data;
-      const i = ctx.dataIndex;
-      const n = data.length;
-      if (n <= 5) return true;
-      const valid = data.filter(v => v > 0);
-      const max = Math.max(...valid);
-      const min = Math.min(...valid);
-      return i === n - 1 || data[i] === max || data[i] === min;
-    },
-    color: 'rgba(232,237,243,0.9)',
-    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
-    anchor: 'end',
-    align: 'top',
-    offset: 3,
-    formatter: v => v > 0 ? '$' + Math.round(v) : null,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    borderRadius: 3,
-    padding: { top: 2, bottom: 2, left: 4, right: 4 }
+    display: ctx => { const data=ctx.dataset.data, i=ctx.dataIndex, n=data.length; if(n<=5)return true; const valid=data.filter(v=>v>0); const max=Math.max(...valid),min=Math.min(...valid); return i===n-1||data[i]===max||data[i]===min; },
+    color: 'rgba(232,237,243,0.9)', font:{size:9,family:'JetBrains Mono',weight:'500'},
+    anchor:'end', align:'top', offset:3, formatter:v=>v>0?'$'+Math.round(v):null,
+    backgroundColor:'rgba(0,0,0,0.4)', borderRadius:3, padding:{top:2,bottom:2,left:4,right:4}
   };
-
   const DATALABEL_PCT = {
-    display: true,
-    color: '#EDF2F7',
-    font: { size: 9, family: 'JetBrains Mono', weight: '600' },
-    anchor: 'end',
-    align: 'top',
-    offset: 4,
-    formatter: v => v > 0 ? Math.round(v) + '%' : null,
-    backgroundColor: 'rgba(8,12,16,0.82)',
-    borderRadius: 3,
-    borderWidth: 0,
-    padding: { top: 2, bottom: 2, left: 5, right: 5 }
+    display: true, color:'#EDF2F7', font:{size:9,family:'JetBrains Mono',weight:'600'},
+    anchor:'end', align:'top', offset:4, formatter:v=>v>0?Math.round(v)+'%':null,
+    backgroundColor:'rgba(8,12,16,0.82)', borderRadius:3, borderWidth:0, padding:{top:2,bottom:2,left:5,right:5}
   };
 
   const filteredMonths = filterMonths(months, chartPeriods[chartId]);
@@ -1422,18 +1122,12 @@ function redrawChart(chartId) {
     destroyChart('rev');
     charts.rev = new Chart(document.getElementById('chartRev'), {
       type: 'bar',
-      data: {
-        labels,
-        datasets: [
-          { label: '3700M', data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]['3700M']||0)), backgroundColor: 'rgba(59,158,255,0.85)', borderRadius: 3, borderSkipped: false,
-            datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } },
-          { label: 'Bayou Park', data: filteredMonths.map(m => Math.round(byMonthPortfolio[m]['Bayou Park']||0)), backgroundColor: 'rgba(45,212,160,0.85)', borderRadius: 3, borderSkipped: false,
-            datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } }
-        ]
-      },
-      options: { ...CHART_OPTS, plugins: { legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}} },
-        scales: { x:{stacked:true,ticks:{color:'#4D5D72',font:{size:10}},grid:{display:false}}, y:{stacked:true,ticks:{color:'#4D5D72',font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(42,52,65,0.5)'}} }
-      }
+      data: { labels, datasets: [
+        { label:'3700M', data:filteredMonths.map(m=>Math.round(byMonthPortfolio[m]['3700M']||0)), backgroundColor:'rgba(59,158,255,0.85)', borderRadius:3, borderSkipped:false, datalabels:{display:'auto',color:'rgba(232,237,243,0.85)',font:{size:9,family:'JetBrains Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true} },
+        { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthPortfolio[m]['Bayou Park']||0)), backgroundColor:'rgba(45,212,160,0.85)', borderRadius:3, borderSkipped:false, datalabels:{display:'auto',color:'rgba(232,237,243,0.85)',font:{size:9,family:'JetBrains Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true} }
+      ]},
+      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},
+        scales: mkScales({stacked:true},{stacked:true}, v=>'$'+(v/1000).toFixed(0)+'k') }
     });
   } else if (chartId === 'adr') {
     destroyChart('adr');
@@ -1444,7 +1138,7 @@ function redrawChart(chartId) {
         { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthADR[m]?.['Bayou Park']||0)), borderColor:'#3DD68C', backgroundColor:'rgba(61,214,140,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#3DD68C', borderDash:[5,3], datalabels:{...DATALABEL_OPTS,color:'#3DD68C',align:'bottom'} }
       ]},
       options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}},datalabels:DATALABEL_OPTS},
-        scales: { x:{ticks:{color:'#4D5D72',font:{size:10}},grid:{display:false}}, y:{ticks:{color:'#4D5D72',font:{size:10},callback:v=>'$'+v},grid:{color:'rgba(42,52,65,0.5)'}} } }
+        scales: mkScales({},{}, v=>'$'+v) }
     });
   } else if (chartId === 'revpar') {
     destroyChart('revpar');
@@ -1455,7 +1149,7 @@ function redrawChart(chartId) {
         { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthRevPAR[m]?.['Bayou Park']||0)), borderColor:'#A78BFA', backgroundColor:'rgba(167,139,250,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#A78BFA', borderDash:[5,3], datalabels:{...DATALABEL_OPTS,color:'#A78BFA',align:'bottom'} }
       ]},
       options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}},datalabels:DATALABEL_OPTS},
-        scales: { x:{ticks:{color:'#4D5D72',font:{size:10}},grid:{display:false}}, y:{ticks:{color:'#4D5D72',font:{size:10},callback:v=>'$'+v},grid:{color:'rgba(42,52,65,0.5)'}} } }
+        scales: mkScales({},{}, v=>'$'+v) }
     });
   } else if (chartId === 'occ') {
     destroyChart('occ');
@@ -1466,7 +1160,7 @@ function redrawChart(chartId) {
         { label:'Bayou Park', data:filteredMonths.map(m=>Math.round(byMonthOcc[m]?.['Bayou Park']||0)), borderColor:'#3DD68C', backgroundColor:'rgba(61,214,140,0.06)', tension:0.4, fill:true, pointRadius:3, pointBackgroundColor:'#3DD68C', borderDash:[5,3], datalabels:{...DATALABEL_PCT,color:'#3DD68C',align:'bottom'} }
       ]},
       options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}},datalabels:DATALABEL_PCT},
-        scales: { x:{ticks:{color:'#4D5D72',font:{size:10}},grid:{display:false}}, y:{min:0,max:100,ticks:{color:'#4D5D72',font:{size:10},callback:v=>v+'%'},grid:{color:'rgba(42,52,65,0.5)'}} } }
+        scales: mkScales({},{min:0,max:100}, v=>v+'%') }
     });
   }
 }
@@ -1474,1122 +1168,451 @@ function redrawChart(chartId) {
 function render(reservations, from, to, prev, allListings) {
   const confirmed = reservations.filter(r => r.status !== 'cancelled');
   const diffDays = getDaysInPeriod(from, to);
-
-  // Aggregate by unit and portfolio
   const byUnit = {};
-  const byPortfolio = {
-    '3700M': {roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0, count:0},
-    'Bayou Park': {roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0, count:0}
-  };
+  const byPortfolio = { '3700M':{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,count:0}, 'Bayou Park':{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,count:0} };
   const byChannel = {};
-  const byMonthPortfolio = {};
-  const byMonthADR = {};
-  const byMonthRevPAR = {};
-  const byMonthOcc = {};
-
-  const periodStart = new Date(from + 'T00:00:00');
-  const periodEnd   = new Date(to   + 'T23:59:59');
+  const byMonthPortfolio = {}, byMonthADR = {}, byMonthRevPAR = {}, byMonthOcc = {};
+  const periodStart = new Date(from+'T00:00:00'), periodEnd = new Date(to+'T23:59:59');
 
   confirmed.forEach(r => {
-    const roomRevTotal = r.money?.fareAccommodation || 0;
-    const cleanTotal   = r.money?.fareCleaning || 0;
-    const otaAdj       = r.money?.resolutionAmount || 0;
-    const otaComm      = Math.abs(r.money?.hostServiceFee || 0);
-    const portfolio    = getPortfolioFromRes(r);
-    const prop         = r.listing?.nickname || r.listing?.title || '—';
-    const shortProp    = prop.replace(/\*/g,'').trim();
-    const channel      = r.source || 'Direct';
-    const channelLabel = channel === 'airbnb2' ? 'Airbnb' :
-                         channel === 'bookingCom' ? 'Booking.com' :
-                         channel === 'manual' ? 'Direct' : channel;
-
-    // Devengo: room revenue distributed by night, cleaning/resolution at checkout
-    const checkIn  = new Date(r.checkIn);
-    const checkOut = new Date(r.checkOut);
-    const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
-    const dailyRoom  = roomRevTotal / totalNights;
-    const dailyComm  = otaComm      / totalNights;
-
-    // Checkout date determines when cleaning fee and OTA adj are booked
-    const coYm = checkOut.toISOString().substring(0, 7);
-    const checkoutInPeriod = checkOut >= periodStart && checkOut <= periodEnd;
-
-    // Count nights inside the selected period (for room revenue)
-    let nightsInPeriod = 0;
-    let cur = new Date(checkIn);
+    const roomRevTotal = r.money?.fareAccommodation||0, cleanTotal = r.money?.fareCleaning||0;
+    const otaAdj = r.money?.resolutionAmount||0, otaComm = Math.abs(r.money?.hostServiceFee||0);
+    const portfolio = getPortfolioFromRes(r);
+    const shortProp = (r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
+    const channelLabel = r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+    const checkIn = new Date(r.checkIn), checkOut = new Date(r.checkOut);
+    const totalNights = Math.max(1, Math.round((checkOut-checkIn)/86400000));
+    const dailyRoom = roomRevTotal/totalNights, dailyComm = otaComm/totalNights;
+    const coYm = checkOut.toISOString().substring(0,7);
+    const checkoutInPeriod = checkOut>=periodStart && checkOut<=periodEnd;
+    let nightsInPeriod = 0, cur = new Date(checkIn);
     while (cur < checkOut) {
-      const ym = cur.toISOString().substring(0, 7);
-      // For charts: accrue room revenue to every month
+      const ym = cur.toISOString().substring(0,7);
       if (!byMonthPortfolio[ym]) byMonthPortfolio[ym] = {'3700M':0,'Bayou Park':0};
       if (byMonthPortfolio[ym][portfolio] !== undefined) byMonthPortfolio[ym][portfolio] += dailyRoom;
-
-      // For KPIs: only count nights inside selected period
       if (cur >= periodStart && cur <= periodEnd) nightsInPeriod++;
-      cur.setDate(cur.getDate() + 1);
+      cur.setDate(cur.getDate()+1);
     }
-
-    // Cleaning fee: attribute to checkout month in charts, to period if checkout is in period
     if (!byMonthPortfolio[coYm]) byMonthPortfolio[coYm] = {'3700M':0,'Bayou Park':0};
-    // (cleaning added to channel mix separately below)
-
-    const roomRev = dailyRoom  * nightsInPeriod;
-    const clean   = checkoutInPeriod ? cleanTotal : 0;
-    const comm    = dailyComm  * nightsInPeriod;
-    const nights  = nightsInPeriod;
-    const otaAdjInPeriod = checkoutInPeriod ? (r.money?.resolutionAmount || 0) : 0;
-
-    if (!byUnit[shortProp]) byUnit[shortProp] = {roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0, portfolio, count:0};
-    byUnit[shortProp].roomRev += roomRev;
-    byUnit[shortProp].clean   += clean;
-    byUnit[shortProp].otaAdj  += otaAdjInPeriod;
-    byUnit[shortProp].otaComm += comm;
-    byUnit[shortProp].nights  += nights;
-    if (nightsInPeriod > 0 || checkoutInPeriod) byUnit[shortProp].count++;
-
-    if (byPortfolio[portfolio]) {
-      byPortfolio[portfolio].roomRev += roomRev;
-      byPortfolio[portfolio].clean   += clean;
-      byPortfolio[portfolio].otaAdj  += otaAdjInPeriod;
-      byPortfolio[portfolio].otaComm += comm;
-      byPortfolio[portfolio].nights  += nights;
-      if (nightsInPeriod > 0 || checkoutInPeriod) byPortfolio[portfolio].count++;
-    }
-
+    const roomRev = dailyRoom*nightsInPeriod, clean = checkoutInPeriod?cleanTotal:0;
+    const comm = dailyComm*nightsInPeriod, nights = nightsInPeriod;
+    const otaAdjInPeriod = checkoutInPeriod?(r.money?.resolutionAmount||0):0;
+    if (!byUnit[shortProp]) byUnit[shortProp] = {roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,portfolio,count:0};
+    byUnit[shortProp].roomRev+=roomRev; byUnit[shortProp].clean+=clean; byUnit[shortProp].otaAdj+=otaAdjInPeriod; byUnit[shortProp].otaComm+=comm; byUnit[shortProp].nights+=nights;
+    if (nightsInPeriod>0||checkoutInPeriod) byUnit[shortProp].count++;
+    if (byPortfolio[portfolio]) { byPortfolio[portfolio].roomRev+=roomRev; byPortfolio[portfolio].clean+=clean; byPortfolio[portfolio].otaAdj+=otaAdjInPeriod; byPortfolio[portfolio].otaComm+=comm; byPortfolio[portfolio].nights+=nights; if(nightsInPeriod>0||checkoutInPeriod)byPortfolio[portfolio].count++; }
     if (!byChannel[channelLabel]) byChannel[channelLabel] = 0;
     byChannel[channelLabel] += roomRev + clean;
   });
 
-  // Month lists
   const months = Object.keys(byMonthPortfolio).sort();
-
-  // Store for redraw
   _lastRenderData = { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc, toDate: to };
 
-  // Collect per-portfolio monthly data for Summary tab
-  const byMonthClean3700 = {}, byMonthCleanBP = {};
-  const byMonthOtaAdj3700 = {}, byMonthOtaAdjBP = {};
-  const byMonthOtaComm3700 = {}, byMonthOtaCommBP = {};
-  const byMonthNights3700 = {}, byMonthNightsBP = {};
+  const byMonthClean3700={}, byMonthCleanBP={}, byMonthOtaAdj3700={}, byMonthOtaAdjBP={};
+  const byMonthOtaComm3700={}, byMonthOtaCommBP={}, byMonthNights3700={}, byMonthNightsBP={};
 
   confirmed.forEach(r => {
     const portfolio = getPortfolioFromRes(r);
-    if (portfolio !== '3700M' && portfolio !== 'Bayou Park') return;
-    const checkOut = new Date(r.checkOut);
-    const coYm = checkOut.toISOString().substring(0, 7);
+    if (portfolio!=='3700M'&&portfolio!=='Bayou Park') return;
+    const checkOut = new Date(r.checkOut), coYm = checkOut.toISOString().substring(0,7);
     const checkIn = new Date(r.checkIn);
-    const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
-    const cleanTotal = r.money?.fareCleaning || 0;
-    const otaAdj = r.money?.resolutionAmount || 0;
-    const otaComm = Math.abs(r.money?.hostServiceFee || 0);
-    const dailyComm = otaComm / totalNights;
-
-    // Count nights per month for this reservation
+    const totalNights = Math.max(1,Math.round((checkOut-checkIn)/86400000));
+    const cleanTotal=r.money?.fareCleaning||0, otaAdj=r.money?.resolutionAmount||0;
+    const otaComm=Math.abs(r.money?.hostServiceFee||0), dailyComm=otaComm/totalNights;
     let cur = new Date(checkIn);
     while (cur < checkOut) {
-      const ym = cur.toISOString().substring(0, 7);
-      if (portfolio === '3700M') {
-        byMonthNights3700[ym] = (byMonthNights3700[ym] || 0) + 1;
-        byMonthOtaComm3700[ym] = (byMonthOtaComm3700[ym] || 0) + dailyComm;
-      } else {
-        byMonthNightsBP[ym] = (byMonthNightsBP[ym] || 0) + 1;
-        byMonthOtaCommBP[ym] = (byMonthOtaCommBP[ym] || 0) + dailyComm;
-      }
-      cur.setDate(cur.getDate() + 1);
+      const ym = cur.toISOString().substring(0,7);
+      if (portfolio==='3700M') { byMonthNights3700[ym]=(byMonthNights3700[ym]||0)+1; byMonthOtaComm3700[ym]=(byMonthOtaComm3700[ym]||0)+dailyComm; }
+      else { byMonthNightsBP[ym]=(byMonthNightsBP[ym]||0)+1; byMonthOtaCommBP[ym]=(byMonthOtaCommBP[ym]||0)+dailyComm; }
+      cur.setDate(cur.getDate()+1);
     }
-    // Cleaning and OTA adj at checkout month
-    if (portfolio === '3700M') {
-      byMonthClean3700[coYm] = (byMonthClean3700[coYm] || 0) + cleanTotal;
-      byMonthOtaAdj3700[coYm] = (byMonthOtaAdj3700[coYm] || 0) + otaAdj;
-    } else {
-      byMonthCleanBP[coYm] = (byMonthCleanBP[coYm] || 0) + cleanTotal;
-      byMonthOtaAdjBP[coYm] = (byMonthOtaAdjBP[coYm] || 0) + otaAdj;
-    }
+    if (portfolio==='3700M') { byMonthClean3700[coYm]=(byMonthClean3700[coYm]||0)+cleanTotal; byMonthOtaAdj3700[coYm]=(byMonthOtaAdj3700[coYm]||0)+otaAdj; }
+    else { byMonthCleanBP[coYm]=(byMonthCleanBP[coYm]||0)+cleanTotal; byMonthOtaAdjBP[coYm]=(byMonthOtaAdjBP[coYm]||0)+otaAdj; }
   });
 
-  _lastSummaryData = {
-    byMonthClean3700, byMonthCleanBP,
-    byMonthOtaAdj3700, byMonthOtaAdjBP,
-    byMonthOtaComm3700, byMonthOtaCommBP,
-    byMonthNights3700, byMonthNightsBP,
-    units3700: UNITS_3700M, unitsBP: UNITS_BP
-  };
+  _lastSummaryData = { byMonthClean3700,byMonthCleanBP,byMonthOtaAdj3700,byMonthOtaAdjBP,byMonthOtaComm3700,byMonthOtaCommBP,byMonthNights3700,byMonthNightsBP,units3700:UNITS_3700M,unitsBP:UNITS_BP };
 
-  // Compute ADR, RevPAR, Occ by month per portfolio
   months.forEach(ym => {
-    const [y, m] = ym.split('-');
-    const daysInMonth = new Date(+y, +m, 0).getDate();
-    const monthStart = ym + '-01';
-    const monthEnd = ym + '-' + String(daysInMonth).padStart(2,'0');
-
+    const [y,m] = ym.split('-');
+    const dIM = new Date(+y,+m,0).getDate();
     ['3700M','Bayou Park'].forEach(port => {
-      const unitCount = port === '3700M' ? UNITS_3700M : UNITS_BP;
-      const portRes = confirmed.filter(r => {
-        const p = getPortfolioFromRes(r);
-        return p === port && r.checkIn && r.checkIn.substring(0,7) === ym;
-      });
-      const portNights = portRes.reduce((a,r) => a + (r.nightsCount||0), 0);
-      const portRev = portRes.reduce((a,r) => a + (r.money?.fareAccommodation||0), 0);
-      const avail = unitCount * daysInMonth;
-      if (!byMonthADR[ym]) byMonthADR[ym] = {};
-      if (!byMonthRevPAR[ym]) byMonthRevPAR[ym] = {};
-      if (!byMonthOcc[ym]) byMonthOcc[ym] = {};
-      byMonthADR[ym][port] = portNights > 0 ? portRev / portNights : 0;
-      byMonthRevPAR[ym][port] = avail > 0 ? portRev / avail : 0;
-      byMonthOcc[ym][port] = avail > 0 ? portNights / avail * 100 : 0;
+      const unitCount = port==='3700M'?UNITS_3700M:UNITS_BP;
+      const portRes = confirmed.filter(r => getPortfolioFromRes(r)===port && r.checkIn && r.checkIn.substring(0,7)===ym);
+      const portNights = portRes.reduce((a,r)=>a+(r.nightsCount||0),0);
+      const portRev = portRes.reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
+      const avail = unitCount*dIM;
+      if (!byMonthADR[ym]) byMonthADR[ym]={};
+      if (!byMonthRevPAR[ym]) byMonthRevPAR[ym]={};
+      if (!byMonthOcc[ym]) byMonthOcc[ym]={};
+      byMonthADR[ym][port] = portNights>0?portRev/portNights:0;
+      byMonthRevPAR[ym][port] = avail>0?portRev/avail:0;
+      byMonthOcc[ym][port] = avail>0?portNights/avail*100:0;
     });
   });
 
-  // Dynamic unit counts from listings
-  const dynUnits3700 = allListings ? allListings.filter(l => getPortfolio(l.nickname) === '3700M').length || UNITS_3700M : UNITS_3700M;
-  const dynUnitsBP   = allListings ? allListings.filter(l => getPortfolio(l.nickname) === 'Bayou Park').length || UNITS_BP : UNITS_BP;
+  const dynUnits3700 = allListings?allListings.filter(l=>getPortfolio(l.nickname)==='3700M').length||UNITS_3700M:UNITS_3700M;
+  const dynUnitsBP = allListings?allListings.filter(l=>getPortfolio(l.nickname)==='Bayou Park').length||UNITS_BP:UNITS_BP;
+  const totalRoomRev = byPortfolio['3700M'].roomRev+byPortfolio['Bayou Park'].roomRev;
+  const totalClean = byPortfolio['3700M'].clean+byPortfolio['Bayou Park'].clean;
+  const totalOtaComm = byPortfolio['3700M'].otaComm+byPortfolio['Bayou Park'].otaComm;
+  const totalNights = byPortfolio['3700M'].nights+byPortfolio['Bayou Park'].nights;
+  const totalAvail = (dynUnits3700+dynUnitsBP)*diffDays;
+  const totalOtaAdj = byPortfolio['3700M'].otaAdj+byPortfolio['Bayou Park'].otaAdj;
+  const totalRev = totalRoomRev+totalClean+totalOtaAdj;
+  const totalOcc = totalAvail>0?totalNights/totalAvail:0;
+  const totalADR = totalNights>0?totalRoomRev/totalNights:0;
+  const totalRevPAR = totalAvail>0?totalRoomRev/totalAvail:0;
 
-  const totalRoomRev = byPortfolio['3700M'].roomRev + byPortfolio['Bayou Park'].roomRev;
-  const totalClean = byPortfolio['3700M'].clean + byPortfolio['Bayou Park'].clean;
-  const totalOtaComm = byPortfolio['3700M'].otaComm + byPortfolio['Bayou Park'].otaComm;
-  const totalNights = byPortfolio['3700M'].nights + byPortfolio['Bayou Park'].nights;
-  const totalAvail = (dynUnits3700 + dynUnitsBP) * diffDays;
-  const totalOtaAdj = byPortfolio['3700M'].otaAdj + byPortfolio['Bayou Park'].otaAdj;
-  const totalRev = totalRoomRev + totalClean + totalOtaAdj;
-  const totalOcc = totalAvail > 0 ? totalNights / totalAvail : 0;
-  const totalADR = totalNights > 0 ? totalRoomRev / totalNights : 0;
-  const totalRevPAR = totalAvail > 0 ? totalRoomRev / totalAvail : 0;
-
-  // ---- TOP KPIs ----
   document.getElementById('kpiTop').innerHTML = `
-    <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Total Revenue</div>
-      <div class="kpi-value">${$c(totalRev)}</div>
-      <div class="kpi-sub">${confirmed.length} bookings</div>
-      ${prev ? delta(totalRev, prev.totalRev) : ''}
-    </div>
-    <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Room Revenue</div>
-      <div class="kpi-value">${$c(totalRoomRev)}</div>
-      <div class="kpi-sub">Net accommodation fare</div>
-      ${prev ? delta(totalRoomRev, prev.roomRev) : ''}
-    </div>
-    <div class="kpi" style="--accent:var(--text2)">
-      <div class="kpi-label">Cleaning Fee</div>
-      <div class="kpi-value">${$c(totalClean)}</div>
-      <div class="kpi-sub">fareCleaning</div>
-      ${prev ? delta(totalClean, prev.clean) : ''}
-    </div>
-    <div class="kpi" style="--accent:var(--red)">
-      <div class="kpi-label">OTA Commission</div>
-      <div class="kpi-value">${$c(totalOtaComm)}</div>
-      <div class="kpi-sub">Channel commission</div>
-      ${prev ? delta(totalOtaComm, prev.otaComm) : ''}
-    </div>
-    <div class="kpi" style="--accent:var(--amber)">
-      <div class="kpi-label">OTA Adjustment</div>
-      <div class="kpi-value">${totalOtaAdj < 0 ? '-$' + Math.round(Math.abs(totalOtaAdj)).toLocaleString('en-US') : $c(totalOtaAdj)}</div>
-      <div class="kpi-sub">Resolution center</div>
-    </div>
-    <div class="kpi" style="--accent:var(--green)">
-      <div class="kpi-label">Occupancy</div>
-      <div class="kpi-value">${pct(totalOcc)}</div>
-      <div class="kpi-sub">${fmt(totalNights)} / ${fmt(totalAvail)} nights</div>
-      ${prev ? delta(totalOcc, prev.occ) : ''}
-    </div>
-    <div class="kpi" style="--accent:var(--amber)">
-      <div class="kpi-label">ADR</div>
-      <div class="kpi-value">${$c(totalADR)}</div>
-      <div class="kpi-sub">Avg. daily rate</div>
-      ${prev ? delta(totalADR, prev.adr) : ''}
-    </div>
-    <div class="kpi" style="--accent:var(--amber)">
-      <div class="kpi-label">RevPAR</div>
-      <div class="kpi-value">${$c(totalRevPAR)}</div>
-      <div class="kpi-sub">Per available night</div>
-      ${prev ? delta(totalRevPAR, prev.revpar) : ''}
-    </div>
-  `;
+    <div class="kpi" style="--accent:var(--blue)"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${$c(totalRev)}</div><div class="kpi-sub">${confirmed.length} bookings</div>${prev?delta(totalRev,prev.totalRev):''}</div>
+    <div class="kpi" style="--accent:var(--blue)"><div class="kpi-label">Room Revenue</div><div class="kpi-value">${$c(totalRoomRev)}</div><div class="kpi-sub">Net accommodation fare</div>${prev?delta(totalRoomRev,prev.roomRev):''}</div>
+    <div class="kpi" style="--accent:var(--text2)"><div class="kpi-label">Cleaning Fee</div><div class="kpi-value">${$c(totalClean)}</div><div class="kpi-sub">fareCleaning</div>${prev?delta(totalClean,prev.clean):''}</div>
+    <div class="kpi" style="--accent:var(--red)"><div class="kpi-label">OTA Commission</div><div class="kpi-value">${$c(totalOtaComm)}</div><div class="kpi-sub">Channel commission</div>${prev?delta(totalOtaComm,prev.otaComm):''}</div>
+    <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">OTA Adjustment</div><div class="kpi-value">${totalOtaAdj<0?'-$'+Math.round(Math.abs(totalOtaAdj)).toLocaleString('en-US'):$c(totalOtaAdj)}</div><div class="kpi-sub">Resolution center</div></div>
+    <div class="kpi" style="--accent:var(--green)"><div class="kpi-label">Occupancy</div><div class="kpi-value">${pct(totalOcc)}</div><div class="kpi-sub">${fmt(totalNights)} / ${fmt(totalAvail)} nights</div>${prev?delta(totalOcc,prev.occ):''}</div>
+    <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">ADR</div><div class="kpi-value">${$c(totalADR)}</div><div class="kpi-sub">Avg. daily rate</div>${prev?delta(totalADR,prev.adr):''}</div>
+    <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">RevPAR</div><div class="kpi-value">${$c(totalRevPAR)}</div><div class="kpi-sub">Per available night</div>${prev?delta(totalRevPAR,prev.revpar):''}</div>`;
 
-  // ---- PORTFOLIO KPIs ----
   function portKpiHtml(port, color, unitCount) {
-    const p = byPortfolio[port];
-    const avail = unitCount * diffDays;
-    const occ = avail > 0 ? p.nights / avail : 0;
-    const adr = p.nights > 0 ? p.roomRev / p.nights : 0;
-    const revpar = avail > 0 ? p.roomRev / avail : 0;
-    return `
-      <div class="portfolio-kpi-card ${color}">
-        <div class="portfolio-kpi-title">
-          <div class="dot" style="background:var(--${color})"></div>
-          <span style="color:var(--${color})">${port}</span>
-          <span style="font-size:11px;color:var(--text3);font-weight:400">${unitCount} units · ${p.count} bookings</span>
-        </div>
-        <div class="portfolio-stats">
-          <div><div class="pstat-label">Occ.</div><div class="pstat-value" style="color:var(--${color})">${pct(occ)}</div></div>
-          <div><div class="pstat-label">ADR</div><div class="pstat-value">${$c(adr)}</div></div>
-          <div><div class="pstat-label">RevPAR</div><div class="pstat-value">${$c(revpar)}</div></div>
-          <div><div class="pstat-label">Revenue</div><div class="pstat-value">${$c(p.roomRev)}</div></div>
-        </div>
-      </div>`;
+    const p = byPortfolio[port], avail = unitCount*diffDays;
+    const occ=avail>0?p.nights/avail:0, adr=p.nights>0?p.roomRev/p.nights:0, revpar=avail>0?p.roomRev/avail:0;
+    return `<div class="portfolio-kpi-card ${color}"><div class="portfolio-kpi-title"><div class="dot" style="background:var(--${color})"></div><span style="color:var(--${color})">${port}</span><span style="font-size:11px;color:var(--text3);font-weight:400">${unitCount} units · ${p.count} bookings</span></div><div class="portfolio-stats"><div><div class="pstat-label">Occ.</div><div class="pstat-value" style="color:var(--${color})">${pct(occ)}</div></div><div><div class="pstat-label">ADR</div><div class="pstat-value">${$c(adr)}</div></div><div><div class="pstat-label">RevPAR</div><div class="pstat-value">${$c(revpar)}</div></div><div><div class="pstat-label">Revenue</div><div class="pstat-value">${$c(p.roomRev)}</div></div></div></div>`;
   }
-  document.getElementById('portfolioKpis').innerHTML =
-    portKpiHtml('3700M', 'blue', dynUnits3700) +
-    portKpiHtml('Bayou Park', 'green', dynUnitsBP);
+  document.getElementById('portfolioKpis').innerHTML = portKpiHtml('3700M','blue',dynUnits3700) + portKpiHtml('Bayou Park','green',dynUnitsBP);
 
-  // ---- CHARTS ----
-  const monthLabels = months.map(monthLabel);
-  // Register datalabels plugin with safe defaults
-  if (window.ChartDataLabels) {
-    Chart.register(ChartDataLabels);
-    // Disable datalabels globally by default - only enable per-dataset
-    Chart.defaults.plugins.datalabels = { display: false };
-  }
+  if (window.ChartDataLabels) { Chart.register(ChartDataLabels); Chart.defaults.plugins.datalabels = { display: false }; }
 
-  const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
-
-  const DATALABEL_OPTS = {
-    display: ctx => {
-      const data = ctx.dataset.data;
-      const i = ctx.dataIndex;
-      const n = data.length;
-      if (n <= 5) return true;
-      const valid = data.filter(v => v > 0);
-      const max = Math.max(...valid);
-      const min = Math.min(...valid);
-      return i === n - 1 || data[i] === max || data[i] === min;
-    },
-    color: 'rgba(232,237,243,0.9)',
-    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
-    anchor: 'end',
-    align: 'top',
-    offset: 3,
-    formatter: v => v > 0 ? '$' + Math.round(v) : null,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    borderRadius: 3,
-    padding: { top: 2, bottom: 2, left: 4, right: 4 }
-  };
-
-  const DATALABEL_PCT = {
-    display: true,
-    color: '#EDF2F7',
-    font: { size: 9, family: 'JetBrains Mono', weight: '600' },
-    anchor: 'end',
-    align: 'top',
-    offset: 4,
-    formatter: v => v > 0 ? Math.round(v) + '%' : null,
-    backgroundColor: 'rgba(8,12,16,0.82)',
-    borderRadius: 3,
-    borderWidth: 0,
-    padding: { top: 2, bottom: 2, left: 5, right: 5 }
-  };
-
-  // Revenue chart
-  document.getElementById('legendRev').innerHTML = `
-    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>3700M</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Bayou Park</div>`;
+  document.getElementById('legendRev').innerHTML = `<div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Bayou Park</div>`;
   redrawChart('rev');
 
-  // Channel mix
-  const channelTotal = Object.values(byChannel).reduce((a,b) => a+b, 0);
-  const channelColors = { 'Airbnb': '#FF5A5F', 'Booking.com': '#003580', 'Direct': '#4A9EFF', 'VRBO': '#4B9E3B' };
-  const sortedChannels = Object.entries(byChannel).sort((a,b) => b[1]-a[1]);
-  document.getElementById('channelBars').innerHTML = `
-    <div class="channel-bars">
-      ${sortedChannels.map(([ch, rev]) => `
-        <div class="channel-bar-item">
-          <div class="channel-bar-label">${ch}</div>
-          <div class="channel-bar-track">
-            <div class="channel-bar-fill" style="width:${channelTotal>0?rev/channelTotal*100:0}%;background:${channelColors[ch]||'var(--purple)'}"></div>
-          </div>
-          <div class="channel-bar-val">${$c(rev)}</div>
-          <div class="channel-bar-pct">${channelTotal>0?Math.round(rev/channelTotal*100)+'%':''}</div>
-        </div>`).join('')}
-    </div>`;
+  const channelTotal = Object.values(byChannel).reduce((a,b)=>a+b,0);
+  const channelColors = {'Airbnb':'#FF5A5F','Booking.com':'#003580','Direct':'#4A9EFF','VRBO':'#4B9E3B'};
+  document.getElementById('channelBars').innerHTML = `<div class="channel-bars">${Object.entries(byChannel).sort((a,b)=>b[1]-a[1]).map(([ch,rev])=>`<div class="channel-bar-item"><div class="channel-bar-label">${ch}</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${channelTotal>0?rev/channelTotal*100:0}%;background:${channelColors[ch]||'var(--purple)'}"></div></div><div class="channel-bar-val">${$c(rev)}</div><div class="channel-bar-pct">${channelTotal>0?Math.round(rev/channelTotal*100)+'%':''}</div></div>`).join('')}</div>`;
 
-  // ADR chart
-  document.getElementById('legendADR').innerHTML = `
-    <div class="legend-item"><div class="legend-line" style="background:var(--blue)"></div>3700M</div>
-    <div class="legend-item"><div class="legend-line" style="background:var(--green);border-top:2px dashed var(--green)"></div>Bayou Park</div>`;
+  document.getElementById('legendADR').innerHTML = `<div class="legend-item"><div class="legend-line" style="background:var(--blue)"></div>3700M</div><div class="legend-item"><div class="legend-line" style="background:var(--green);border-top:2px dashed var(--green)"></div>Bayou Park</div>`;
   redrawChart('adr');
-
-  // RevPAR chart
   document.getElementById('legendRevPAR').innerHTML = document.getElementById('legendADR').innerHTML;
   redrawChart('revpar');
-
-  // Occupancy chart
-  document.getElementById('legendOcc').innerHTML = `
-    <div class="legend-item"><div class="legend-line" style="background:var(--blue)"></div>3700M</div>
-    <div class="legend-item"><div class="legend-line" style="background:var(--green)"></div>Bayou Park</div>`;
+  document.getElementById('legendOcc').innerHTML = `<div class="legend-item"><div class="legend-line" style="background:var(--blue)"></div>3700M</div><div class="legend-item"><div class="legend-line" style="background:var(--green)"></div>Bayou Park</div>`;
   redrawChart('occ');
 
-  // ---- OCCUPANCY BY UNIT ----
   function renderOccUnits(containerId, portfolio, unitCount) {
-    const defaultColor = portfolio === '3700M' ? '#4A9EFF' : '#3DD68C';
+    const defaultColor = portfolio==='3700M'?'#4A9EFF':'#3DD68C';
     const avail = diffDays;
-
-    // Get all listing nicknames for this portfolio from /listings endpoint
-    const allNames = (allListings || [])
-      .filter(l => getPortfolio(l.nickname) === portfolio)
-      .map(l => l.nickname.trim());
-
-    // Fallback: use units from reservations if listings not available
-    const reservationNames = Object.entries(byUnit)
-      .filter(([,u]) => u.portfolio === portfolio)
-      .map(([name]) => name);
-    const nameSet = new Set([...allNames, ...reservationNames]);
-
-    // Merge with reservation data
+    const allNames = (allListings||[]).filter(l=>getPortfolio(l.nickname)===portfolio).map(l=>l.nickname.trim());
+    const reservationNames = Object.entries(byUnit).filter(([,u])=>u.portfolio===portfolio).map(([name])=>name);
+    const nameSet = new Set([...allNames,...reservationNames]);
     const unitData = Array.from(nameSet).map(name => {
       const unitNum = name.match(/\d+/)?.[0];
-      const match = Object.entries(byUnit).find(([k, u]) => {
-        return u.portfolio === portfolio && k.match(/\d+/)?.[0] === unitNum;
-      });
-      return [name, match ? match[1] : {roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0, portfolio, count:0}];
-    }).sort((a,b) => a[1].nights - b[1].nights); // low occ first
-
-    document.getElementById(containerId).innerHTML = unitData.map(([name, u]) => {
-      const occPct = avail > 0 ? Math.min(100, u.nights / avail * 100) : 0;
-      const isLow = occPct < 30;
-      const isMed = occPct >= 30 && occPct < 60;
-      const barColor = isLow ? '#FF5C5C' : isMed ? '#F5A623' : defaultColor;
-      const cardBorder = isLow ? 'border-color:rgba(255,92,92,0.35)' : isMed ? 'border-color:rgba(245,166,35,0.25)' : '';
-      const shortName = name.replace(/^(Unit\s+|Apt\s+|Two Bed,?\s*)/i,'').replace(/[-*].*$/,'').trim().split(' ')[0];
-      const alertBadge = isLow ? '<span style="font-size:9px;background:rgba(255,92,92,0.15);color:#FF5C5C;padding:1px 5px;border-radius:3px;margin-left:4px">LOW</span>' :
-                         isMed ? '<span style="font-size:9px;background:rgba(245,166,35,0.15);color:#F5A623;padding:1px 5px;border-radius:3px;margin-left:4px">MED</span>' : '';
-      return `
-        <div class="occ-unit-card" style="${cardBorder}">
-          <div class="occ-unit-name" title="${name}" style="display:flex;align-items:center">${shortName}${alertBadge}</div>
-          <div class="occ-unit-bar-track"><div class="occ-unit-bar-fill" style="width:${occPct}%;background:${barColor}"></div></div>
-          <div class="occ-unit-pct" style="color:${barColor}">${Math.round(occPct)}%</div>
-        </div>`;
+      const match = Object.entries(byUnit).find(([k,u])=>u.portfolio===portfolio&&k.match(/\d+/)?.[0]===unitNum);
+      return [name, match?match[1]:{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,portfolio,count:0}];
+    }).sort((a,b)=>a[1].nights-b[1].nights);
+    document.getElementById(containerId).innerHTML = unitData.map(([name,u])=>{
+      const occPct=avail>0?Math.min(100,u.nights/avail*100):0;
+      const isLow=occPct<30, isMed=occPct>=30&&occPct<60;
+      const barColor=isLow?'#FF5C5C':isMed?'#F5A623':defaultColor;
+      const cardBorder=isLow?'border-color:rgba(255,92,92,0.35)':isMed?'border-color:rgba(245,166,35,0.25)':'';
+      const shortName=name.replace(/^(Unit\s+|Apt\s+|Two Bed,?\s*)/i,'').replace(/[-*].*$/,'').trim().split(' ')[0];
+      const alertBadge=isLow?'<span style="font-size:9px;background:rgba(255,92,92,0.15);color:#FF5C5C;padding:1px 5px;border-radius:3px;margin-left:4px">LOW</span>':isMed?'<span style="font-size:9px;background:rgba(245,166,35,0.15);color:#F5A623;padding:1px 5px;border-radius:3px;margin-left:4px">MED</span>':'';
+      return `<div class="occ-unit-card" style="${cardBorder}"><div class="occ-unit-name" title="${name}" style="display:flex;align-items:center">${shortName}${alertBadge}</div><div class="occ-unit-bar-track"><div class="occ-unit-bar-fill" style="width:${occPct}%;background:${barColor}"></div></div><div class="occ-unit-pct" style="color:${barColor}">${Math.round(occPct)}%</div></div>`;
     }).join('');
   }
-  renderOccUnits('occUnits3700', '3700M', dynUnits3700);
-  renderOccUnits('occUnitsBP', 'Bayou Park', dynUnitsBP);
+  renderOccUnits('occUnits3700','3700M',dynUnits3700);
+  renderOccUnits('occUnitsBP','Bayou Park',dynUnitsBP);
 
-  // ---- PORTFOLIO TABLES ----
   function buildPortTable(portfolio, tableId, unitCount, portHeaderStatsId) {
-    // Get all listing names for this portfolio
-    const allNames = (allListings || [])
-      .filter(l => getPortfolio(l.nickname) === portfolio)
-      .map(l => l.nickname.trim());
-    const reservationNames = Object.entries(byUnit)
-      .filter(([,u]) => u.portfolio === portfolio)
-      .map(([name]) => name);
-    const nameSet = new Set([...allNames, ...reservationNames]);
-    const units = Array.from(nameSet).map(name => {
-      const unitNum = name.match(/\d+/)?.[0];
-      const match = Object.entries(byUnit).find(([k,u]) => u.portfolio === portfolio && k.match(/\d+/)?.[0] === unitNum);
-      return [name, match ? match[1] : {roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,portfolio,count:0}];
-    }).sort((a,b) => b[1].roomRev - a[1].roomRev);
-    const avail = diffDays;
-    let totRoomRev=0, totClean=0, totOtaAdj=0, totOtaComm=0, totNights=0;
-
-    const rows = units.map(([name, u]) => {
-      const occ = avail > 0 ? u.nights/avail : 0;
-      const adr = u.nights > 0 ? u.roomRev/u.nights : 0;
-      const revpar = avail > 0 ? u.roomRev/avail : 0;
-      const totRev = u.roomRev + u.clean + (u.otaAdj||0);
+    const allNames=(allListings||[]).filter(l=>getPortfolio(l.nickname)===portfolio).map(l=>l.nickname.trim());
+    const reservationNames=Object.entries(byUnit).filter(([,u])=>u.portfolio===portfolio).map(([name])=>name);
+    const nameSet=new Set([...allNames,...reservationNames]);
+    const units=Array.from(nameSet).map(name=>{
+      const unitNum=name.match(/\d+/)?.[0];
+      const match=Object.entries(byUnit).find(([k,u])=>u.portfolio===portfolio&&k.match(/\d+/)?.[0]===unitNum);
+      return [name,match?match[1]:{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,portfolio,count:0}];
+    }).sort((a,b)=>b[1].roomRev-a[1].roomRev);
+    const avail=diffDays;
+    let totRoomRev=0,totClean=0,totOtaAdj=0,totOtaComm=0,totNights=0;
+    const rows=units.map(([name,u])=>{
+      const occ=avail>0?u.nights/avail:0, adr=u.nights>0?u.roomRev/u.nights:0, revpar=avail>0?u.roomRev/avail:0;
+      const totRev=u.roomRev+u.clean+(u.otaAdj||0);
       totRoomRev+=u.roomRev; totClean+=u.clean; totOtaAdj+=(u.otaAdj||0); totOtaComm+=u.otaComm; totNights+=u.nights;
-      const occPctRow = occ * 100;
-      const rowAlert = occPctRow < 30 ? 'style="background:rgba(255,92,92,0.05)"' : occPctRow < 60 ? 'style="background:rgba(245,166,35,0.04)"' : '';
-      const occColor = occPctRow < 30 ? 'color:#FF5C5C;font-weight:600' : occPctRow < 60 ? 'color:#F5A623' : '';
-      return `<tr ${rowAlert}>
-        <td>${name}</td>
-        <td class="num">${avail}</td>
-        <td class="num">${Math.round(u.nights)}</td>
-        <td class="num" style="${occColor}">${pct(occ)}</td>
-        <td class="num">${$c(adr)}</td>
-        <td class="num">${$c(revpar)}</td>
-        <td class="num">${$c(u.roomRev)}</td>
-        <td class="num">${$c(u.clean)}</td>
-        <td class="num">${$c(totRev)}</td>
-        <td class="num">${$c(u.otaComm)}</td>
-      </tr>`;
+      const occPctRow=occ*100;
+      const rowAlert=occPctRow<30?'style="background:rgba(255,92,92,0.05)"':occPctRow<60?'style="background:rgba(245,166,35,0.04)"':'';
+      const occColor=occPctRow<30?'color:#FF5C5C;font-weight:600':occPctRow<60?'color:#F5A623':'';
+      return `<tr ${rowAlert}><td>${name}</td><td class="num">${avail}</td><td class="num">${Math.round(u.nights)}</td><td class="num" style="${occColor}">${pct(occ)}</td><td class="num">${$c(adr)}</td><td class="num">${$c(revpar)}</td><td class="num">${$c(u.roomRev)}</td><td class="num">${$c(u.clean)}</td><td class="num">${$c(totRev)}</td><td class="num">${$c(u.otaComm)}</td></tr>`;
     }).join('');
-
-    const totalAvailPort = unitCount * diffDays;
-    const totOcc = totalAvailPort > 0 ? totNights/totalAvailPort : 0;
-    const totADR = totNights > 0 ? totRoomRev/totNights : 0;
-    const totRevPAR = totalAvailPort > 0 ? totRoomRev/totalAvailPort : 0;
-    const totRev = totRoomRev + totClean + totOtaAdj;
-
-    document.querySelector(`#${tableId} tbody`).innerHTML = rows + `
-      <tr class="total-row">
-        <td>TOTAL</td>
-        <td class="num">${totalAvailPort}</td>
-        <td class="num">${Math.round(totNights)}</td>
-        <td class="num">${pct(totOcc)}</td>
-        <td class="num">${$c(totADR)}</td>
-        <td class="num">${$c(totRevPAR)}</td>
-        <td class="num">${$c(totRoomRev)}</td>
-        <td class="num">${$c(totClean)}</td>
-        <td class="num">${$c(totRev)}</td>
-        <td class="num">${$c(totOtaComm)}</td>
-      </tr>`;
-
-    document.getElementById(portHeaderStatsId).innerHTML = `
-      <div class="port-header-stat"><div class="port-header-stat-label">Occupancy</div><div class="port-header-stat-val">${pct(totOcc)}</div></div>
-      <div class="port-header-stat"><div class="port-header-stat-label">ADR</div><div class="port-header-stat-val">${$c(totADR)}</div></div>
-      <div class="port-header-stat"><div class="port-header-stat-label">RevPAR</div><div class="port-header-stat-val">${$c(totRevPAR)}</div></div>
-      <div class="port-header-stat"><div class="port-header-stat-label">Room Revenue</div><div class="port-header-stat-val">${$c(totRoomRev)}</div></div>`;
-
-    // Alert banner for low occupancy units
-    const lowUnits = units.filter(([,u]) => { const o = avail > 0 ? u.nights/avail*100 : 0; return o < 30; });
-    const medUnits = units.filter(([,u]) => { const o = avail > 0 ? u.nights/avail*100 : 0; return o >= 30 && o < 60; });
-    const alertContainer = document.getElementById(tableId).closest('.table-wrap');
-    if (lowUnits.length > 0) {
-      const banner = document.createElement('div');
-      banner.style.cssText = 'background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#FF5C5C;display:flex;align-items:center;gap:8px';
-      banner.innerHTML = `⚠️ <strong>${lowUnits.length} unit${lowUnits.length>1?'s':''} with low occupancy (&lt;30%):</strong> ${lowUnits.map(([n])=>n.split('-')[0].trim()).join(', ')}`;
-      alertContainer.parentNode.insertBefore(banner, alertContainer);
+    const totalAvailPort=unitCount*diffDays, totOcc=totalAvailPort>0?totNights/totalAvailPort:0;
+    const totADR=totNights>0?totRoomRev/totNights:0, totRevPAR=totalAvailPort>0?totRoomRev/totalAvailPort:0, totRev=totRoomRev+totClean+totOtaAdj;
+    document.querySelector(`#${tableId} tbody`).innerHTML = rows + `<tr class="total-row"><td>TOTAL</td><td class="num">${totalAvailPort}</td><td class="num">${Math.round(totNights)}</td><td class="num">${pct(totOcc)}</td><td class="num">${$c(totADR)}</td><td class="num">${$c(totRevPAR)}</td><td class="num">${$c(totRoomRev)}</td><td class="num">${$c(totClean)}</td><td class="num">${$c(totRev)}</td><td class="num">${$c(totOtaComm)}</td></tr>`;
+    document.getElementById(portHeaderStatsId).innerHTML = `<div class="port-header-stat"><div class="port-header-stat-label">Occupancy</div><div class="port-header-stat-val">${pct(totOcc)}</div></div><div class="port-header-stat"><div class="port-header-stat-label">ADR</div><div class="port-header-stat-val">${$c(totADR)}</div></div><div class="port-header-stat"><div class="port-header-stat-label">RevPAR</div><div class="port-header-stat-val">${$c(totRevPAR)}</div></div><div class="port-header-stat"><div class="port-header-stat-label">Room Revenue</div><div class="port-header-stat-val">${$c(totRoomRev)}</div></div>`;
+    const lowUnits=units.filter(([,u])=>{const o=avail>0?u.nights/avail*100:0;return o<30;});
+    if (lowUnits.length>0) {
+      const banner=document.createElement('div');
+      banner.style.cssText='background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.2);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#FF5C5C;display:flex;align-items:center;gap:8px';
+      banner.innerHTML=`⚠️ <strong>${lowUnits.length} unit${lowUnits.length>1?'s':''} with low occupancy (&lt;30%):</strong> ${lowUnits.map(([n])=>n.split('-')[0].trim()).join(', ')}`;
+      document.getElementById(tableId).closest('.table-wrap').parentNode.insertBefore(banner, document.getElementById(tableId).closest('.table-wrap'));
     }
   }
+  buildPortTable('3700M','tbl3700',dynUnits3700,'portStats3700');
+  buildPortTable('Bayou Park','tblBP',dynUnitsBP,'portStatsBP');
 
-  buildPortTable('3700M', 'tbl3700', dynUnits3700, 'portStats3700');
-  buildPortTable('Bayou Park', 'tblBP', dynUnitsBP, 'portStatsBP');
-
-  // ---- PORTFOLIO TAB DASHBOARDS ----
   function buildPortDashboard(portfolio, color, unitCount, ids) {
-    const p = byPortfolio[portfolio];
-    const avail = unitCount * diffDays;
-    const occ = avail > 0 ? p.nights / avail : 0;
-    const adr = p.nights > 0 ? p.roomRev / p.nights : 0;
-    const revpar = avail > 0 ? p.roomRev / avail : 0;
-    const totalRev = p.roomRev + p.clean + (p.otaAdj||0);
-    const hexColor = color === 'blue' ? '#4A9EFF' : '#3DD68C';
-    const rgbaColor = color === 'blue' ? 'rgba(74,158,255,0.85)' : 'rgba(61,214,140,0.85)';
-    const rgbaFill = color === 'blue' ? 'rgba(74,158,255,0.06)' : 'rgba(61,214,140,0.06)';
+    const p=byPortfolio[portfolio], avail=unitCount*diffDays;
+    const occ=avail>0?p.nights/avail:0, adr=p.nights>0?p.roomRev/p.nights:0, revpar=avail>0?p.roomRev/avail:0;
+    const totalRev=p.roomRev+p.clean+(p.otaAdj||0);
+    const hexColor=color==='blue'?'#4A9EFF':'#3DD68C';
+    const rgbaColor=color==='blue'?'rgba(74,158,255,0.85)':'rgba(61,214,140,0.85)';
+    const rgbaFill=color==='blue'?'rgba(74,158,255,0.06)':'rgba(61,214,140,0.06)';
 
-    // KPIs
     document.getElementById(ids.kpi).innerHTML = `
-      <div class="kpi" style="--accent:${hexColor}">
-        <div class="kpi-label">Total Revenue</div>
-        <div class="kpi-value">${$c(totalRev)}</div>
-        <div class="kpi-sub">${p.count} bookings</div>
-      </div>
-      <div class="kpi" style="--accent:${hexColor}">
-        <div class="kpi-label">Room Revenue</div>
-        <div class="kpi-value">${$c(p.roomRev)}</div>
-        <div class="kpi-sub">Net accommodation fare</div>
-      </div>
-      <div class="kpi" style="--accent:var(--text2)">
-        <div class="kpi-label">Cleaning Fee</div>
-        <div class="kpi-value">${$c(p.clean)}</div>
-        <div class="kpi-sub">fareCleaning</div>
-      </div>
-      <div class="kpi" style="--accent:var(--red)">
-        <div class="kpi-label">OTA Commission</div>
-        <div class="kpi-value">${$c(p.otaComm)}</div>
-        <div class="kpi-sub">Channel commission</div>
-      </div>
-      <div class="kpi" style="--accent:var(--amber)">
-        <div class="kpi-label">OTA Adjustment</div>
-        <div class="kpi-value">${p.otaAdj < 0 ? '-$' + Math.round(Math.abs(p.otaAdj)).toLocaleString('en-US') : $c(p.otaAdj)}</div>
-        <div class="kpi-sub">Resolution center</div>
-      </div>
-      <div class="kpi" style="--accent:var(--green)">
-        <div class="kpi-label">Occupancy</div>
-        <div class="kpi-value">${pct(occ)}</div>
-        <div class="kpi-sub">${fmt(p.nights)} / ${fmt(avail)} nights</div>
-      </div>
-      <div class="kpi" style="--accent:var(--amber)">
-        <div class="kpi-label">ADR</div>
-        <div class="kpi-value">${$c(adr)}</div>
-        <div class="kpi-sub">Avg. daily rate</div>
-      </div>
-      <div class="kpi" style="--accent:var(--amber)">
-        <div class="kpi-label">RevPAR</div>
-        <div class="kpi-value">${$c(revpar)}</div>
-        <div class="kpi-sub">Per available night</div>
-      </div>`;
+      <div class="kpi" style="--accent:${hexColor}"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${$c(totalRev)}</div><div class="kpi-sub">${p.count} bookings</div></div>
+      <div class="kpi" style="--accent:${hexColor}"><div class="kpi-label">Room Revenue</div><div class="kpi-value">${$c(p.roomRev)}</div><div class="kpi-sub">Net accommodation fare</div></div>
+      <div class="kpi" style="--accent:var(--text2)"><div class="kpi-label">Cleaning Fee</div><div class="kpi-value">${$c(p.clean)}</div><div class="kpi-sub">fareCleaning</div></div>
+      <div class="kpi" style="--accent:var(--red)"><div class="kpi-label">OTA Commission</div><div class="kpi-value">${$c(p.otaComm)}</div><div class="kpi-sub">Channel commission</div></div>
+      <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">OTA Adjustment</div><div class="kpi-value">${p.otaAdj<0?'-$'+Math.round(Math.abs(p.otaAdj)).toLocaleString('en-US'):$c(p.otaAdj)}</div><div class="kpi-sub">Resolution center</div></div>
+      <div class="kpi" style="--accent:var(--green)"><div class="kpi-label">Occupancy</div><div class="kpi-value">${pct(occ)}</div><div class="kpi-sub">${fmt(p.nights)} / ${fmt(avail)} nights</div></div>
+      <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">ADR</div><div class="kpi-value">${$c(adr)}</div><div class="kpi-sub">Avg. daily rate</div></div>
+      <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">RevPAR</div><div class="kpi-value">${$c(revpar)}</div><div class="kpi-sub">Per available night</div></div>`;
 
-    // Channel mix for this portfolio
-    const portChannel = {};
-    confirmed.filter(r => getPortfolioFromRes(r) === portfolio).forEach(r => {
-      const ch = r.source === 'airbnb2' ? 'Airbnb' : r.source === 'bookingCom' ? 'Booking.com' : r.source === 'manual' ? 'Direct' : (r.source||'Direct');
-      const rev = (r.money?.fareAccommodation||0) + (r.money?.fareCleaning||0);
-      if (!portChannel[ch]) portChannel[ch] = 0;
-      portChannel[ch] += rev;
+    const portChannel={};
+    confirmed.filter(r=>getPortfolioFromRes(r)===portfolio).forEach(r=>{
+      const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+      const rev=(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0);
+      if (!portChannel[ch]) portChannel[ch]=0; portChannel[ch]+=rev;
     });
-    const chTotal = Object.values(portChannel).reduce((a,b)=>a+b,0);
-    const channelColors = { 'Airbnb': '#FF5A5F', 'Booking.com': '#4A9EFF', 'Direct': '#F5A623', 'VRBO': '#4B9E3B' };
-    document.getElementById(ids.channels).innerHTML = `<div class="channel-bars">
-      ${Object.entries(portChannel).sort((a,b)=>b[1]-a[1]).map(([ch,rev]) => `
-        <div class="channel-bar-item">
-          <div class="channel-bar-label">${ch}</div>
-          <div class="channel-bar-track"><div class="channel-bar-fill" style="width:${chTotal>0?rev/chTotal*100:0}%;background:${channelColors[ch]||'var(--purple)'}"></div></div>
-          <div class="channel-bar-val">${$c(rev)}</div>
-          <div class="channel-bar-pct">${chTotal>0?Math.round(rev/chTotal*100)+'%':''}</div>
-        </div>`).join('')}
-    </div>`;
+    const chTotal=Object.values(portChannel).reduce((a,b)=>a+b,0);
+    const chColors={'Airbnb':'#FF5A5F','Booking.com':'#4A9EFF','Direct':'#F5A623','VRBO':'#4B9E3B'};
+    document.getElementById(ids.channels).innerHTML=`<div class="channel-bars">${Object.entries(portChannel).sort((a,b)=>b[1]-a[1]).map(([ch,rev])=>`<div class="channel-bar-item"><div class="channel-bar-label">${ch}</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${chTotal>0?rev/chTotal*100:0}%;background:${chColors[ch]||'var(--purple)'}"></div></div><div class="channel-bar-val">${$c(rev)}</div><div class="channel-bar-pct">${chTotal>0?Math.round(rev/chTotal*100)+'%':''}</div></div>`).join('')}</div>`;
 
-    // Store for period filter redraw
-    _lastPortRenderData[portfolio] = { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc, hexColor, rgbaColor, rgbaFill, ids };
+    _lastPortRenderData[portfolio]={months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc,hexColor,rgbaColor,rgbaFill,ids};
 
-    // Monthly stats for this portfolio
-    const portMonthRevData = months.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0));
-    const portMonthADR = months.map(m => Math.round(byMonthADR[m]?.[portfolio]||0));
-    const portMonthRevPAR = months.map(m => Math.round(byMonthRevPAR[m]?.[portfolio]||0));
-    const portMonthOcc = months.map(m => Math.round(byMonthOcc[m]?.[portfolio]||0));
+    const CHART_OPTS={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
 
-    const scaleOpts = { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { color: 'rgba(42,52,65,0.5)' } } };
-
-    const filteredRev = filterMonths(months, portChartPeriods[portfolio].rev);
+    const filteredRev=filterMonths(months,portChartPeriods[portfolio].rev);
     destroyChart(ids.rev);
-    charts[ids.rev] = new Chart(document.getElementById(ids.rev), {
-      type: 'bar',
-      data: { labels: filteredRev.map(monthLabel), datasets: [{ data: filteredRev.map(m => Math.round(byMonthPortfolio[m]?.[portfolio]||0)), backgroundColor: rgbaColor, borderRadius: 3,
-            datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } }] },
-      options: { ...CHART_OPTS, plugins: { legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}} },
-        scales: { x:{...scaleOpts.x,stacked:true}, y:{...scaleOpts.y,ticks:{...scaleOpts.y.ticks,callback:v=>'$'+(v/1000).toFixed(0)+'k'}} } }
-    });
+    charts[ids.rev]=new Chart(document.getElementById(ids.rev),{type:'bar',data:{labels:filteredRev.map(monthLabel),datasets:[{data:filteredRev.map(m=>Math.round(byMonthPortfolio[m]?.[portfolio]||0)),backgroundColor:rgbaColor,borderRadius:3,datalabels:{display:'auto',color:'rgba(232,237,243,0.85)',font:{size:9,family:'JetBrains Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true}}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});
 
-    const filteredADR = filterMonths(months, portChartPeriods[portfolio].adr);
+    const filteredADR=filterMonths(months,portChartPeriods[portfolio].adr);
     destroyChart(ids.adr);
-    charts[ids.adr] = new Chart(document.getElementById(ids.adr), {
-      type: 'line',
-      data: { labels: filteredADR.map(monthLabel), datasets: [{ data: filteredADR.map(m => Math.round(byMonthADR[m]?.[portfolio]||0)), borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
-      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},
-        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
-    });
+    charts[ids.adr]=new Chart(document.getElementById(ids.adr),{type:'line',data:{labels:filteredADR.map(monthLabel),datasets:[{data:filteredADR.map(m=>Math.round(byMonthADR[m]?.[portfolio]||0)),borderColor:hexColor,backgroundColor:rgbaFill,tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:hexColor}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({},{},v=>'$'+v)}});
 
-    const filteredRevPAR = filterMonths(months, portChartPeriods[portfolio].revpar);
+    const filteredRevPAR=filterMonths(months,portChartPeriods[portfolio].revpar);
     destroyChart(ids.revpar);
-    charts[ids.revpar] = new Chart(document.getElementById(ids.revpar), {
-      type: 'line',
-      data: { labels: filteredRevPAR.map(monthLabel), datasets: [{ data: filteredRevPAR.map(m => Math.round(byMonthRevPAR[m]?.[portfolio]||0)), borderColor: '#F5A623', backgroundColor: 'rgba(245,166,35,0.06)', tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: '#F5A623' }] },
-      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},
-        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, ticks:{...scaleOpts.y.ticks,callback:v=>'$'+v} } } }
-    });
+    charts[ids.revpar]=new Chart(document.getElementById(ids.revpar),{type:'line',data:{labels:filteredRevPAR.map(monthLabel),datasets:[{data:filteredRevPAR.map(m=>Math.round(byMonthRevPAR[m]?.[portfolio]||0)),borderColor:'#F5A623',backgroundColor:'rgba(245,166,35,0.06)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#F5A623'}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({},{},v=>'$'+v)}});
 
-    const filteredOcc = filterMonths(months, portChartPeriods[portfolio].occ);
+    const filteredOcc=filterMonths(months,portChartPeriods[portfolio].occ);
     destroyChart(ids.occ);
-    charts[ids.occ] = new Chart(document.getElementById(ids.occ), {
-      type: 'line',
-      data: { labels: filteredOcc.map(monthLabel), datasets: [{ data: filteredOcc.map(m => Math.round(byMonthOcc[m]?.[portfolio]||0)), borderColor: hexColor, backgroundColor: rgbaFill, tension: 0.4, fill: true, pointRadius: 3, pointBackgroundColor: hexColor }] },
-      options: { ...CHART_OPTS, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},
-        scales: { x: scaleOpts.x, y: { ...scaleOpts.y, min:0, max:100, ticks:{...scaleOpts.y.ticks,callback:v=>v+'%'} } } }
-    });
+    charts[ids.occ]=new Chart(document.getElementById(ids.occ),{type:'line',data:{labels:filteredOcc.map(monthLabel),datasets:[{data:filteredOcc.map(m=>Math.round(byMonthOcc[m]?.[portfolio]||0)),borderColor:hexColor,backgroundColor:rgbaFill,tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:hexColor}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},scales:mkScales({},{min:0,max:100},v=>v+'%')}});
 
-    // Occ by unit
-    renderOccUnits(ids.occUnits, portfolio, unitCount);
+    renderOccUnits(ids.occUnits,portfolio,unitCount);
   }
 
-  buildPortDashboard('3700M', 'blue', dynUnits3700, {
-    kpi: 'kpi3700', channels: 'channelBars3700',
-    rev: 'chartRev3700', adr: 'chartADR3700', revpar: 'chartRevPAR3700', occ: 'chartOcc3700',
-    occUnits: 'occUnits3700b'
-  });
-  buildPortDashboard('Bayou Park', 'green', dynUnitsBP, {
-    kpi: 'kpiBP', channels: 'channelBarsBP',
-    rev: 'chartRevBP', adr: 'chartADRBP', revpar: 'chartRevPARBP', occ: 'chartOccBP',
-    occUnits: 'occUnitsBPb'
-  });
+  buildPortDashboard('3700M','blue',dynUnits3700,{kpi:'kpi3700',channels:'channelBars3700',rev:'chartRev3700',adr:'chartADR3700',revpar:'chartRevPAR3700',occ:'chartOcc3700',occUnits:'occUnits3700b'});
+  buildPortDashboard('Bayou Park','green',dynUnitsBP,{kpi:'kpiBP',channels:'channelBarsBP',rev:'chartRevBP',adr:'chartADRBP',revpar:'chartRevPARBP',occ:'chartOccBP',occUnits:'occUnitsBPb'});
 
-  // ---- BOOKINGS TABLE ----
-  const sorted = [...reservations].sort((a,b) => (b.checkIn||'').localeCompare(a.checkIn||''));
-  document.querySelector('#tblBookings tbody').innerHTML = sorted.slice(0, 500).map(r => {
-    const roomRev = r.money?.fareAccommodation || 0;
-    const clean = r.money?.fareCleaning || 0;
-    const otaAdj = r.money?.resolutionAmount || 0;
-    const otaComm = Math.abs(r.money?.hostServiceFee || 0);
-    const totRev = roomRev + clean + otaAdj;
-    const prop = (r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
-    const guest = r.guest?.fullName || '—';
-    const ci = r.checkIn ? r.checkIn.split('T')[0] : '—';
-    const co = r.checkOut ? r.checkOut.split('T')[0] : '—';
-    const nights = r.nightsCount || '—';
-    const ch = r.source === 'airbnb2' ? 'Airbnb' : r.source === 'bookingCom' ? 'Booking.com' : r.source === 'manual' ? 'Direct' : (r.source||'Direct');
-    const st = r.status || 'confirmed';
-    const badge = st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok';
-    const stLabel = st==='cancelled'?'Cancelled':st==='inquiry'?'Inquiry':'Confirmed';
-    return `<tr>
-      <td>${prop}</td><td style="font-family:'DM Sans',sans-serif">${guest}</td>
-      <td>${ci}</td><td>${co}</td>
-      <td class="num">${nights}</td>
-      <td style="font-family:'DM Sans',sans-serif">${ch}</td>
-      <td><span class="badge ${badge}">${stLabel}</span></td>
-      <td class="num">${$c(roomRev)}</td>
-      <td class="num">${$c(clean)}</td>
-      <td class="num">${otaAdj !== 0 ? $c(otaAdj) : '—'}</td>
-      <td class="num">${$c(totRev)}</td>
-      <td class="num">${$c(otaComm)}</td>
-    </tr>`;
+  const sorted=[...reservations].sort((a,b)=>(b.checkIn||'').localeCompare(a.checkIn||''));
+  document.querySelector('#tblBookings tbody').innerHTML=sorted.slice(0,500).map(r=>{
+    const roomRev=r.money?.fareAccommodation||0, clean=r.money?.fareCleaning||0;
+    const otaAdj=r.money?.resolutionAmount||0, otaComm=Math.abs(r.money?.hostServiceFee||0);
+    const prop=(r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
+    const ci=r.checkIn?r.checkIn.split('T')[0]:'—', co=r.checkOut?r.checkOut.split('T')[0]:'—';
+    const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+    const st=r.status||'confirmed', badge=st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok';
+    return `<tr><td>${prop}</td><td>${r.guest?.fullName||'—'}</td><td>${ci}</td><td>${co}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td><span class="badge ${badge}">${st==='cancelled'?'Cancelled':st==='inquiry'?'Inquiry':'Confirmed'}</span></td><td class="num">${$c(roomRev)}</td><td class="num">${$c(clean)}</td><td class="num">${otaAdj!==0?$c(otaAdj):'—'}</td><td class="num">${$c(roomRev+clean+otaAdj)}</td><td class="num">${$c(otaComm)}</td></tr>`;
   }).join('');
 
-  // ---- PIPELINE TAB ----
-  const today = new Date().toISOString().split('T')[0];
-  const upcoming = reservations.filter(r => r.status !== 'cancelled' && r.checkIn && r.checkIn.split('T')[0] >= today);
-  upcoming.sort((a,b) => (a.checkIn||'').localeCompare(b.checkIn||''));
-
-  // Aggregate by month for pipeline
-  const pipelineByMonth = {};
-  upcoming.forEach(r => {
-    const ym = (r.checkIn||'').substring(0,7);
-    if (!ym) return;
-    const portfolio = getPortfolioFromRes(r);
-    if (!pipelineByMonth[ym]) pipelineByMonth[ym] = {'3700M':0,'Bayou Park':0};
-    if (pipelineByMonth[ym][portfolio] !== undefined)
-      pipelineByMonth[ym][portfolio] += r.money?.fareAccommodation || 0;
+  const today=new Date().toISOString().split('T')[0];
+  const upcoming=reservations.filter(r=>r.status!=='cancelled'&&r.checkIn&&r.checkIn.split('T')[0]>=today).sort((a,b)=>(a.checkIn||'').localeCompare(b.checkIn||''));
+  const pipelineByMonth={};
+  upcoming.forEach(r=>{
+    const ym=(r.checkIn||'').substring(0,7); if(!ym)return;
+    const portfolio=getPortfolioFromRes(r);
+    if (!pipelineByMonth[ym]) pipelineByMonth[ym]={'3700M':0,'Bayou Park':0};
+    if (pipelineByMonth[ym][portfolio]!==undefined) pipelineByMonth[ym][portfolio]+=r.money?.fareAccommodation||0;
   });
+  const pipeMonths=Object.keys(pipelineByMonth).sort(), pipeLabels=pipeMonths.map(monthLabel);
+  const pipe3700Rev=upcoming.filter(r=>getPortfolioFromRes(r)==='3700M').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
+  const pipeBPRev=upcoming.filter(r=>getPortfolioFromRes(r)==='Bayou Park').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
+  const pipeClean=upcoming.reduce((a,r)=>a+(r.money?.fareCleaning||0),0);
+  const pipeComm=upcoming.reduce((a,r)=>a+Math.abs(r.money?.hostServiceFee||0),0);
+  const pipeNights=upcoming.reduce((a,r)=>a+(r.nightsCount||0),0);
 
-  const pipeMonths = Object.keys(pipelineByMonth).sort();
-  const pipeLabels = pipeMonths.map(monthLabel);
-
-  const pipe3700Rev = upcoming.filter(r => getPortfolioFromRes(r)==='3700M').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
-  const pipeBPRev   = upcoming.filter(r => getPortfolioFromRes(r)==='Bayou Park').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
-  const pipeTotalRev = pipe3700Rev + pipeBPRev;
-  const pipeClean = upcoming.reduce((a,r)=>a+(r.money?.fareCleaning||0),0);
-  const pipeComm  = upcoming.reduce((a,r)=>a+Math.abs(r.money?.hostServiceFee||0),0);
-  const pipeNights = upcoming.reduce((a,r)=>a+(r.nightsCount||0),0);
-
-  // Revenue falling exclusively in each window (not cumulative)
-  function revBetweenDays(reservations, fromDay, toDay) {
-    const now = new Date(); now.setHours(0,0,0,0);
-    const start = new Date(now); start.setDate(start.getDate() + fromDay);
-    const end = new Date(now); end.setDate(end.getDate() + toDay);
-    let total = 0;
-    reservations.forEach(r => {
-      const checkIn = new Date(r.checkIn); checkIn.setHours(0,0,0,0);
-      const checkOut = new Date(r.checkOut); checkOut.setHours(0,0,0,0);
-      const totalNights = Math.max(1, Math.round((checkOut - checkIn) / 86400000));
-      const dailyRate = ((r.money?.fareAccommodation||0) + (r.money?.fareCleaning||0)) / totalNights;
-      let cur = new Date(Math.max(checkIn, start));
-      while (cur < checkOut && cur < end) {
-        total += dailyRate;
-        cur.setDate(cur.getDate() + 1);
-      }
+  function revBetweenDays(reservations,fromDay,toDay) {
+    const now=new Date(); now.setHours(0,0,0,0);
+    const start=new Date(now); start.setDate(start.getDate()+fromDay);
+    const end=new Date(now); end.setDate(end.getDate()+toDay);
+    let total=0;
+    reservations.forEach(r=>{
+      const ci=new Date(r.checkIn); ci.setHours(0,0,0,0);
+      const co=new Date(r.checkOut); co.setHours(0,0,0,0);
+      const tn=Math.max(1,Math.round((co-ci)/86400000));
+      const dailyRate=((r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0))/tn;
+      let cur=new Date(Math.max(ci,start));
+      while(cur<co&&cur<end){total+=dailyRate;cur.setDate(cur.getDate()+1);}
     });
     return total;
   }
-  const rev30 = revBetweenDays(upcoming, 0, 30);
-  const rev60 = revBetweenDays(upcoming, 30, 60);
-  const rev90 = revBetweenDays(upcoming, 60, 90);
 
-  document.getElementById('kpiPipeline').innerHTML = `
-    <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Total Pipeline</div>
-      <div class="kpi-value">${$c(pipeTotalRev + pipeClean)}</div>
-      <div class="kpi-sub">${upcoming.length} upcoming bookings</div>
-    </div>
-    <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Days 0–30</div>
-      <div class="kpi-value">${$c(rev30)}</div>
-      <div class="kpi-sub">Confirmed revenue</div>
-    </div>
-    <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Days 31–60</div>
-      <div class="kpi-value">${$c(rev60)}</div>
-      <div class="kpi-sub">Confirmed revenue</div>
-    </div>
-    <div class="kpi" style="--accent:var(--blue)">
-      <div class="kpi-label">Days 61–90</div>
-      <div class="kpi-value">${$c(rev90)}</div>
-      <div class="kpi-sub">Confirmed revenue</div>
-    </div>
-    <div class="kpi" style="--accent:var(--green)">
-      <div class="kpi-label">Nights Booked</div>
-      <div class="kpi-value">${fmt(pipeNights)}</div>
-      <div class="kpi-sub">Upcoming nights</div>
-    </div>
-    <div class="kpi" style="--accent:var(--red)">
-      <div class="kpi-label">OTA Commission</div>
-      <div class="kpi-value">${$c(pipeComm)}</div>
-      <div class="kpi-sub">On upcoming bookings</div>
-    </div>
-  `;
+  document.getElementById('kpiPipeline').innerHTML=`
+    <div class="kpi" style="--accent:var(--blue)"><div class="kpi-label">Total Pipeline</div><div class="kpi-value">${$c(pipe3700Rev+pipeBPRev+pipeClean)}</div><div class="kpi-sub">${upcoming.length} upcoming bookings</div></div>
+    <div class="kpi" style="--accent:var(--blue)"><div class="kpi-label">Days 0–30</div><div class="kpi-value">${$c(revBetweenDays(upcoming,0,30))}</div><div class="kpi-sub">Confirmed revenue</div></div>
+    <div class="kpi" style="--accent:var(--blue)"><div class="kpi-label">Days 31–60</div><div class="kpi-value">${$c(revBetweenDays(upcoming,30,60))}</div><div class="kpi-sub">Confirmed revenue</div></div>
+    <div class="kpi" style="--accent:var(--blue)"><div class="kpi-label">Days 61–90</div><div class="kpi-value">${$c(revBetweenDays(upcoming,60,90))}</div><div class="kpi-sub">Confirmed revenue</div></div>
+    <div class="kpi" style="--accent:var(--green)"><div class="kpi-label">Nights Booked</div><div class="kpi-value">${fmt(pipeNights)}</div><div class="kpi-sub">Upcoming nights</div></div>
+    <div class="kpi" style="--accent:var(--red)"><div class="kpi-label">OTA Commission</div><div class="kpi-value">${$c(pipeComm)}</div><div class="kpi-sub">On upcoming bookings</div></div>`;
 
-  // Pipeline revenue chart
-  document.getElementById('legendPipeline').innerHTML = `
-    <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>3700M</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Bayou Park</div>`;
+  document.getElementById('legendPipeline').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Bayou Park</div>`;
   destroyChart('pipeline');
-  charts.pipeline = new Chart(document.getElementById('chartPipeline'), {
-    type: 'bar',
-    data: {
-      labels: pipeLabels,
-      datasets: [
-        { label: '3700M', data: pipeMonths.map(m => Math.round(pipelineByMonth[m]['3700M']||0)), backgroundColor: 'rgba(59,158,255,0.85)', borderRadius: 3, datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } },
-        { label: 'Bayou Park', data: pipeMonths.map(m => Math.round(pipelineByMonth[m]['Bayou Park']||0)), backgroundColor: 'rgba(45,212,160,0.85)', borderRadius: 3, datalabels: { display: 'auto', color: 'rgba(232,237,243,0.85)', font: { size: 9, family: 'JetBrains Mono', weight: '500' }, anchor: 'center', align: 'center', formatter: v => v >= 1000 ? '$' + Math.round(v/1000) + 'k' : (v > 0 ? '$' + Math.round(v) : null), clamp: true } }
-      ]
-    },
-    options: { ...CHART_OPTS,
-      plugins: { legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}} },
-      scales: {
-        x: { stacked:true, ticks:{color:'#4D5D72',font:{size:10}}, grid:{display:false} },
-        y: { stacked:true, ticks:{color:'#4D5D72',font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'}, grid:{color:'rgba(42,52,65,0.5)'} }
-      }
-    }
-  });
+  charts.pipeline=new Chart(document.getElementById('chartPipeline'),{type:'bar',data:{labels:pipeLabels,datasets:[
+    {label:'3700M',data:pipeMonths.map(m=>Math.round(pipelineByMonth[m]['3700M']||0)),backgroundColor:'rgba(59,158,255,0.85)',borderRadius:3,datalabels:{display:'auto',color:'rgba(232,237,243,0.85)',font:{size:9,family:'JetBrains Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true}},
+    {label:'Bayou Park',data:pipeMonths.map(m=>Math.round(pipelineByMonth[m]['Bayou Park']||0)),backgroundColor:'rgba(45,212,160,0.85)',borderRadius:3,datalabels:{display:'auto',color:'rgba(232,237,243,0.85)',font:{size:9,family:'JetBrains Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true}}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});
 
-  // Portfolio bars
-  const portTotal = pipe3700Rev + pipeBPRev || 1;
-  const pipe3700Count = upcoming.filter(r => getPortfolioFromRes(r)==='3700M').length;
-  const pipeBPCount = upcoming.filter(r => getPortfolioFromRes(r)==='Bayou Park').length;
-  document.getElementById('pipelinePortBars').innerHTML = `
-    <div class="channel-bars" style="margin-top:16px">
-      <div class="channel-bar-item">
-        <div class="channel-bar-label" style="color:var(--blue)">3700M</div>
-        <div class="channel-bar-track"><div class="channel-bar-fill" style="width:${pipe3700Rev/portTotal*100}%;background:var(--blue)"></div></div>
-        <div class="channel-bar-val">${$c(pipe3700Rev)}</div>
-        <div class="channel-bar-pct">${pipe3700Count} bkgs</div>
-      </div>
-      <div class="channel-bar-item">
-        <div class="channel-bar-label" style="color:var(--green)">Bayou Park</div>
-        <div class="channel-bar-track"><div class="channel-bar-fill" style="width:${pipeBPRev/portTotal*100}%;background:var(--green)"></div></div>
-        <div class="channel-bar-val">${$c(pipeBPRev)}</div>
-        <div class="channel-bar-pct">${pipeBPCount} bkgs</div>
-      </div>
-    </div>`;
+  const portTotal=pipe3700Rev+pipeBPRev||1;
+  const pipe3700Count=upcoming.filter(r=>getPortfolioFromRes(r)==='3700M').length;
+  const pipeBPCount=upcoming.filter(r=>getPortfolioFromRes(r)==='Bayou Park').length;
+  document.getElementById('pipelinePortBars').innerHTML=`<div class="channel-bars" style="margin-top:16px"><div class="channel-bar-item"><div class="channel-bar-label" style="color:var(--blue)">3700M</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${pipe3700Rev/portTotal*100}%;background:var(--blue)"></div></div><div class="channel-bar-val">${$c(pipe3700Rev)}</div><div class="channel-bar-pct">${pipe3700Count} bkgs</div></div><div class="channel-bar-item"><div class="channel-bar-label" style="color:var(--green)">Bayou Park</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${pipeBPRev/portTotal*100}%;background:var(--green)"></div></div><div class="channel-bar-val">${$c(pipeBPRev)}</div><div class="channel-bar-pct">${pipeBPCount} bkgs</div></div></div>`;
 
-  // Upcoming table
-  document.querySelector('#tblPipeline tbody').innerHTML = upcoming.slice(0,200).map(r => {
-    const roomRev = r.money?.fareAccommodation || 0;
-    const clean = r.money?.fareCleaning || 0;
-    const otaComm = Math.abs(r.money?.hostServiceFee || 0);
-    const totRev = roomRev + clean;
-    const prop = (r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
-    const guest = r.guest?.fullName || '—';
-    const ci = r.checkIn ? r.checkIn.split('T')[0] : '—';
-    const co = r.checkOut ? r.checkOut.split('T')[0] : '—';
-    const nights = r.nightsCount || '—';
-    const ch = r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
-    // Days until check-in
-    const daysUntil = Math.ceil((new Date(ci) - new Date()) / 86400000);
-    const daysLabel = daysUntil === 0 ? '<span style="color:var(--amber)">Today</span>' :
-                      daysUntil === 1 ? '<span style="color:var(--amber)">Tomorrow</span>' :
-                      `<span style="color:var(--text3)">in ${daysUntil}d</span>`;
-    return `<tr>
-      <td>${prop}</td>
-      <td style="font-family:'DM Sans',sans-serif">${guest}</td>
-      <td>${ci} ${daysLabel}</td>
-      <td>${co}</td>
-      <td class="num">${nights}</td>
-      <td style="font-family:'DM Sans',sans-serif">${ch}</td>
-      <td class="num">${$c(roomRev)}</td>
-      <td class="num">${$c(clean)}</td>
-      <td class="num">${$c(totRev)}</td>
-      <td class="num">${$c(otaComm)}</td>
-    </tr>`;
+  document.querySelector('#tblPipeline tbody').innerHTML=upcoming.slice(0,200).map(r=>{
+    const roomRev=r.money?.fareAccommodation||0,clean=r.money?.fareCleaning||0,otaComm=Math.abs(r.money?.hostServiceFee||0);
+    const prop=(r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
+    const ci=r.checkIn?r.checkIn.split('T')[0]:'—',co=r.checkOut?r.checkOut.split('T')[0]:'—';
+    const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+    const daysUntil=Math.ceil((new Date(ci)-new Date())/86400000);
+    const daysLabel=daysUntil===0?'<span style="color:var(--amber)">Today</span>':daysUntil===1?'<span style="color:var(--amber)">Tomorrow</span>':`<span style="color:var(--text3)">in ${daysUntil}d</span>`;
+    return `<tr><td>${prop}</td><td>${r.guest?.fullName||'—'}</td><td>${ci} ${daysLabel}</td><td>${co}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td class="num">${$c(roomRev)}</td><td class="num">${$c(clean)}</td><td class="num">${$c(roomRev+clean)}</td><td class="num">${$c(otaComm)}</td></tr>`;
   }).join('');
 
-  document.getElementById('main').style.display = 'block';
-  document.getElementById('emptyBox').style.display = 'none';
-  document.getElementById('btnPDF').style.display = '';
+  document.getElementById('main').style.display='block';
+  document.getElementById('emptyBox').style.display='none';
+  document.getElementById('btnPDF').style.display='';
   renderSummaryTable();
 }
 
 async function exportPDF() {
-  const from = document.getElementById('df').value;
-  const to = document.getElementById('dt').value;
-  const btn = document.getElementById('btnPDF');
-  btn.textContent = '⏳ Generating...';
-  btn.disabled = true;
-
+  const from=document.getElementById('df').value, to=document.getElementById('dt').value;
+  const btn=document.getElementById('btnPDF');
+  btn.textContent='⏳ Generating...'; btn.disabled=true;
   try {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    const W = pdf.internal.pageSize.getWidth();
-    const H = pdf.internal.pageSize.getHeight();
-    const margin = 14;
-    const col = (W - margin * 2) / 2;
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    const W=pdf.internal.pageSize.getWidth(), H=pdf.internal.pageSize.getHeight(), margin=14;
+    const DARK=[13,17,23],BLUE=[74,158,255],GREEN=[61,214,140],AMBER=[245,166,35],RED=[255,92,92];
+    const TEXT=[232,237,243],TEXT2=[139,155,180],TEXT3=[77,93,114],BG2=[22,27,34],BG3=[28,34,48],BORDER=[42,52,65];
+    const fmt$=v=>'$'+Math.round(Math.abs(v)).toLocaleString('en-US');
+    const fmtPct=v=>Math.round(v*100)+'%';
 
-    // Colors
-    const DARK = [13, 17, 23];
-    const BLUE = [74, 158, 255];
-    const GREEN = [61, 214, 140];
-    const AMBER = [245, 166, 35];
-    const RED = [255, 92, 92];
-    const TEXT = [232, 237, 243];
-    const TEXT2 = [139, 155, 180];
-    const TEXT3 = [77, 93, 114];
-    const BG2 = [22, 27, 34];
-    const BG3 = [28, 34, 48];
-    const BORDER = [42, 52, 65];
-
-    const fmt$ = v => '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
-    const fmtPct = v => Math.round(v * 100) + '%';
-
-    function addPage(title, subtitle) {
-      pdf.setFillColor(...DARK);
-      pdf.rect(0, 0, W, H, 'F');
-      // Header bar
-      pdf.setFillColor(...BG2);
-      pdf.rect(0, 0, W, 14, 'F');
-      // Logo mark
-      pdf.setFillColor(...BLUE);
-      pdf.roundedRect(margin, 3, 8, 8, 1.5, 1.5, 'F');
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(6); pdf.setFont('helvetica', 'bold');
-      pdf.text('US', margin + 4, 8.2, { align: 'center' });
-      // Brand
-      pdf.setTextColor(...TEXT);
-      pdf.setFontSize(8); pdf.setFont('helvetica', 'bold');
-      pdf.text('US Living', margin + 11, 7.5);
-      pdf.setTextColor(...TEXT3);
-      pdf.setFontSize(6); pdf.setFont('helvetica', 'normal');
-      pdf.text('Revenue Intelligence', margin + 11, 11);
-      // Title
-      pdf.setTextColor(...TEXT);
-      pdf.setFontSize(9); pdf.setFont('helvetica', 'bold');
-      pdf.text(title, W / 2, 8, { align: 'center' });
-      if (subtitle) {
-        pdf.setTextColor(...TEXT3);
-        pdf.setFontSize(6); pdf.setFont('helvetica', 'normal');
-        pdf.text(subtitle, W / 2, 12, { align: 'center' });
-      }
-      // Date range
-      pdf.setTextColor(...TEXT2);
-      pdf.setFontSize(6.5);
-      pdf.text(from + '  →  ' + to, W - margin, 8, { align: 'right' });
-      // Divider
-      pdf.setDrawColor(...BORDER);
-      pdf.setLineWidth(0.3);
-      pdf.line(margin, 14, W - margin, 14);
+    function addPage(title,subtitle) {
+      pdf.setFillColor(...DARK); pdf.rect(0,0,W,H,'F');
+      pdf.setFillColor(...BG2); pdf.rect(0,0,W,14,'F');
+      pdf.setFillColor(...BLUE); pdf.roundedRect(margin,3,8,8,1.5,1.5,'F');
+      pdf.setTextColor(255,255,255); pdf.setFontSize(6); pdf.setFont('helvetica','bold');
+      pdf.text('US',margin+4,8.2,{align:'center'});
+      pdf.setTextColor(...TEXT); pdf.setFontSize(8); pdf.setFont('helvetica','bold');
+      pdf.text('US Living',margin+11,7.5);
+      pdf.setTextColor(...TEXT3); pdf.setFontSize(6); pdf.setFont('helvetica','normal');
+      pdf.text('Revenue Intelligence',margin+11,11);
+      pdf.setTextColor(...TEXT); pdf.setFontSize(9); pdf.setFont('helvetica','bold');
+      pdf.text(title,W/2,8,{align:'center'});
+      if(subtitle){pdf.setTextColor(...TEXT3);pdf.setFontSize(6);pdf.setFont('helvetica','normal');pdf.text(subtitle,W/2,12,{align:'center'});}
+      pdf.setTextColor(...TEXT2); pdf.setFontSize(6.5);
+      pdf.text(from+'  →  '+to,W-margin,8,{align:'right'});
+      pdf.setDrawColor(...BORDER); pdf.setLineWidth(0.3); pdf.line(margin,14,W-margin,14);
     }
 
-    function kpiCard(x, y, w, h, label, value, sub, accentColor) {
-      pdf.setFillColor(...BG2);
-      pdf.roundedRect(x, y, w, h, 2, 2, 'F');
-      pdf.setFillColor(...accentColor);
-      pdf.rect(x, y, w, 0.8, 'F');
-      pdf.setTextColor(...TEXT3);
-      pdf.setFontSize(5.5); pdf.setFont('helvetica', 'bold');
-      pdf.text(label.toUpperCase(), x + 4, y + 5);
-      pdf.setTextColor(...TEXT);
-      pdf.setFontSize(11); pdf.setFont('helvetica', 'bold');
-      pdf.text(value, x + 4, y + 12);
-      if (sub) {
-        pdf.setTextColor(...TEXT3);
-        pdf.setFontSize(5); pdf.setFont('helvetica', 'normal');
-        pdf.text(sub, x + 4, y + 16);
-      }
+    function kpiCard(x,y,w,h,label,value,sub,accentColor) {
+      pdf.setFillColor(...BG2); pdf.roundedRect(x,y,w,h,2,2,'F');
+      pdf.setFillColor(...accentColor); pdf.rect(x,y,w,0.8,'F');
+      pdf.setTextColor(...TEXT3); pdf.setFontSize(5.5); pdf.setFont('helvetica','bold'); pdf.text(label.toUpperCase(),x+4,y+5);
+      pdf.setTextColor(...TEXT); pdf.setFontSize(11); pdf.setFont('helvetica','bold'); pdf.text(value,x+4,y+12);
+      if(sub){pdf.setTextColor(...TEXT3);pdf.setFontSize(5);pdf.setFont('helvetica','normal');pdf.text(sub,x+4,y+16);}
     }
 
-    function sectionTitle(x, y, text) {
-      pdf.setTextColor(...TEXT3);
-      pdf.setFontSize(6); pdf.setFont('helvetica', 'bold');
-      pdf.text(text.toUpperCase(), x, y);
-      pdf.setDrawColor(...BORDER);
-      pdf.setLineWidth(0.2);
-      pdf.line(x + pdf.getTextWidth(text.toUpperCase()) + 2, y - 1, W - margin, y - 1);
+    function sectionTitle(x,y,text) {
+      pdf.setTextColor(...TEXT3); pdf.setFontSize(6); pdf.setFont('helvetica','bold'); pdf.text(text.toUpperCase(),x,y);
+      pdf.setDrawColor(...BORDER); pdf.setLineWidth(0.2); pdf.line(x+pdf.getTextWidth(text.toUpperCase())+2,y-1,W-margin,y-1);
     }
 
-    function portCard(x, y, w, port, color, data) {
-      pdf.setFillColor(...BG2);
-      pdf.roundedRect(x, y, w, 22, 2, 2, 'F');
-      pdf.setDrawColor(...color);
-      pdf.setLineWidth(0.5);
-      pdf.roundedRect(x, y, w, 22, 2, 2, 'S');
-      // dot
-      pdf.setFillColor(...color);
-      pdf.circle(x + 5, y + 5, 1.5, 'F');
-      pdf.setTextColor(...color);
-      pdf.setFontSize(7); pdf.setFont('helvetica', 'bold');
-      pdf.text(port, x + 9, y + 6);
-      pdf.setTextColor(...TEXT3);
-      pdf.setFontSize(5.5); pdf.setFont('helvetica', 'normal');
-      pdf.text(data.sub, x + 9, y + 10);
-      // Stats
-      const stats = data.stats;
-      const sw = (w - 10) / stats.length;
-      stats.forEach((s, i) => {
-        const sx = x + 5 + i * sw;
-        pdf.setTextColor(...TEXT3); pdf.setFontSize(5);
-        pdf.text(s.label, sx, y + 15);
-        pdf.setTextColor(...TEXT); pdf.setFontSize(7); pdf.setFont('helvetica', 'bold');
-        pdf.text(s.value, sx, y + 20);
-        pdf.setFont('helvetica', 'normal');
+    function portCard(x,y,w,port,color,data) {
+      pdf.setFillColor(...BG2); pdf.roundedRect(x,y,w,22,2,2,'F');
+      pdf.setDrawColor(...color); pdf.setLineWidth(0.5); pdf.roundedRect(x,y,w,22,2,2,'S');
+      pdf.setFillColor(...color); pdf.circle(x+5,y+5,1.5,'F');
+      pdf.setTextColor(...color); pdf.setFontSize(7); pdf.setFont('helvetica','bold'); pdf.text(port,x+9,y+6);
+      pdf.setTextColor(...TEXT3); pdf.setFontSize(5.5); pdf.setFont('helvetica','normal'); pdf.text(data.sub,x+9,y+10);
+      const stats=data.stats, sw=(w-10)/stats.length;
+      stats.forEach((s,i)=>{
+        const sx=x+5+i*sw;
+        pdf.setTextColor(...TEXT3); pdf.setFontSize(5); pdf.text(s.label,sx,y+15);
+        pdf.setTextColor(...TEXT); pdf.setFontSize(7); pdf.setFont('helvetica','bold'); pdf.text(s.value,sx,y+20); pdf.setFont('helvetica','normal');
       });
     }
 
-    function summaryTable(x, y, portLabel, portColor, rows, months) {
-      const colW = (W - margin * 2 - 32) / months.length;
-      const rowH = 6.5;
-      // Header
-      pdf.setFillColor(...BG3);
-      pdf.rect(x, y, W - margin * 2, rowH, 'F');
-      pdf.setTextColor(...portColor);
-      pdf.setFontSize(6); pdf.setFont('helvetica', 'bold');
-      pdf.text(portLabel, x + 2, y + 4.5);
-      months.forEach((m, i) => {
-        pdf.setTextColor(...TEXT3); pdf.setFontSize(5.5); pdf.setFont('helvetica', 'normal');
-        pdf.text(m, x + 32 + i * colW + colW / 2, y + 4.5, { align: 'center' });
-      });
-      y += rowH;
-
-      rows.forEach((row, ri) => {
-        const isTotal = row.isTotal;
-        if (isTotal) {
-          pdf.setFillColor(15, 25, 45);
-          pdf.rect(x, y, W - margin * 2, rowH, 'F');
-        } else if (ri % 2 === 0) {
-          pdf.setFillColor(...BG2);
-          pdf.rect(x, y, W - margin * 2, rowH, 'F');
-        }
-        pdf.setTextColor(...(isTotal ? BLUE : TEXT2));
-        pdf.setFontSize(5.5);
-        pdf.setFont('helvetica', isTotal ? 'bold' : 'normal');
-        pdf.text(row.label, x + 2, y + 4.5);
-        row.values.forEach((v, i) => {
-          const txt = v === null ? '-' : v;
-          pdf.setTextColor(...(isTotal ? BLUE : (typeof v === 'string' && v.startsWith('(') ? RED : TEXT)));
-          pdf.text(String(txt), x + 32 + i * colW + colW / 2, y + 4.5, { align: 'center' });
+    function summaryTable(x,y,portLabel,portColor,rows,months) {
+      const colW=(W-margin*2-32)/months.length, rowH=6.5;
+      pdf.setFillColor(...BG3); pdf.rect(x,y,W-margin*2,rowH,'F');
+      pdf.setTextColor(...portColor); pdf.setFontSize(6); pdf.setFont('helvetica','bold'); pdf.text(portLabel,x+2,y+4.5);
+      months.forEach((m,i)=>{pdf.setTextColor(...TEXT3);pdf.setFontSize(5.5);pdf.setFont('helvetica','normal');pdf.text(m,x+32+i*colW+colW/2,y+4.5,{align:'center'});});
+      y+=rowH;
+      rows.forEach((row,ri)=>{
+        const isTotal=row.isTotal;
+        if(isTotal){pdf.setFillColor(15,25,45);pdf.rect(x,y,W-margin*2,rowH,'F');}
+        else if(ri%2===0){pdf.setFillColor(...BG2);pdf.rect(x,y,W-margin*2,rowH,'F');}
+        pdf.setTextColor(...(isTotal?BLUE:TEXT2)); pdf.setFontSize(5.5); pdf.setFont('helvetica',isTotal?'bold':'normal');
+        pdf.text(row.label,x+2,y+4.5);
+        row.values.forEach((v,i)=>{
+          const txt=v===null?'-':v;
+          pdf.setTextColor(...(isTotal?BLUE:(typeof v==='string'&&v.startsWith('(')?RED:TEXT)));
+          pdf.text(String(txt),x+32+i*colW+colW/2,y+4.5,{align:'center'});
         });
-        y += rowH;
-        pdf.setDrawColor(...BORDER); pdf.setLineWidth(0.15);
-        pdf.line(x, y, x + W - margin * 2, y);
+        y+=rowH; pdf.setDrawColor(...BORDER); pdf.setLineWidth(0.15); pdf.line(x,y,x+W-margin*2,y);
       });
       return y;
     }
 
-    // ---- Get data ----
-    if (!_lastRenderData || !_lastSummaryData) { alert('Load data first'); return; }
-    const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc } = _lastRenderData;
-    const { byMonthClean3700, byMonthCleanBP, byMonthOtaAdj3700, byMonthOtaAdjBP,
-            byMonthOtaComm3700, byMonthOtaCommBP, byMonthNights3700, byMonthNightsBP } = _lastSummaryData;
-
-    const totalRoomRev = Object.values(byMonthPortfolio).reduce((a,m) => a + (m['3700M']||0) + (m['Bayou Park']||0), 0);
-    const p3700 = { roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0 };
-    const pBP   = { roomRev:0, clean:0, otaAdj:0, otaComm:0, nights:0 };
-    months.forEach(m => {
-      p3700.roomRev += byMonthPortfolio[m]?.['3700M']||0;
-      p3700.clean   += byMonthClean3700[m]||0;
-      p3700.otaAdj  += byMonthOtaAdj3700[m]||0;
-      p3700.otaComm += byMonthOtaComm3700[m]||0;
-      p3700.nights  += byMonthNights3700[m]||0;
-      pBP.roomRev   += byMonthPortfolio[m]?.['Bayou Park']||0;
-      pBP.clean     += byMonthCleanBP[m]||0;
-      pBP.otaAdj    += byMonthOtaAdjBP[m]||0;
-      pBP.otaComm   += byMonthOtaCommBP[m]||0;
-      pBP.nights    += byMonthNightsBP[m]||0;
+    if (!_lastRenderData||!_lastSummaryData) { alert('Load data first'); return; }
+    const {months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc}=_lastRenderData;
+    const {byMonthClean3700,byMonthCleanBP,byMonthOtaAdj3700,byMonthOtaAdjBP,byMonthOtaComm3700,byMonthOtaCommBP,byMonthNights3700,byMonthNightsBP}=_lastSummaryData;
+    const p3700={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0}, pBP={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0};
+    months.forEach(m=>{
+      p3700.roomRev+=byMonthPortfolio[m]?.['3700M']||0; p3700.clean+=byMonthClean3700[m]||0; p3700.otaAdj+=byMonthOtaAdj3700[m]||0; p3700.otaComm+=byMonthOtaComm3700[m]||0; p3700.nights+=byMonthNights3700[m]||0;
+      pBP.roomRev+=byMonthPortfolio[m]?.['Bayou Park']||0; pBP.clean+=byMonthCleanBP[m]||0; pBP.otaAdj+=byMonthOtaAdjBP[m]||0; pBP.otaComm+=byMonthOtaCommBP[m]||0; pBP.nights+=byMonthNightsBP[m]||0;
     });
-    const days = Math.max(1, Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1);
-    const avail3700 = UNITS_3700M * days, availBP = UNITS_BP * days;
-    const occ3700 = avail3700 > 0 ? p3700.nights / avail3700 : 0;
-    const occBP   = availBP   > 0 ? pBP.nights   / availBP   : 0;
-    const adr3700 = p3700.nights > 0 ? p3700.roomRev / p3700.nights : 0;
-    const adrBP   = pBP.nights   > 0 ? pBP.roomRev   / pBP.nights   : 0;
+    const days=Math.max(1,Math.ceil((new Date(to)-new Date(from))/86400000)+1);
+    const avail3700=UNITS_3700M*days, availBP=UNITS_BP*days;
+    const occ3700=avail3700>0?p3700.nights/avail3700:0, occBP=availBP>0?pBP.nights/availBP:0;
+    const adr3700=p3700.nights>0?p3700.roomRev/p3700.nights:0, adrBP=pBP.nights>0?pBP.roomRev/pBP.nights:0;
 
-    // ======= PAGE 1: OVERVIEW =======
-    addPage('Revenue Overview', 'Combined Portfolio Performance');
-    let cy = 20;
+    addPage('Revenue Overview','Combined Portfolio Performance');
+    let cy=20;
+    const kpiW=(W-margin*2-9)/4, kpiH=20;
+    [{label:'Total Revenue',value:fmt$(p3700.roomRev+p3700.clean+p3700.otaAdj+pBP.roomRev+pBP.clean+pBP.otaAdj),sub:'Room + Cleaning + Adj',color:BLUE},{label:'Room Revenue',value:fmt$(p3700.roomRev+pBP.roomRev),sub:'Net accommodation fare',color:BLUE},{label:'Cleaning Fee',value:fmt$(p3700.clean+pBP.clean),sub:'At checkout',color:TEXT2},{label:'OTA Commission',value:fmt$(p3700.otaComm+pBP.otaComm),sub:'Channel commission',color:RED}].forEach((k,i)=>kpiCard(margin+i*(kpiW+3),cy,kpiW,kpiH,k.label,k.value,k.sub,k.color));
+    cy+=kpiH+3;
+    [{label:'OTA Adjustment',value:(p3700.otaAdj+pBP.otaAdj)<0?'('+fmt$(p3700.otaAdj+pBP.otaAdj)+')':fmt$(p3700.otaAdj+pBP.otaAdj),sub:'Resolution center',color:AMBER},{label:'Occupancy',value:fmtPct((p3700.nights+pBP.nights)/(avail3700+availBP)),sub:(p3700.nights+pBP.nights)+' / '+(avail3700+availBP)+' nights',color:GREEN},{label:'ADR',value:fmt$((p3700.nights+pBP.nights)>0?(p3700.roomRev+pBP.roomRev)/(p3700.nights+pBP.nights):0),sub:'Avg daily rate',color:AMBER},{label:'RevPAR',value:fmt$((p3700.roomRev+pBP.roomRev)/(avail3700+availBP)),sub:'Per available night',color:AMBER}].forEach((k,i)=>kpiCard(margin+i*(kpiW+3),cy,kpiW,kpiH,k.label,k.value,k.sub,k.color));
+    cy+=kpiH+6;
+    sectionTitle(margin,cy,'Portfolio Summary'); cy+=4;
+    const portW=(W-margin*2-4)/2;
+    portCard(margin,cy,portW,'3700M',BLUE,{sub:'Dallas — McKinney Ave · '+UNITS_3700M+' units',stats:[{label:'OCC',value:fmtPct(occ3700)},{label:'ADR',value:fmt$(adr3700)},{label:'RevPAR',value:fmt$(avail3700>0?p3700.roomRev/avail3700:0)},{label:'Room Revenue',value:fmt$(p3700.roomRev)},{label:'Cleaning',value:fmt$(p3700.clean)},{label:'Total Revenue',value:fmt$(p3700.roomRev+p3700.clean+p3700.otaAdj)},{label:'OTA Comm.',value:fmt$(p3700.otaComm)}]});
+    portCard(margin+portW+4,cy,portW,'Bayou Park',GREEN,{sub:'Houston — Montrose / Midtown · '+UNITS_BP+' units',stats:[{label:'OCC',value:fmtPct(occBP)},{label:'ADR',value:fmt$(adrBP)},{label:'RevPAR',value:fmt$(availBP>0?pBP.roomRev/availBP:0)},{label:'Room Revenue',value:fmt$(pBP.roomRev)},{label:'Cleaning',value:fmt$(pBP.clean)},{label:'Total Revenue',value:fmt$(pBP.roomRev+pBP.clean+pBP.otaAdj)},{label:'OTA Comm.',value:fmt$(pBP.otaComm)}]});
+    cy+=26;
 
-    // KPI cards row 1 — 4 wide cards
-    const kpiW = (W - margin * 2 - 9) / 4;
-    const kpiH = 20;
-    const kpiData = [
-      { label: 'Total Revenue', value: fmt$(p3700.roomRev+p3700.clean+p3700.otaAdj+pBP.roomRev+pBP.clean+pBP.otaAdj), sub: 'Room + Cleaning + Adj', color: BLUE },
-      { label: 'Room Revenue', value: fmt$(p3700.roomRev+pBP.roomRev), sub: 'Net accommodation fare', color: BLUE },
-      { label: 'Cleaning Fee', value: fmt$(p3700.clean+pBP.clean), sub: 'At checkout', color: TEXT2 },
-      { label: 'OTA Commission', value: fmt$(p3700.otaComm+pBP.otaComm), sub: 'Channel commission', color: RED },
-    ];
-    kpiData.forEach((k, i) => kpiCard(margin + i * (kpiW + 3), cy, kpiW, kpiH, k.label, k.value, k.sub, k.color));
-    cy += kpiH + 3;
+    pdf.addPage(); addPage('Monthly Summary','Revenue by portfolio by month'); cy=20;
+    const sumMonths=filterMonths(months,summaryPeriod);
+    const sumLabels=sumMonths.map(m=>{const[y,mo]=m.split('-');return new Date(+y,+mo-1).toLocaleString('en',{month:'short',year:'2-digit'});});
+    const fmtV=v=>v===0?'-':'$'+Math.round(Math.abs(v)).toLocaleString('en-US');
+    const fmtAdj=v=>v===0?'-':v<0?'('+fmtV(v)+')':fmtV(v);
+    const fmtO=v=>v===0?'-':Math.round(v)+'%';
+    const dIM=m=>{const[y,mo]=m.split('-');return new Date(+y,+mo,0).getDate();};
 
-    const kpiData2 = [
-      { label: 'OTA Adjustment', value: (p3700.otaAdj+pBP.otaAdj) < 0 ? '(' + fmt$(p3700.otaAdj+pBP.otaAdj) + ')' : fmt$(p3700.otaAdj+pBP.otaAdj), sub: 'Resolution center', color: AMBER },
-      { label: 'Occupancy', value: fmtPct((p3700.nights+pBP.nights)/(avail3700+availBP)), sub: (p3700.nights+pBP.nights) + ' / ' + (avail3700+availBP) + ' nights', color: GREEN },
-      { label: 'ADR', value: fmt$((p3700.nights+pBP.nights)>0?(p3700.roomRev+pBP.roomRev)/(p3700.nights+pBP.nights):0), sub: 'Avg daily rate', color: AMBER },
-      { label: 'RevPAR', value: fmt$((p3700.roomRev+pBP.roomRev)/(avail3700+availBP)), sub: 'Per available night', color: AMBER },
-    ];
-    kpiData2.forEach((k, i) => kpiCard(margin + i * (kpiW + 3), cy, kpiW, kpiH, k.label, k.value, k.sub, k.color));
-    cy += kpiH + 6;
+    const rows3700=[{label:'Units',values:sumMonths.map(()=>UNITS_3700M)},{label:'Available Nights',values:sumMonths.map(m=>dIM(m)*UNITS_3700M)},{label:'Occupied Nights',values:sumMonths.map(m=>Math.round(byMonthNights3700[m]||0))},{label:'Occupancy',values:sumMonths.map(m=>fmtO(dIM(m)*UNITS_3700M>0?(byMonthNights3700[m]||0)/(dIM(m)*UNITS_3700M)*100:0))},{label:'ADR',values:sumMonths.map(m=>fmtV(byMonthADR[m]?.['3700M']||0))},{label:'RevPAR',values:sumMonths.map(m=>fmtV(byMonthRevPAR[m]?.['3700M']||0))},{label:'Room Revenue',values:sumMonths.map(m=>fmtV(byMonthPortfolio[m]?.['3700M']||0))},{label:'Cleaning Fee',values:sumMonths.map(m=>fmtV(byMonthClean3700[m]||0))},{label:'OTA Adjustment',values:sumMonths.map(m=>fmtAdj(byMonthOtaAdj3700[m]||0))},{label:'Total Revenue',values:sumMonths.map(m=>fmtV((byMonthPortfolio[m]?.['3700M']||0)+(byMonthClean3700[m]||0)+(byMonthOtaAdj3700[m]||0))),isTotal:true},{label:'OTA Commission',values:sumMonths.map(m=>fmtAdj(-(byMonthOtaComm3700[m]||0)))}];
+    const rowsBP=[{label:'Units',values:sumMonths.map(()=>UNITS_BP)},{label:'Available Nights',values:sumMonths.map(m=>dIM(m)*UNITS_BP)},{label:'Occupied Nights',values:sumMonths.map(m=>Math.round(byMonthNightsBP[m]||0))},{label:'Occupancy',values:sumMonths.map(m=>fmtO(dIM(m)*UNITS_BP>0?(byMonthNightsBP[m]||0)/(dIM(m)*UNITS_BP)*100:0))},{label:'ADR',values:sumMonths.map(m=>fmtV(byMonthADR[m]?.['Bayou Park']||0))},{label:'RevPAR',values:sumMonths.map(m=>fmtV(byMonthRevPAR[m]?.['Bayou Park']||0))},{label:'Room Revenue',values:sumMonths.map(m=>fmtV(byMonthPortfolio[m]?.['Bayou Park']||0))},{label:'Cleaning Fee',values:sumMonths.map(m=>fmtV(byMonthCleanBP[m]||0))},{label:'OTA Adjustment',values:sumMonths.map(m=>fmtAdj(byMonthOtaAdjBP[m]||0))},{label:'Total Revenue',values:sumMonths.map(m=>fmtV((byMonthPortfolio[m]?.['Bayou Park']||0)+(byMonthCleanBP[m]||0)+(byMonthOtaAdjBP[m]||0))),isTotal:true},{label:'OTA Commission',values:sumMonths.map(m=>fmtAdj(-(byMonthOtaCommBP[m]||0)))}];
 
-    // Portfolio cards
-    sectionTitle(margin, cy, 'Portfolio Summary');
-    cy += 4;
-    const portW = (W - margin * 2 - 4) / 2;
-    portCard(margin, cy, portW, '3700M', BLUE, {
-      sub: 'Dallas — McKinney Ave · ' + UNITS_3700M + ' units',
-      stats: [
-        { label: 'OCC', value: fmtPct(occ3700) },
-        { label: 'ADR', value: fmt$(adr3700) },
-        { label: 'RevPAR', value: fmt$(avail3700>0?p3700.roomRev/avail3700:0) },
-        { label: 'Room Revenue', value: fmt$(p3700.roomRev) },
-        { label: 'Cleaning', value: fmt$(p3700.clean) },
-        { label: 'Total Revenue', value: fmt$(p3700.roomRev+p3700.clean+p3700.otaAdj) },
-        { label: 'OTA Comm.', value: fmt$(p3700.otaComm) },
-      ]
-    });
-    portCard(margin + portW + 4, cy, portW, 'Bayou Park', GREEN, {
-      sub: 'Houston — Montrose / Midtown · ' + UNITS_BP + ' units',
-      stats: [
-        { label: 'OCC', value: fmtPct(occBP) },
-        { label: 'ADR', value: fmt$(adrBP) },
-        { label: 'RevPAR', value: fmt$(availBP>0?pBP.roomRev/availBP:0) },
-        { label: 'Room Revenue', value: fmt$(pBP.roomRev) },
-        { label: 'Cleaning', value: fmt$(pBP.clean) },
-        { label: 'Total Revenue', value: fmt$(pBP.roomRev+pBP.clean+pBP.otaAdj) },
-        { label: 'OTA Comm.', value: fmt$(pBP.otaComm) },
-      ]
-    });
-    cy += 26;
+    cy=summaryTable(margin,cy,'3700M  ·  Dallas — McKinney Ave',BLUE,rows3700,sumLabels); cy+=6;
+    summaryTable(margin,cy,'Bayou Park  ·  Houston — Montrose / Midtown',GREEN,rowsBP,sumLabels);
 
-    // Summary table — filtered months
-    pdf.addPage();
-    addPage('Monthly Summary', 'Revenue by portfolio by month');
-    cy = 20;
-
-    const sumMonths = filterMonths(months, summaryPeriod);
-    const sumLabels = sumMonths.map(m => {
-      const [y, mo] = m.split('-');
-      return new Date(+y, +mo-1).toLocaleString('en', {month:'short', year:'2-digit'});
-    });
-
-    const fmtV = v => v === 0 ? '-' : '$' + Math.round(Math.abs(v)).toLocaleString('en-US');
-    const fmtAdj = v => v === 0 ? '-' : v < 0 ? '(' + fmtV(v) + ')' : fmtV(v);
-    const fmtO = v => v === 0 ? '-' : Math.round(v) + '%';
-
-    const dIM = m => { const [y,mo] = m.split('-'); return new Date(+y,+mo,0).getDate(); };
-
-    const rows3700 = [
-      { label: 'Units', values: sumMonths.map(() => UNITS_3700M) },
-      { label: 'Available Nights', values: sumMonths.map((m,i) => dIM(m)*UNITS_3700M) },
-      { label: 'Occupied Nights', values: sumMonths.map(m => Math.round(byMonthNights3700[m]||0)) },
-      { label: 'Occupancy', values: sumMonths.map((m,i) => fmtO(dIM(m)*UNITS_3700M>0?(byMonthNights3700[m]||0)/(dIM(m)*UNITS_3700M)*100:0)) },
-      { label: 'ADR', values: sumMonths.map(m => fmtV(byMonthADR[m]?.['3700M']||0)) },
-      { label: 'RevPAR', values: sumMonths.map(m => fmtV(byMonthRevPAR[m]?.['3700M']||0)) },
-      { label: 'Room Revenue', values: sumMonths.map(m => fmtV(byMonthPortfolio[m]?.['3700M']||0)) },
-      { label: 'Cleaning Fee', values: sumMonths.map(m => fmtV(byMonthClean3700[m]||0)) },
-      { label: 'OTA Adjustment', values: sumMonths.map(m => fmtAdj(byMonthOtaAdj3700[m]||0)) },
-      { label: 'Total Revenue', values: sumMonths.map(m => fmtV((byMonthPortfolio[m]?.['3700M']||0)+(byMonthClean3700[m]||0)+(byMonthOtaAdj3700[m]||0))), isTotal: true },
-      { label: 'OTA Commission', values: sumMonths.map(m => fmtAdj(-(byMonthOtaComm3700[m]||0))) },
-    ];
-
-    const rowsBP = [
-      { label: 'Units', values: sumMonths.map(() => UNITS_BP) },
-      { label: 'Available Nights', values: sumMonths.map((m,i) => dIM(m)*UNITS_BP) },
-      { label: 'Occupied Nights', values: sumMonths.map(m => Math.round(byMonthNightsBP[m]||0)) },
-      { label: 'Occupancy', values: sumMonths.map((m,i) => fmtO(dIM(m)*UNITS_BP>0?(byMonthNightsBP[m]||0)/(dIM(m)*UNITS_BP)*100:0)) },
-      { label: 'ADR', values: sumMonths.map(m => fmtV(byMonthADR[m]?.['Bayou Park']||0)) },
-      { label: 'RevPAR', values: sumMonths.map(m => fmtV(byMonthRevPAR[m]?.['Bayou Park']||0)) },
-      { label: 'Room Revenue', values: sumMonths.map(m => fmtV(byMonthPortfolio[m]?.['Bayou Park']||0)) },
-      { label: 'Cleaning Fee', values: sumMonths.map(m => fmtV(byMonthCleanBP[m]||0)) },
-      { label: 'OTA Adjustment', values: sumMonths.map(m => fmtAdj(byMonthOtaAdjBP[m]||0)) },
-      { label: 'Total Revenue', values: sumMonths.map(m => fmtV((byMonthPortfolio[m]?.['Bayou Park']||0)+(byMonthCleanBP[m]||0)+(byMonthOtaAdjBP[m]||0))), isTotal: true },
-      { label: 'OTA Commission', values: sumMonths.map(m => fmtAdj(-(byMonthOtaCommBP[m]||0))) },
-    ];
-
-    cy = summaryTable(margin, cy, '3700M  ·  Dallas — McKinney Ave', BLUE, rows3700, sumLabels);
-    cy += 6;
-    summaryTable(margin, cy, 'Bayou Park  ·  Houston — Montrose / Midtown', GREEN, rowsBP, sumLabels);
-
-    // Footer
-    const pageCount = pdf.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      pdf.setPage(i);
-      pdf.setTextColor(...TEXT3);
-      pdf.setFontSize(5.5);
-      pdf.text('US Living — Revenue Intelligence  |  Confidential', margin, H - 5);
-      pdf.text('Page ' + i + ' of ' + pageCount, W - margin, H - 5, { align: 'right' });
-    }
-
-    pdf.save('US-Living-Revenue-' + from + '-' + to + '.pdf');
-
-  } catch(e) {
-    alert('Error generating PDF: ' + e.message);
-    console.error(e);
-  } finally {
-    btn.textContent = '⬇ Export PDF';
-    btn.disabled = false;
-  }
+    const pageCount=pdf.internal.getNumberOfPages();
+    for(let i=1;i<=pageCount;i++){pdf.setPage(i);pdf.setTextColor(...TEXT3);pdf.setFontSize(5.5);pdf.text('US Living — Revenue Intelligence  |  Confidential',margin,H-5);pdf.text('Page '+i+' of '+pageCount,W-margin,H-5,{align:'right'});}
+    pdf.save('US-Living-Revenue-'+from+'-'+to+'.pdf');
+  } catch(e) { alert('Error generating PDF: '+e.message); console.error(e); }
+  finally { btn.textContent='⬇ Export PDF'; btn.disabled=false; }
 }
 </script>
 </body>
