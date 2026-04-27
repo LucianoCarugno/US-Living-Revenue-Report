@@ -1263,29 +1263,49 @@ function redrawPortChart(portfolio, chartType) {
   const portData = _lastPortRenderData[portfolio];
   if (!portData) return;
   const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc, hexColor, rgbaColor, rgbaFill, ids } = portData;
-  // Register datalabels plugin
-  if (window.ChartDataLabels) Chart.register(ChartDataLabels);
+  // Register datalabels plugin with safe defaults
+  if (window.ChartDataLabels) {
+    Chart.register(ChartDataLabels);
+    // Disable datalabels globally by default - only enable per-dataset
+    Chart.defaults.plugins.datalabels = { display: false };
+  }
 
   const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
   const DATALABEL_OPTS = {
-    display: true,
-    color: 'rgba(232,237,243,0.85)',
+    display: ctx => {
+      const data = ctx.dataset.data;
+      const i = ctx.dataIndex;
+      const n = data.length;
+      if (n <= 5) return true;
+      const valid = data.filter(v => v > 0);
+      const max = Math.max(...valid);
+      const min = Math.min(...valid);
+      return i === n - 1 || data[i] === max || data[i] === min;
+    },
+    color: 'rgba(232,237,243,0.9)',
     font: { size: 9, family: 'JetBrains Mono', weight: '500' },
     anchor: 'end',
     align: 'top',
-    offset: 2,
-    formatter: v => v > 0 ? '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : Math.round(v)) : null
+    offset: 3,
+    formatter: v => v > 0 ? '$' + Math.round(v) : null,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 3,
+    padding: { top: 2, bottom: 2, left: 4, right: 4 }
   };
 
   const DATALABEL_PCT = {
     display: true,
-    color: 'rgba(232,237,243,0.85)',
-    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
+    color: '#EDF2F7',
+    font: { size: 9, family: 'JetBrains Mono', weight: '600' },
     anchor: 'end',
     align: 'top',
-    offset: 2,
-    formatter: v => v > 0 ? Math.round(v) + '%' : null
+    offset: 4,
+    formatter: v => v > 0 ? Math.round(v) + '%' : null,
+    backgroundColor: 'rgba(8,12,16,0.82)',
+    borderRadius: 3,
+    borderWidth: 0,
+    padding: { top: 2, bottom: 2, left: 5, right: 5 }
   };
   const scaleOpts = { x: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#4D5D72', font: { size: 10 } }, grid: { color: 'rgba(42,52,65,0.5)' } } };
 
@@ -1350,29 +1370,49 @@ let _lastPortRenderData = {}; // store per-portfolio render data for redraw
 function redrawChart(chartId) {
   if (!_lastRenderData) return;
   const { months, byMonthPortfolio, byMonthADR, byMonthRevPAR, byMonthOcc } = _lastRenderData;
-  // Register datalabels plugin
-  if (window.ChartDataLabels) Chart.register(ChartDataLabels);
+  // Register datalabels plugin with safe defaults
+  if (window.ChartDataLabels) {
+    Chart.register(ChartDataLabels);
+    // Disable datalabels globally by default - only enable per-dataset
+    Chart.defaults.plugins.datalabels = { display: false };
+  }
 
   const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
   const DATALABEL_OPTS = {
-    display: true,
-    color: 'rgba(232,237,243,0.85)',
+    display: ctx => {
+      const data = ctx.dataset.data;
+      const i = ctx.dataIndex;
+      const n = data.length;
+      if (n <= 5) return true;
+      const valid = data.filter(v => v > 0);
+      const max = Math.max(...valid);
+      const min = Math.min(...valid);
+      return i === n - 1 || data[i] === max || data[i] === min;
+    },
+    color: 'rgba(232,237,243,0.9)',
     font: { size: 9, family: 'JetBrains Mono', weight: '500' },
     anchor: 'end',
     align: 'top',
-    offset: 2,
-    formatter: v => v > 0 ? '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : Math.round(v)) : null
+    offset: 3,
+    formatter: v => v > 0 ? '$' + Math.round(v) : null,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 3,
+    padding: { top: 2, bottom: 2, left: 4, right: 4 }
   };
 
   const DATALABEL_PCT = {
     display: true,
-    color: 'rgba(232,237,243,0.85)',
-    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
+    color: '#EDF2F7',
+    font: { size: 9, family: 'JetBrains Mono', weight: '600' },
     anchor: 'end',
     align: 'top',
-    offset: 2,
-    formatter: v => v > 0 ? Math.round(v) + '%' : null
+    offset: 4,
+    formatter: v => v > 0 ? Math.round(v) + '%' : null,
+    backgroundColor: 'rgba(8,12,16,0.82)',
+    borderRadius: 3,
+    borderWidth: 0,
+    padding: { top: 2, bottom: 2, left: 5, right: 5 }
   };
 
   const filteredMonths = filterMonths(months, chartPeriods[chartId]);
@@ -1693,29 +1733,49 @@ function render(reservations, from, to, prev, allListings) {
 
   // ---- CHARTS ----
   const monthLabels = months.map(monthLabel);
-  // Register datalabels plugin
-  if (window.ChartDataLabels) Chart.register(ChartDataLabels);
+  // Register datalabels plugin with safe defaults
+  if (window.ChartDataLabels) {
+    Chart.register(ChartDataLabels);
+    // Disable datalabels globally by default - only enable per-dataset
+    Chart.defaults.plugins.datalabels = { display: false };
+  }
 
   const CHART_OPTS = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
   const DATALABEL_OPTS = {
-    display: true,
-    color: 'rgba(232,237,243,0.85)',
+    display: ctx => {
+      const data = ctx.dataset.data;
+      const i = ctx.dataIndex;
+      const n = data.length;
+      if (n <= 5) return true;
+      const valid = data.filter(v => v > 0);
+      const max = Math.max(...valid);
+      const min = Math.min(...valid);
+      return i === n - 1 || data[i] === max || data[i] === min;
+    },
+    color: 'rgba(232,237,243,0.9)',
     font: { size: 9, family: 'JetBrains Mono', weight: '500' },
     anchor: 'end',
     align: 'top',
-    offset: 2,
-    formatter: v => v > 0 ? '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : Math.round(v)) : null
+    offset: 3,
+    formatter: v => v > 0 ? '$' + Math.round(v) : null,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 3,
+    padding: { top: 2, bottom: 2, left: 4, right: 4 }
   };
 
   const DATALABEL_PCT = {
     display: true,
-    color: 'rgba(232,237,243,0.85)',
-    font: { size: 9, family: 'JetBrains Mono', weight: '500' },
+    color: '#EDF2F7',
+    font: { size: 9, family: 'JetBrains Mono', weight: '600' },
     anchor: 'end',
     align: 'top',
-    offset: 2,
-    formatter: v => v > 0 ? Math.round(v) + '%' : null
+    offset: 4,
+    formatter: v => v > 0 ? Math.round(v) + '%' : null,
+    backgroundColor: 'rgba(8,12,16,0.82)',
+    borderRadius: 3,
+    borderWidth: 0,
+    padding: { top: 2, bottom: 2, left: 5, right: 5 }
   };
 
   // Revenue chart
