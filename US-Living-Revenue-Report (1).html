@@ -8,6 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* ─────────────────────────────────────────────────────────────
    RESET & TOKENS
@@ -644,6 +645,10 @@ tr.total-row td:first-child{font-family:var(--mono);font-size:11px;font-weight:7
       <button class="btn btn-ghost" id="btnPDF" onclick="exportPDF()" style="display:none">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 4h4M4 6.5h4M4 9h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         PDF
+      </button>
+      <button class="btn btn-ghost" id="btnXLSX" onclick="exportExcel()" style="display:none">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 4L5.5 6L3.5 8M6.5 8H8.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Excel
       </button>
     </div>
   </div>
@@ -1334,9 +1339,11 @@ function render(reservations,from,to,prev,lists){
     return`<tr><td>${p}</td><td>${r.guest?.fullName||'—'}</td><td>${fmtDate(r.checkIn)}${dl}</td><td>${fmtDate(r.checkOut)}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td class="num">${$c(rr)}</td><td class="num">${$c(cl)}</td><td class="num">${$c(rr+cl)}</td><td class="num">${$c(oc)}</td></tr>`;
   }).join('');
 
+  window._lastReservations=reservations;
   document.getElementById('main').style.display='block';
   document.getElementById('emptyBox').style.display='none';
   document.getElementById('btnPDF').style.display='';
+  document.getElementById('btnXLSX').style.display='';
   renderSummary();
 }
 
@@ -1416,6 +1423,137 @@ async function exportPDF(){
     pdf.save('US-Living-Revenue-'+from+'-'+to+'.pdf');
   }catch(e){alert('PDF error: '+e.message);}
   finally{document.getElementById('btnPDF').innerHTML='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 4h4M4 6.5h4M4 9h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> PDF';document.getElementById('btnPDF').disabled=false;}
+}
+
+// ─── Excel export ─────────────────────────────────────────────────
+function exportExcel(){
+  if(!_LD||!_SD){alert('Load data first');return;}
+  const btn=document.getElementById('btnXLSX');btn.textContent='Generating…';btn.disabled=true;
+  try{
+    const from=document.getElementById('df').value,to=document.getElementById('dt').value;
+    const wb=XLSX.utils.book_new();
+    const {months:M,bMP,bADR,bRevPAR,bOcc}=_LD;
+    const {bCl3,bClB,bOA3,bOAB,bOC3,bOCB,bN3,bNB}=_SD;
+    const f$=v=>Math.round(v);
+    const fP=v=>+(v*100).toFixed(1);
+    const fNeg=v=>Math.round(v);
+
+    // ── Sheet 1: Overview KPIs ──────────────────────────────────────
+    const p3={rr:0,cl:0,oa:0,oc:0,ni:0},pB={rr:0,cl:0,oa:0,oc:0,ni:0};
+    M.forEach(m=>{
+      p3.rr+=bMP[m]?.['3700M']||0;p3.cl+=bCl3[m]||0;p3.oa+=bOA3[m]||0;p3.oc+=bOC3[m]||0;p3.ni+=bN3[m]||0;
+      pB.rr+=bMP[m]?.['Bayou Park']||0;pB.cl+=bClB[m]||0;pB.oa+=bOAB[m]||0;pB.oc+=bOCB[m]||0;pB.ni+=bNB[m]||0;
+    });
+    const days=Math.max(1,Math.ceil((new Date(to)-new Date(from))/86400000)+1);
+    const a3=12*days,aB=20*days;
+    const tRR=p3.rr+pB.rr,tCl=p3.cl+pB.cl,tOA=p3.oa+pB.oa,tOC=p3.oc+pB.oc,tNi=p3.ni+pB.ni,tAv=a3+aB;
+    const ovData=[
+      ['US Living — Revenue Intelligence','','Period:',`${isoToUS(from)} – ${isoToUS(to)}`],
+      [''],
+      ['PORTFOLIO OVERVIEW'],
+      ['Metric','Combined','3700M','Bayou Park'],
+      ['Total Revenue ($)',f$(tRR+tCl+tOA),f$(p3.rr+p3.cl+p3.oa),f$(pB.rr+pB.cl+pB.oa)],
+      ['Room Revenue ($)',f$(tRR),f$(p3.rr),f$(pB.rr)],
+      ['Cleaning Fee ($)',f$(tCl),f$(p3.cl),f$(pB.cl)],
+      ['OTA Commission ($)',f$(tOC),f$(p3.oc),f$(pB.oc)],
+      ['OTA Adjustment ($)',f$(tOA),f$(p3.oa),f$(pB.oa)],
+      ['Occupied Nights',f$(tNi),f$(p3.ni),f$(pB.ni)],
+      ['Available Nights',f$(tAv),f$(a3),f$(aB)],
+      ['Occupancy (%)',fP(tAv>0?tNi/tAv:0),fP(a3>0?p3.ni/a3:0),fP(aB>0?pB.ni/aB:0)],
+      ['ADR ($)',f$(tNi>0?tRR/tNi:0),f$(p3.ni>0?p3.rr/p3.ni:0),f$(pB.ni>0?pB.rr/pB.ni:0)],
+      ['RevPAR ($)',f$(tAv>0?tRR/tAv:0),f$(a3>0?p3.rr/a3:0),f$(aB>0?pB.rr/aB:0)],
+    ];
+    const wsOv=XLSX.utils.aoa_to_sheet(ovData);
+    wsOv['!cols']=[{wch:28},{wch:16},{wch:16},{wch:16}];
+    XLSX.utils.book_append_sheet(wb,wsOv,'Overview');
+
+    // ── Sheet 2: Monthly Summary ────────────────────────────────────
+    const allMonths=M.sort();
+    const dim=m=>{const[y,mo]=m.split('-');return new Date(+y,+mo,0).getDate();};
+    const mLabel=m=>{const[y,mo]=m.split('-');return new Date(+y,+mo-1).toLocaleString('en-US',{month:'short',year:'numeric'});};
+    const hdr=['Metric',...allMonths.map(mLabel)];
+    const summaryData=[
+      hdr,
+      // 3700M
+      [''],
+      ['3700M — Dallas, McKinney Avenue'],
+      ['Units',...allMonths.map(()=>12)],
+      ['Available Nights',...allMonths.map(m=>dim(m)*12)],
+      ['Occupied Nights',...allMonths.map(m=>Math.round(bN3[m]||0))],
+      ['Occupancy (%)',...allMonths.map(m=>{const a=dim(m)*12;return fP(a>0?(bN3[m]||0)/a:0);})],
+      ['ADR ($)',...allMonths.map(m=>f$(bADR[m]?.['3700M']||0))],
+      ['RevPAR ($)',...allMonths.map(m=>f$(bRevPAR[m]?.['3700M']||0))],
+      ['Room Revenue ($)',...allMonths.map(m=>f$(bMP[m]?.['3700M']||0))],
+      ['Cleaning Fee ($)',...allMonths.map(m=>f$(bCl3[m]||0))],
+      ['OTA Adjustment ($)',...allMonths.map(m=>fNeg(bOA3[m]||0))],
+      ['Total Revenue ($)',...allMonths.map(m=>f$((bMP[m]?.['3700M']||0)+(bCl3[m]||0)+(bOA3[m]||0)))],
+      ['OTA Commission ($)',...allMonths.map(m=>f$(bOC3[m]||0))],
+      [''],
+      // Bayou Park
+      ['Bayou Park — Houston, Montrose / Midtown'],
+      ['Units',...allMonths.map(()=>20)],
+      ['Available Nights',...allMonths.map(m=>dim(m)*20)],
+      ['Occupied Nights',...allMonths.map(m=>Math.round(bNB[m]||0))],
+      ['Occupancy (%)',...allMonths.map(m=>{const a=dim(m)*20;return fP(a>0?(bNB[m]||0)/a:0);})],
+      ['ADR ($)',...allMonths.map(m=>f$(bADR[m]?.['Bayou Park']||0))],
+      ['RevPAR ($)',...allMonths.map(m=>f$(bRevPAR[m]?.['Bayou Park']||0))],
+      ['Room Revenue ($)',...allMonths.map(m=>f$(bMP[m]?.['Bayou Park']||0))],
+      ['Cleaning Fee ($)',...allMonths.map(m=>f$(bClB[m]||0))],
+      ['OTA Adjustment ($)',...allMonths.map(m=>fNeg(bOAB[m]||0))],
+      ['Total Revenue ($)',...allMonths.map(m=>f$((bMP[m]?.['Bayou Park']||0)+(bClB[m]||0)+(bOAB[m]||0)))],
+      ['OTA Commission ($)',...allMonths.map(m=>f$(bOCB[m]||0))],
+    ];
+    const wsSumm=XLSX.utils.aoa_to_sheet(summaryData);
+    const summCols=[{wch:28},...allMonths.map(()=>({wch:14}))];
+    wsSumm['!cols']=summCols;
+    XLSX.utils.book_append_sheet(wb,wsSumm,'Monthly Summary');
+
+    // ── Sheet 3: All Bookings ───────────────────────────────────────
+    // We need the reservations — pull from the last render global
+    if(window._lastReservations){
+      const bkHdr=['Property','Guest','Confirmation','Check-in','Check-out','Nights','Channel','Status','Room Rev ($)','Cleaning ($)','OTA Adj ($)','Total Rev ($)','OTA Comm ($)'];
+      const bkRows=_lastReservations.map(r=>{
+        const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oa=r.money?.resolutionAmount||0,oc=Math.abs(r.money?.hostServiceFee||0);
+        const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+        return[
+          (r.listing?.nickname||r.listing?.title||'').replace(/\*/g,'').trim(),
+          r.guest?.fullName||'',
+          r.confirmationCode||'',
+          r.checkIn?isoToUS(r.checkIn.split('T')[0]):'',
+          r.checkOut?isoToUS(r.checkOut.split('T')[0]):'',
+          r.nightsCount||0,
+          ch,
+          r.status||'confirmed',
+          f$(rr),f$(cl),f$(oa),f$(rr+cl+oa),f$(oc)
+        ];
+      });
+      const wsBk=XLSX.utils.aoa_to_sheet([bkHdr,...bkRows]);
+      wsBk['!cols']=[{wch:28},{wch:22},{wch:16},{wch:12},{wch:12},{wch:7},{wch:14},{wch:12},{wch:12},{wch:12},{wch:10},{wch:12},{wch:12}];
+      XLSX.utils.book_append_sheet(wb,wsBk,'Bookings');
+    }
+
+    // ── Sheet 4: Pipeline ───────────────────────────────────────────
+    if(window._lastReservations){
+      const today=new Date().toISOString().split('T')[0];
+      const upc=_lastReservations.filter(r=>r.status!=='cancelled'&&r.checkIn&&r.checkIn.split('T')[0]>=today).sort((a,b)=>(a.checkIn||'').localeCompare(b.checkIn||''));
+      const ppHdr=['Property','Guest','Check-in','Check-out','Nights','Days Until','Channel','Room Rev ($)','Cleaning ($)','Total Rev ($)','OTA Comm ($)'];
+      const ppRows=upc.map(r=>{
+        const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oc=Math.abs(r.money?.hostServiceFee||0);
+        const du=Math.ceil((new Date(r.checkIn.split('T')[0])-new Date())/86400000);
+        const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+        return[(r.listing?.nickname||r.listing?.title||'').replace(/\*/g,'').trim(),r.guest?.fullName||'',isoToUS(r.checkIn.split('T')[0]),isoToUS(r.checkOut.split('T')[0]),r.nightsCount||0,du,ch,f$(rr),f$(cl),f$(rr+cl),f$(oc)];
+      });
+      const wsPP=XLSX.utils.aoa_to_sheet([ppHdr,...ppRows]);
+      wsPP['!cols']=[{wch:28},{wch:22},{wch:12},{wch:12},{wch:7},{wch:10},{wch:14},{wch:12},{wch:12},{wch:12},{wch:12}];
+      XLSX.utils.book_append_sheet(wb,wsPP,'Pipeline');
+    }
+
+    XLSX.writeFile(wb,`US-Living-Revenue-${from}-${to}.xlsx`);
+  }catch(e){alert('Excel error: '+e.message);console.error(e);}
+  finally{
+    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 4L5.5 6L3.5 8M6.5 8H8.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Excel';
+    btn.disabled=false;
+  }
 }
 </script>
 </body>
