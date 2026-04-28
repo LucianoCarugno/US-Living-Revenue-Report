@@ -4,719 +4,680 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>US Living — Revenue Intelligence</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-:root {
-  --ink: #0A0D12;
-  --ink2: #111620;
-  --ink3: #181E2A;
-  --ink4: #1E2736;
-  --line: rgba(255,255,255,0.06);
-  --line2: rgba(255,255,255,0.1);
-  --line3: rgba(255,255,255,0.16);
-  --fog: #8898B4;
-  --fog2: #A8BBCF;
-  --mist: #C8D8E8;
-  --snow: #EDF2FA;
-  --cobalt: #1A6CFF;
-  --cobalt-dim: rgba(26,108,255,0.12);
-  --cobalt-glow: rgba(26,108,255,0.25);
-  --cobalt-line: rgba(26,108,255,0.3);
-  --jade: #00C896;
-  --jade-dim: rgba(0,200,150,0.1);
-  --jade-glow: rgba(0,200,150,0.22);
-  --jade-line: rgba(0,200,150,0.28);
-  --amber: #F0A500;
-  --amber-dim: rgba(240,165,0,0.1);
-  --crimson: #FF4D6A;
-  --crimson-dim: rgba(255,77,106,0.1);
-  --r: 6px;
-  --r2: 10px;
-  --r3: 14px;
+:root{
+  --bg:#07090E;
+  --s1:#0D1017;
+  --s2:#111520;
+  --s3:#161C2A;
+  --s4:#1C2335;
+  --wire:rgba(255,255,255,0.055);
+  --wire2:rgba(255,255,255,0.09);
+  --wire3:rgba(255,255,255,0.14);
+  --dim:#6B7FA0;
+  --mid:#94A3B8;
+  --lit:#C8D8EC;
+  --white:#ECF2FA;
+  --blue:#2563EB;
+  --blue-b:rgba(37,99,235,0.14);
+  --blue-r:rgba(37,99,235,0.28);
+  --blue-g:rgba(37,99,235,0.4);
+  --teal:#0EA87A;
+  --teal-b:rgba(14,168,122,0.12);
+  --teal-r:rgba(14,168,122,0.26);
+  --gold:#D97706;
+  --gold-b:rgba(217,119,6,0.1);
+  --rose:#E11D48;
+  --rose-b:rgba(225,29,72,0.1);
+  --r:5px;--r2:9px;--r3:13px;
 }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--ink);
-  color: var(--snow);
-  min-height: 100vh;
-  font-size: 13px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+html{color-scheme:dark}
+body{
+  font-family:'Geist',sans-serif;
+  background:var(--bg);color:var(--white);
+  min-height:100vh;font-size:13px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
 }
-
-/* Subtle grid + vignette background */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
+body::before{
+  content:'';position:fixed;inset:0;
   background:
-    radial-gradient(ellipse 70% 60% at 15% -10%, rgba(26,108,255,0.07) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 85% 110%, rgba(0,200,150,0.05) 0%, transparent 55%),
-    repeating-linear-gradient(0deg, transparent, transparent 47px, rgba(255,255,255,0.018) 47px, rgba(255,255,255,0.018) 48px),
-    repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(255,255,255,0.018) 47px, rgba(255,255,255,0.018) 48px);
-  pointer-events: none;
-  z-index: 0;
+    radial-gradient(ellipse 900px 700px at -100px -200px,rgba(37,99,235,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 600px 500px at calc(100% + 100px) calc(100% + 100px),rgba(14,168,122,0.06) 0%,transparent 55%);
+  pointer-events:none;z-index:0;
+}
+/* Fine dot grid */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;z-index:0;opacity:.5;
+}
+.page{max-width:1380px;margin:0 auto;padding:32px 32px 80px;position:relative;z-index:1}
+
+/* ══ HEADER ══════════════════════════════════════════════════════ */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:20px;
+  margin-bottom:40px;padding-bottom:28px;
+  border-bottom:1px solid var(--wire2);
+}
+.brand{display:flex;align-items:center;gap:16px}
+.brand-mark{
+  width:44px;height:44px;
+  background:var(--blue);border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Geist',sans-serif;font-size:13px;font-weight:700;
+  color:#fff;letter-spacing:-.5px;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.1),0 12px 32px rgba(37,99,235,0.45);
+  position:relative;
+}
+.brand-mark::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,transparent 60%);
+  border-radius:11px;
+}
+.brand-wordmark{display:flex;flex-direction:column;gap:2px}
+.brand-name{
+  font-family:'Geist',sans-serif;font-size:17px;font-weight:600;
+  color:var(--white);letter-spacing:-.4px;
+}
+.brand-sub{
+  font-size:10.5px;color:var(--dim);font-weight:400;
+  letter-spacing:.8px;text-transform:uppercase;
 }
 
-.page { max-width: 1320px; margin: 0 auto; padding: 28px 28px 64px; position: relative; z-index: 1; }
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 
-/* ── HEADER ── */
-.header {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 16px;
-  margin-bottom: 36px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--line2);
+/* Custom date pickers */
+.date-group{
+  display:flex;align-items:center;gap:6px;
+  background:var(--s2);border:1px solid var(--wire2);
+  border-radius:var(--r);padding:0;overflow:hidden;
 }
-.brand { display: flex; align-items: center; gap: 14px; }
-.brand-mark {
-  width: 40px; height: 40px;
-  background: var(--cobalt);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif;
-  font-size: 14px; font-weight: 800; color: #fff;
-  letter-spacing: -0.5px;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 8px 24px rgba(26,108,255,0.4);
+.date-input-wrap{
+  display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;
+  position:relative;
 }
-.brand-name {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px; font-weight: 700; color: var(--snow);
-  letter-spacing: -0.5px;
+.date-input-wrap:hover{background:var(--s3)}
+.date-label-tiny{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
+.date-display{font-family:'Geist Mono',monospace;font-size:12px;color:var(--lit);white-space:nowrap;min-width:76px}
+.date-input-real{
+  position:absolute;inset:0;opacity:0;cursor:pointer;
+  width:100%;height:100%;
 }
-.brand-sub { font-size: 11px; color: var(--fog); font-weight: 400; margin-top: 1px; letter-spacing: 0.5px; text-transform: uppercase; }
+.date-sep{color:var(--wire3);font-size:12px;padding:0 2px}
 
-.controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.btn{
+  font-size:12px;font-family:'Geist',sans-serif;font-weight:500;
+  padding:8px 16px;border-radius:var(--r);
+  border:1px solid var(--wire2);background:var(--s2);
+  color:var(--mid);cursor:pointer;transition:all .15s;
+  white-space:nowrap;letter-spacing:.1px;
+}
+.btn:hover{background:var(--s3);color:var(--white);border-color:var(--wire3)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-primary{
+  background:var(--blue);color:#fff;border-color:transparent;
+  box-shadow:0 1px 0 rgba(255,255,255,0.08) inset,0 6px 20px var(--blue-g);
+  font-weight:600;
+}
+.btn-primary:hover{background:#3B7CFF;box-shadow:0 6px 28px rgba(37,99,235,0.6)}
 
-.date-group {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--ink3); border: 1px solid var(--line2);
-  border-radius: var(--r); padding: 8px 14px;
+/* ══ TABS ════════════════════════════════════════════════════════ */
+.tabs{
+  display:flex;gap:1px;
+  background:var(--s1);border:1px solid var(--wire);
+  border-radius:var(--r2);padding:4px;margin-bottom:30px;
+  width:fit-content;
 }
-.date-group input[type=date] {
-  background: none; border: none; color: var(--mist);
-  font-size: 12px; font-family: 'DM Mono', monospace;
-  outline: none; cursor: pointer; color-scheme: dark;
+.tab{
+  font-family:'Geist',sans-serif;font-size:12px;font-weight:500;
+  padding:7px 18px;cursor:pointer;color:var(--dim);
+  border-radius:var(--r);transition:all .15s;white-space:nowrap;letter-spacing:.2px;
 }
-.date-sep { color: var(--fog); font-size: 11px; }
+.tab:hover{color:var(--lit);background:rgba(255,255,255,0.035)}
+.tab.active{background:var(--s4);color:var(--white);box-shadow:0 1px 4px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.04)}
+.tab.active.t-blue{color:#5B9AFF}
+.tab.active.t-teal{color:#2DD4A0}
 
-.btn {
-  font-size: 12px; font-family: 'DM Sans', sans-serif; font-weight: 500;
-  padding: 8px 16px; border-radius: var(--r);
-  border: 1px solid var(--line2); background: var(--ink3);
-  color: var(--fog2); cursor: pointer; transition: all .15s;
-  white-space: nowrap; letter-spacing: 0.2px;
+/* ══ KPI GRID ════════════════════════════════════════════════════ */
+.kpi-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:20px}
+.kpi{
+  background:var(--s1);border:1px solid var(--wire);
+  border-radius:var(--r2);padding:20px 18px 16px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s;
 }
-.btn:hover { background: var(--ink4); color: var(--snow); border-color: var(--line3); }
-.btn:disabled { opacity: .3; cursor: not-allowed; }
-.btn-primary {
-  background: var(--cobalt); color: #fff; border-color: var(--cobalt);
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 4px 16px var(--cobalt-glow);
+.kpi::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent,var(--blue)),transparent);
+  opacity:.7;
 }
-.btn-primary:hover { background: #2878FF; box-shadow: 0 4px 24px rgba(26,108,255,0.5); }
+.kpi:hover{border-color:var(--wire2);transform:translateY(-2px)}
+.kpi-label{
+  font-size:9px;font-weight:600;color:var(--dim);
+  text-transform:uppercase;letter-spacing:1.1px;margin-bottom:10px;
+}
+.kpi-value{
+  font-family:'Geist',sans-serif;font-size:24px;font-weight:700;
+  color:var(--white);line-height:1;margin-bottom:6px;letter-spacing:-.8px;
+}
+.kpi-sub{font-size:10px;color:var(--dim)}
+.kpi-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:10px;font-weight:500;padding:2px 7px;
+  border-radius:4px;margin-top:6px;font-family:'Geist Mono',monospace;
+}
+.kpi-delta.up{background:rgba(14,168,122,0.12);color:#2DD4A0}
+.kpi-delta.down{background:rgba(225,29,72,0.1);color:#FB7185}
 
-/* ── TABS ── */
-.tabs {
-  display: flex; gap: 2px;
-  background: var(--ink2); border: 1px solid var(--line);
-  border-radius: var(--r2); padding: 4px; margin-bottom: 28px;
-  width: fit-content;
+/* ══ PORTFOLIO CARDS ════════════════════════════════════════════ */
+.portfolio-kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.port-card{
+  background:var(--s1);border:1px solid var(--wire);
+  border-radius:var(--r2);padding:22px 24px;
+  position:relative;overflow:hidden;transition:border-color .3s;
 }
-.tab {
-  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
-  padding: 7px 18px; cursor: pointer; color: var(--fog);
-  border-radius: var(--r); transition: all .15s; white-space: nowrap;
-  letter-spacing: 0.2px;
+.port-card.pc-blue{border-color:var(--blue-r)}
+.port-card.pc-teal{border-color:var(--teal-r)}
+.port-card::before{
+  content:'';position:absolute;top:0;left:0;width:3px;bottom:0;
+  background:var(--pc-accent,var(--blue));
+  border-radius:0 0 0 0;
 }
-.tab:hover { color: var(--mist); background: rgba(255,255,255,0.04); }
-.tab.active { background: var(--ink4); color: var(--snow); box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
-.tab.active.cobalt { color: var(--cobalt); }
-.tab.active.jade { color: var(--jade); }
+.port-card-top{display:flex;align-items:baseline;gap:10px;margin-bottom:18px}
+.port-card-name{
+  font-family:'Geist',sans-serif;font-size:14px;font-weight:600;
+  color:var(--pc-accent,var(--blue));letter-spacing:-.2px;
+}
+.port-card-meta{font-size:11px;color:var(--dim);font-weight:400}
+.port-stats{display:grid;grid-template-columns:repeat(7,1fr);gap:14px}
+.ps-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}
+.ps-val{font-family:'Geist Mono',monospace;font-size:13px;font-weight:500;color:var(--lit)}
 
-/* ── KPI GRID ── */
-.kpi-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-bottom: 20px; }
+/* ══ CHART CARDS ═════════════════════════════════════════════════*/
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.chart-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.chart-card{
+  background:var(--s1);border:1px solid var(--wire);
+  border-radius:var(--r2);padding:24px;
+  transition:border-color .2s;position:relative;
+}
+.chart-card:hover{border-color:var(--wire2)}
+.chart-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.chart-eyebrow{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:3px}
+.chart-title-text{font-size:13px;color:var(--lit);font-weight:400;margin-bottom:18px}
+.chart-wrap{position:relative;width:100%}
+.chart-legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mid)}
+.legend-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.legend-dash{width:18px;height:2px;border-radius:1px;flex-shrink:0}
 
-.kpi {
-  background: var(--ink2); border: 1px solid var(--line);
-  border-radius: var(--r2); padding: 18px 16px 16px;
-  position: relative; overflow: hidden; transition: border-color .2s, transform .2s;
-  cursor: default;
+.period-btns{display:flex;gap:2px}
+.period-btn{
+  font-size:9.5px;font-weight:500;padding:3px 8px;
+  border-radius:4px;border:1px solid var(--wire);
+  background:none;color:var(--dim);cursor:pointer;
+  font-family:'Geist',sans-serif;transition:all .15s;letter-spacing:.3px;
 }
-.kpi:hover { border-color: var(--line2); transform: translateY(-1px); }
-.kpi::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1.5px;
-  background: var(--accent, var(--cobalt));
-  opacity: 0.7;
-}
-.kpi-label {
-  font-size: 9.5px; font-weight: 600; color: var(--fog);
-  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
-}
-.kpi-value {
-  font-family: 'Syne', sans-serif;
-  font-size: 22px; font-weight: 700; color: var(--snow);
-  line-height: 1; margin-bottom: 6px; letter-spacing: -0.5px;
-}
-.kpi-sub { font-size: 10px; color: var(--fog); }
-.kpi-delta {
-  display: inline-flex; align-items: center; gap: 3px;
-  font-size: 10px; font-weight: 500; padding: 2px 6px;
-  border-radius: 4px; margin-top: 6px;
-  font-family: 'DM Mono', monospace;
-}
-.kpi-delta.up { background: var(--jade-dim); color: var(--jade); }
-.kpi-delta.down { background: var(--crimson-dim); color: var(--crimson); }
-.kpi-delta.neutral { background: rgba(255,255,255,0.05); color: var(--fog); }
+.period-btn:hover{color:var(--mid);border-color:var(--wire2)}
+.period-btn.active{background:var(--s3);color:#5B9AFF;border-color:rgba(37,99,235,0.3)}
 
-/* ── PORTFOLIO CARDS ── */
-.portfolio-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+/* ══ SECTION LABELS ══════════════════════════════════════════════*/
+.section-label{
+  font-size:9px;font-weight:700;color:var(--dim);
+  text-transform:uppercase;letter-spacing:2px;
+  margin:36px 0 18px;display:flex;align-items:center;gap:14px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--wire2),transparent)}
 
-.portfolio-kpi-card {
-  background: var(--ink2); border: 1px solid var(--line);
-  border-radius: var(--r2); padding: 20px 22px;
-  position: relative; overflow: hidden;
+/* ══ TABLES ══════════════════════════════════════════════════════*/
+.table-wrap{
+  background:var(--s1);border:1px solid var(--wire);
+  border-radius:var(--r2);overflow:hidden;margin-bottom:16px;
+  overflow-x:auto;
 }
-.portfolio-kpi-card::before {
-  content: ''; position: absolute; inset: 0;
-  opacity: 0;
-  transition: opacity .3s;
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{
+  padding:11px 16px;text-align:left;
+  font-size:9px;font-weight:700;color:var(--dim);
+  text-transform:uppercase;letter-spacing:1.2px;
+  background:var(--s2);border-bottom:1px solid var(--wire);
+  white-space:nowrap;
 }
-.portfolio-kpi-card:hover::before { opacity: 1; }
-.portfolio-kpi-card.cobalt { border-color: var(--cobalt-line); }
-.portfolio-kpi-card.cobalt::before { background: radial-gradient(ellipse 80% 60% at 0% 0%, rgba(26,108,255,0.06) 0%, transparent 70%); }
-.portfolio-kpi-card.jade { border-color: var(--jade-line); }
-.portfolio-kpi-card.jade::before { background: radial-gradient(ellipse 80% 60% at 0% 0%, rgba(0,200,150,0.05) 0%, transparent 70%); }
-
-.portfolio-kpi-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 13px; font-weight: 600; margin-bottom: 16px;
-  display: flex; align-items: center; gap: 8px;
+thead th.num{text-align:right}
+tbody td{
+  padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.03);
+  color:var(--lit);white-space:nowrap;
+  font-family:'Geist Mono',monospace;font-size:11.5px;
 }
-.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.portfolio-stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
-.pstat-label { font-size: 9px; color: var(--fog); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 4px; }
-.pstat-value {
-  font-family: 'DM Mono', monospace;
-  font-size: 14px; font-weight: 500; color: var(--snow);
-}
-
-/* ── CHART CARDS ── */
-.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.chart-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.chart-full { margin-bottom: 12px; }
-
-.chart-card {
-  background: var(--ink2); border: 1px solid var(--line);
-  border-radius: var(--r2); padding: 22px;
-  transition: border-color .2s;
-  position: relative;
-}
-.chart-card:hover { border-color: var(--line2); }
-
-.chart-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
-.chart-title {
-  font-size: 9px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.5px; color: var(--fog); margin-bottom: 3px;
-}
-.chart-subtitle { font-size: 12px; color: var(--fog2); margin-bottom: 18px; font-weight: 400; }
-.chart-wrap { position: relative; width: 100%; }
-
-.chart-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--fog2); }
-.legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.legend-line { width: 18px; height: 2px; border-radius: 1px; flex-shrink: 0; }
-
-.period-btns { display: flex; gap: 2px; }
-.period-btn {
-  font-size: 10px; font-weight: 500; padding: 3px 8px;
-  border-radius: 5px; border: 1px solid var(--line);
-  background: none; color: var(--fog); cursor: pointer;
-  font-family: 'DM Sans', sans-serif; transition: all .15s;
-}
-.period-btn:hover { color: var(--fog2); border-color: var(--line2); }
-.period-btn.active { background: var(--ink4); color: var(--cobalt); border-color: var(--cobalt-line); }
-
-/* ── SECTION LABEL ── */
-.section-label {
-  font-size: 9px; font-weight: 700; color: var(--fog);
-  text-transform: uppercase; letter-spacing: 2px;
-  margin: 32px 0 16px; display: flex; align-items: center; gap: 14px;
-}
-.section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line2), transparent); }
-
-/* ── TABLE ── */
-.table-wrap {
-  background: var(--ink2); border: 1px solid var(--line);
-  border-radius: var(--r2); overflow: hidden; margin-bottom: 16px;
-}
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-thead th {
-  padding: 11px 14px; text-align: left;
-  font-size: 9px; font-weight: 700; color: var(--fog);
-  text-transform: uppercase; letter-spacing: 1.2px;
-  background: var(--ink3); border-bottom: 1px solid var(--line);
-  white-space: nowrap;
-}
-thead th.num { text-align: right; }
-tbody td {
-  padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.035);
-  color: var(--mist); white-space: nowrap;
-  font-family: 'DM Mono', monospace; font-size: 11.5px;
-}
-tbody td:first-child { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--snow); }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover td { background: rgba(255,255,255,0.015); }
-.num { text-align: right; }
-tr.total-row td {
-  font-weight: 600; background: rgba(26,108,255,0.06);
-  border-top: 1px solid var(--line2); color: var(--cobalt);
+tbody td:first-child{font-family:'Geist',sans-serif;font-size:12px;font-weight:500;color:var(--white)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,0.013)}
+.num{text-align:right}
+tr.total-row td{
+  font-weight:600;background:rgba(37,99,235,0.06);
+  border-top:1px solid var(--wire2);color:#5B9AFF;
 }
 
-.badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; font-family: 'DM Sans', sans-serif; }
-.badge-ok { background: var(--jade-dim); color: var(--jade); }
-.badge-warn { background: var(--amber-dim); color: var(--amber); }
-.badge-cancel { background: var(--crimson-dim); color: var(--crimson); }
+.badge{font-size:10px;padding:2px 9px;border-radius:20px;font-weight:500;font-family:'Geist',sans-serif;letter-spacing:.2px}
+.badge-ok{background:rgba(14,168,122,0.12);color:#2DD4A0}
+.badge-warn{background:var(--gold-b);color:#FBBF24}
+.badge-cancel{background:var(--rose-b);color:#FB7185}
 
-/* ── CHANNEL BARS ── */
-.channel-bars { display: flex; flex-direction: column; gap: 12px; }
-.channel-bar-item { display: flex; align-items: center; gap: 10px; }
-.channel-bar-label { font-size: 11px; color: var(--fog2); width: 82px; flex-shrink: 0; }
-.channel-bar-track { flex: 1; height: 4px; background: var(--ink4); border-radius: 2px; overflow: hidden; }
-.channel-bar-fill { height: 100%; border-radius: 2px; transition: width .6s cubic-bezier(0.4,0,0.2,1); }
-.channel-bar-val { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--fog2); width: 60px; text-align: right; flex-shrink: 0; }
-.channel-bar-pct { font-size: 10px; color: var(--fog); width: 32px; text-align: right; flex-shrink: 0; }
+/* ══ CHANNEL BARS ════════════════════════════════════════════════*/
+.channel-bars{display:flex;flex-direction:column;gap:13px}
+.channel-bar-item{display:flex;align-items:center;gap:10px}
+.channel-bar-label{font-size:11px;color:var(--mid);width:88px;flex-shrink:0}
+.channel-bar-track{flex:1;height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.channel-bar-fill{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.channel-bar-val{font-size:11px;font-family:'Geist Mono',monospace;color:var(--lit);width:64px;text-align:right;flex-shrink:0}
+.channel-bar-pct{font-size:10px;color:var(--dim);width:32px;text-align:right;flex-shrink:0}
 
-/* ── LOADING / EMPTY ── */
-.loading-box {
-  background: var(--ink2); border: 1px solid var(--line);
-  border-radius: var(--r2); padding: 56px;
-  text-align: center; color: var(--fog2); margin-bottom: 16px;
+/* ══ STATES ══════════════════════════════════════════════════════*/
+.loading-box{
+  background:var(--s1);border:1px solid var(--wire);
+  border-radius:var(--r2);padding:64px;text-align:center;color:var(--mid);
 }
-.spinner {
-  display: inline-block; width: 22px; height: 22px;
-  border: 2px solid var(--line2); border-top-color: var(--cobalt);
-  border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: 14px;
+.spinner{
+  display:inline-block;width:20px;height:20px;
+  border:1.5px solid var(--wire2);border-top-color:var(--blue);
+  border-radius:50%;animation:spin .7s linear infinite;margin-bottom:16px;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-.err-box {
-  background: var(--crimson-dim); border: 1px solid rgba(255,77,106,0.2);
-  border-radius: var(--r); padding: 12px 16px; font-size: 12px;
-  color: var(--crimson); margin-bottom: 16px; display: none;
+@keyframes spin{to{transform:rotate(360deg)}}
+.err-box{
+  background:var(--rose-b);border:1px solid rgba(225,29,72,0.2);
+  border-radius:var(--r);padding:12px 16px;font-size:12px;
+  color:#FB7185;margin-bottom:16px;display:none;
 }
-.empty-box {
-  background: var(--ink2); border: 1px solid var(--line);
-  border-radius: var(--r2); padding: 80px 32px; text-align: center;
+.empty-box{
+  background:var(--s1);border:1px solid var(--wire);
+  border-radius:var(--r2);padding:100px 40px;text-align:center;
 }
-.empty-icon { font-size: 36px; margin-bottom: 16px; opacity: 0.25; }
-.empty-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; color: var(--fog2); margin-bottom: 8px; }
-.empty-sub { font-size: 13px; color: var(--fog); }
+.empty-icon{
+  font-family:'Instrument Serif',serif;font-style:italic;
+  font-size:40px;color:var(--wire3);margin-bottom:20px;
+}
+.empty-title{
+  font-family:'Geist',sans-serif;font-size:15px;font-weight:500;
+  color:var(--mid);margin-bottom:8px;
+}
+.empty-sub{font-size:12px;color:var(--dim)}
 
-/* ── OCC UNIT GRID ── */
-.occ-unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 8px; }
-.occ-unit-card {
-  background: var(--ink3); border: 1px solid var(--line);
-  border-radius: var(--r); padding: 12px;
-  transition: border-color .2s;
+/* ══ UNIT OCCUPANCY GRID ═════════════════════════════════════════*/
+.occ-unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(126px,1fr));gap:8px}
+.occ-unit-card{
+  background:var(--s2);border:1px solid var(--wire);
+  border-radius:var(--r);padding:12px;
+  transition:border-color .2s;
 }
-.occ-unit-name { font-size: 10px; color: var(--fog); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.occ-unit-bar-track { height: 3px; background: var(--ink4); border-radius: 2px; overflow: hidden; margin-bottom: 7px; }
-.occ-unit-bar-fill { height: 100%; border-radius: 2px; }
-.occ-unit-pct { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; }
+.occ-unit-name{font-size:10px;color:var(--dim);margin-bottom:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center}
+.occ-unit-bar-track{height:2px;background:var(--s4);border-radius:1px;overflow:hidden;margin-bottom:8px}
+.occ-unit-bar-fill{height:100%;border-radius:1px}
+.occ-unit-pct{font-family:'Geist Mono',monospace;font-size:13px;font-weight:500}
 
-/* ── PORTFOLIO PORT HEADER ── */
-.port-header {
-  display: flex; align-items: center; gap: 12px; padding: 18px 22px;
-  background: var(--ink2); border: 1px solid var(--line);
-  border-radius: var(--r2); margin-bottom: 14px;
-}
-.port-header-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; }
-.port-header-stats { display: flex; gap: 24px; margin-left: auto; }
-.port-header-stat { text-align: right; }
-.port-header-stat-label { font-size: 9px; color: var(--fog); text-transform: uppercase; letter-spacing: 0.7px; }
-.port-header-stat-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; }
-
-/* ── SUMMARY TABLE ── */
-.summary-wrap { background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r2); overflow-x: auto; margin-bottom: 16px; }
-.summary-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
-.summary-table th {
-  padding: 8px 12px; text-align: right;
-  font-size: 9px; font-weight: 600; color: var(--fog);
-  text-transform: uppercase; letter-spacing: 0.7px;
-  background: var(--ink3); border-bottom: 1px solid var(--line);
-  white-space: nowrap;
-}
-.summary-table th:first-child { text-align: left; width: 160px; }
-.summary-table td {
-  padding: 6px 12px; text-align: right;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  color: var(--mist); font-family: 'DM Mono', monospace; font-size: 11px; white-space: nowrap;
-}
-.summary-table td:first-child {
-  text-align: left; font-family: 'DM Sans', sans-serif;
-  font-size: 11px; color: var(--fog2); font-weight: 400;
-}
-.summary-section-header td {
-  background: var(--ink3); color: var(--fog2) !important;
-  font-family: 'Syne', sans-serif !important; font-size: 11px !important;
-  font-weight: 700 !important; padding: 9px 12px !important; letter-spacing: 0.3px;
-}
-.summary-total-row td {
-  font-weight: 700 !important; background: rgba(26,108,255,0.06);
-  border-top: 1px solid var(--line); color: var(--cobalt) !important;
-}
-.summary-negative { color: var(--crimson) !important; }
-
-/* ── CSV BANNER ── */
-#csvBanner {
-  background: var(--cobalt-dim); border: 1px solid var(--cobalt-line);
-  border-radius: var(--r2); padding: 11px 16px; margin-bottom: 14px;
-  font-size: 12px; color: var(--cobalt);
+/* ══ CSV BANNER ══════════════════════════════════════════════════*/
+#csvBanner{
+  background:var(--blue-b);border:1px solid var(--blue-r);
+  border-radius:var(--r2);padding:10px 16px;margin-bottom:14px;
+  font-size:12px;color:#5B9AFF;
 }
 
-@media(max-width:900px) {
-  .chart-row,.chart-row-3,.portfolio-kpis{grid-template-columns:1fr}
-  .portfolio-stats{grid-template-columns:repeat(2,1fr)}
+/* ══ SUMMARY TABLE ═══════════════════════════════════════════════*/
+.summary-wrap{
+  background:var(--s1);border:1px solid var(--wire);
+  border-radius:var(--r2);overflow-x:auto;margin-bottom:16px;
 }
+.summary-table{width:100%;border-collapse:collapse;font-size:11px}
+.summary-table th{
+  padding:8px 13px;text-align:right;
+  font-size:8.5px;font-weight:700;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.8px;
+  background:var(--s2);border-bottom:1px solid var(--wire);white-space:nowrap;
+}
+.summary-table th:first-child{text-align:left;min-width:150px}
+.summary-table td{
+  padding:6px 13px;text-align:right;
+  border-bottom:1px solid rgba(255,255,255,0.025);
+  color:var(--lit);font-family:'Geist Mono',monospace;font-size:10.5px;white-space:nowrap;
+}
+.summary-table td:first-child{text-align:left;font-family:'Geist',sans-serif;font-size:11px;color:var(--mid)}
+.summary-section-header td{
+  background:var(--s2);color:var(--mid)!important;
+  font-family:'Geist',sans-serif!important;font-size:11px!important;
+  font-weight:600!important;padding:9px 13px!important;letter-spacing:.2px;
+}
+.summary-total-row td{
+  font-weight:600!important;background:rgba(37,99,235,0.06);
+  border-top:1px solid var(--wire);color:#5B9AFF!important;
+}
+.summary-negative{color:#FB7185!important}
+
+/* ══ ALERTS ══════════════════════════════════════════════════════*/
+.low-alert{
+  background:rgba(225,29,72,0.07);border:1px solid rgba(225,29,72,0.16);
+  border-radius:var(--r2);padding:10px 16px;margin-bottom:10px;
+  font-size:12px;color:#FB7185;display:flex;align-items:center;gap:8px;
+}
+
+/* ══ ANIMATIONS ══════════════════════════════════════════════════*/
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.kpi,.port-card,.chart-card{animation:fadeUp .3s ease both}
+.kpi:nth-child(1){animation-delay:.03s}.kpi:nth-child(2){animation-delay:.06s}.kpi:nth-child(3){animation-delay:.09s}.kpi:nth-child(4){animation-delay:.12s}
+.kpi:nth-child(5){animation-delay:.15s}.kpi:nth-child(6){animation-delay:.18s}.kpi:nth-child(7){animation-delay:.21s}.kpi:nth-child(8){animation-delay:.24s}
+
+/* ══ RESPONSIVE ══════════════════════════════════════════════════*/
+@media(max-width:1000px){.chart-row,.chart-row-3,.portfolio-kpis{grid-template-columns:1fr}.port-stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:640px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
 
-/* Entry animation */
-.kpi, .portfolio-kpi-card, .chart-card {
-  animation: fadeUp .35s ease both;
-}
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ══ PRINT ═══════════════════════════════════════════════════════*/
+@media print{
+  body{background:#fff!important;color:#000!important}
+  body::before,body::after{display:none}
+  .controls,.tabs,#btnPDF{display:none!important}
+  .kpi,.port-card,.chart-card{background:#f8f8f8!important;border:1px solid #ddd!important;break-inside:avoid}
+  .kpi-value,.ps-val{color:#000!important}
+  .kpi-label,.ps-label{color:#666!important}
+  thead th{background:#eee!important;color:#444!important}
+  tbody td{color:#000!important}
+  tr.total-row td{background:#e8f0ff!important;color:#1a50a0!important}
 }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <div class="header">
-    <div class="brand">
-      <div class="brand-mark">US</div>
-      <div>
-        <div class="brand-name">US Living</div>
-        <div class="brand-sub">Revenue Intelligence</div>
-      </div>
-    </div>
-    <div class="controls">
-      <div class="date-group">
-        <input type="date" id="df">
-        <span class="date-sep">—</span>
-        <input type="date" id="dt">
-      </div>
-      <button class="btn btn-primary" id="btnLoad" onclick="loadData()">Load Data</button>
-      <div style="display:flex;gap:3px;background:var(--ink3);border:1px solid var(--line);border-radius:var(--r);padding:3px">
-        <button class="btn" id="btnSwitchAPI" onclick="switchToAPI()" style="padding:5px 12px;font-size:11px">🔌 API</button>
-        <button class="btn" id="btnSwitchCSV" onclick="switchToCSV()" style="padding:5px 12px;font-size:11px"><span id="btnCSVLabel">📂 CSV</span></button>
-        <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="loadCSV(this)">
-      </div>
-      <button class="btn" id="btnPDF" onclick="exportPDF()" style="display:none">⬇ Export PDF</button>
+<!-- ══ HEADER ══════════════════════════════════════════════════ -->
+<div class="header">
+  <div class="brand">
+    <div class="brand-mark">US</div>
+    <div class="brand-wordmark">
+      <div class="brand-name">US Living</div>
+      <div class="brand-sub">Revenue Intelligence</div>
     </div>
   </div>
+  <div class="controls">
+    <!-- Custom US-format date pickers -->
+    <div class="date-group">
+      <div class="date-input-wrap" title="Start date">
+        <div>
+          <div class="date-label-tiny">From</div>
+          <div class="date-display" id="dfDisplay">MM/DD/YYYY</div>
+        </div>
+        <input type="date" id="df" class="date-input-real" onchange="syncDateDisplay()">
+      </div>
+      <div class="date-sep">→</div>
+      <div class="date-input-wrap" title="End date">
+        <div>
+          <div class="date-label-tiny">To</div>
+          <div class="date-display" id="dtDisplay">MM/DD/YYYY</div>
+        </div>
+        <input type="date" id="dt" class="date-input-real" onchange="syncDateDisplay()">
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btnLoad" onclick="loadData()">Load Data</button>
+    <div style="display:flex;gap:2px;background:var(--s2);border:1px solid var(--wire);border-radius:var(--r);padding:3px">
+      <button class="btn" onclick="switchToAPI()" style="padding:5px 12px;font-size:11px;border:none;background:none">🔌 API</button>
+      <button class="btn" onclick="switchToCSV()" style="padding:5px 12px;font-size:11px;border:none;background:none"><span id="btnCSVLabel">📂 CSV</span></button>
+      <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="loadCSV(this)">
+    </div>
+    <button class="btn" id="btnPDF" onclick="exportPDF()" style="display:none">↓ Export PDF</button>
+  </div>
+</div>
 
-  <div class="err-box" id="errBox"></div>
+<div class="err-box" id="errBox"></div>
+<div id="csvBanner" style="display:none;align-items:center;gap:8px">
+  📂 <strong>CSV mode</strong> — <span id="csvInfo"></span>
+  <button onclick="uploadNewCSV()" style="margin-left:auto;background:var(--blue-b);border:1px solid var(--blue-r);color:#5B9AFF;border-radius:4px;padding:3px 10px;cursor:pointer;font-size:11px;font-family:inherit">↑ New CSV</button>
+  <button onclick="clearCSV()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:12px;padding:0 4px">✕</button>
+</div>
 
-  <div id="csvBanner" style="display:none;align-items:center;gap:8px">
-    📂 <strong>CSV mode</strong> — <span id="csvInfo"></span>
-    <button onclick="uploadNewCSV()" style="margin-left:auto;background:var(--cobalt-dim);border:1px solid var(--cobalt-line);color:var(--cobalt);border-radius:5px;padding:3px 10px;cursor:pointer;font-size:11px;font-family:inherit">↑ Upload new</button>
-    <button onclick="clearCSV()" style="background:none;border:none;color:var(--fog);cursor:pointer;font-size:11px;padding:0 4px" title="Back to API">✕</button>
+<div id="loadBox" class="loading-box" style="display:none">
+  <div class="spinner"></div>
+  <div style="font-size:12px;color:var(--mid)">Fetching reservations from Guesty...</div>
+</div>
+
+<div id="main" style="display:none">
+  <div class="tabs">
+    <div class="tab active t-blue" onclick="showTab('overview',this)">Overview</div>
+    <div class="tab" onclick="showTab('summary',this)">Summary</div>
+    <div class="tab" onclick="showTab('tab3700',this)">3700M</div>
+    <div class="tab" onclick="showTab('tabBP',this)">Bayou Park</div>
+    <div class="tab" onclick="showTab('bookings',this)">Bookings</div>
+    <div class="tab" onclick="showTab('pipeline',this)">Pipeline</div>
   </div>
 
-  <div id="loadBox" style="display:none" class="loading-box">
-    <div class="spinner"></div>
-    <div style="font-size:13px;color:var(--fog2)">Fetching reservations from Guesty...</div>
-  </div>
-
-  <div id="main" style="display:none">
-    <div class="tabs">
-      <div class="tab active cobalt" onclick="showTab('overview',this)">Overview</div>
-      <div class="tab" onclick="showTab('summary',this)">Summary</div>
-      <div class="tab" onclick="showTab('tab3700',this)">3700M</div>
-      <div class="tab" onclick="showTab('tabBP',this)">Bayou Park</div>
-      <div class="tab" onclick="showTab('bookings',this)">Bookings</div>
-      <div class="tab" onclick="showTab('pipeline',this)">Pipeline</div>
-    </div>
-
-    <div id="tab-overview">
-      <div class="kpi-grid" id="kpiTop"></div>
-      <div class="portfolio-kpis" id="portfolioKpis"></div>
-      <div class="chart-row">
-        <div class="chart-card">
-          <div class="chart-header">
-            <div><div class="chart-title">Total Revenue</div><div class="chart-subtitle">By month, stacked by portfolio</div></div>
-            <div class="period-btns" id="periodRev">
-              <button class="period-btn" onclick="setChartPeriod('rev',6,this)">6M</button>
-              <button class="period-btn active" onclick="setChartPeriod('rev',12,this)">12M</button>
-              <button class="period-btn" onclick="setChartPeriod('rev',24,this)">24M</button>
-              <button class="period-btn" onclick="setChartPeriod('rev',0,this)">All</button>
-            </div>
-          </div>
-          <div class="chart-legend" id="legendRev"></div>
-          <div class="chart-wrap"><canvas id="chartRev" height="220"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Channel Mix</div>
-          <div class="chart-subtitle">Revenue by booking source</div>
-          <div id="channelBars" style="margin-top:12px"></div>
-        </div>
-      </div>
-      <div class="chart-row-3">
-        <div class="chart-card">
-          <div class="chart-header">
-            <div><div class="chart-title">ADR Trend</div><div class="chart-subtitle">Average daily rate</div></div>
-            <div class="period-btns" id="periodADR">
-              <button class="period-btn" onclick="setChartPeriod('adr',6,this)">6M</button>
-              <button class="period-btn active" onclick="setChartPeriod('adr',12,this)">12M</button>
-              <button class="period-btn" onclick="setChartPeriod('adr',24,this)">24M</button>
-              <button class="period-btn" onclick="setChartPeriod('adr',0,this)">All</button>
-            </div>
-          </div>
-          <div class="chart-legend" id="legendADR"></div>
-          <div class="chart-wrap"><canvas id="chartADR" height="180"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-header">
-            <div><div class="chart-title">RevPAR Trend</div><div class="chart-subtitle">Revenue per available night</div></div>
-            <div class="period-btns" id="periodRevPAR">
-              <button class="period-btn" onclick="setChartPeriod('revpar',6,this)">6M</button>
-              <button class="period-btn active" onclick="setChartPeriod('revpar',12,this)">12M</button>
-              <button class="period-btn" onclick="setChartPeriod('revpar',24,this)">24M</button>
-              <button class="period-btn" onclick="setChartPeriod('revpar',0,this)">All</button>
-            </div>
-          </div>
-          <div class="chart-legend" id="legendRevPAR"></div>
-          <div class="chart-wrap"><canvas id="chartRevPAR" height="180"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-header">
-            <div><div class="chart-title">Occupancy %</div><div class="chart-subtitle">By portfolio per month</div></div>
-            <div class="period-btns" id="periodOcc">
-              <button class="period-btn" onclick="setChartPeriod('occ',6,this)">6M</button>
-              <button class="period-btn active" onclick="setChartPeriod('occ',12,this)">12M</button>
-              <button class="period-btn" onclick="setChartPeriod('occ',24,this)">24M</button>
-              <button class="period-btn" onclick="setChartPeriod('occ',0,this)">All</button>
-            </div>
-          </div>
-          <div class="chart-legend" id="legendOcc"></div>
-          <div class="chart-wrap"><canvas id="chartOcc" height="180"></canvas></div>
-        </div>
-      </div>
-      <div class="section-label">Occupancy by Unit</div>
-      <div class="chart-row">
-        <div class="chart-card">
-          <div class="chart-title">3700M</div>
-          <div class="chart-subtitle" style="margin-bottom:16px">Dallas — McKinney Ave</div>
-          <div class="occ-unit-grid" id="occUnits3700"></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Bayou Park</div>
-          <div class="chart-subtitle" style="margin-bottom:16px">Houston — Montrose / Midtown</div>
-          <div class="occ-unit-grid" id="occUnitsBP"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-summary" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div style="font-size:13px;color:var(--fog2)">Monthly summary by portfolio</div>
-        <div class="period-btns" id="periodSummary">
-          <button class="period-btn" onclick="setSummaryPeriod(6,this)">6M</button>
-          <button class="period-btn active" onclick="setSummaryPeriod(12,this)">12M</button>
-          <button class="period-btn" onclick="setSummaryPeriod(24,this)">24M</button>
-          <button class="period-btn" onclick="setSummaryPeriod(0,this)">All</button>
-        </div>
-      </div>
-      <div id="summaryTable"></div>
-    </div>
-
-    <div id="tab-tab3700" style="display:none">
-      <div id="portfolioKpi3700" style="margin-bottom:14px"></div>
-      <div class="kpi-grid" id="kpi3700"></div>
-      <div class="chart-row">
-        <div class="chart-card">
-          <div class="chart-header">
-            <div><div class="chart-title">Revenue by Month</div><div class="chart-subtitle">Room revenue accrued daily</div></div>
-            <div class="period-btns" id="periodRev3700">
-              <button class="period-btn" onclick="setPortChartPeriod('3700M','rev',6,this)">6M</button>
-              <button class="period-btn active" onclick="setPortChartPeriod('3700M','rev',12,this)">12M</button>
-              <button class="period-btn" onclick="setPortChartPeriod('3700M','rev',24,this)">24M</button>
-              <button class="period-btn" onclick="setPortChartPeriod('3700M','rev',0,this)">All</button>
-            </div>
-          </div>
-          <div class="chart-wrap"><canvas id="chartRev3700" height="180"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Channel Mix</div>
-          <div class="chart-subtitle">Revenue by booking source</div>
-          <div id="channelBars3700" style="margin-top:12px"></div>
-        </div>
-      </div>
-      <div class="chart-row-3">
-        <div class="chart-card">
-          <div class="chart-header"><div><div class="chart-title">ADR Trend</div></div>
-            <div class="period-btns" id="periodADR3700"><button class="period-btn" onclick="setPortChartPeriod('3700M','adr',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('3700M','adr',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','adr',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','adr',0,this)">All</button></div>
-          </div>
-          <div class="chart-wrap"><canvas id="chartADR3700" height="160"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-header"><div><div class="chart-title">RevPAR Trend</div></div>
-            <div class="period-btns" id="periodRevPAR3700"><button class="period-btn" onclick="setPortChartPeriod('3700M','revpar',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('3700M','revpar',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','revpar',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','revpar',0,this)">All</button></div>
-          </div>
-          <div class="chart-wrap"><canvas id="chartRevPAR3700" height="160"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-header"><div><div class="chart-title">Occupancy %</div></div>
-            <div class="period-btns" id="periodOcc3700"><button class="period-btn" onclick="setPortChartPeriod('3700M','occ',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('3700M','occ',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','occ',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','occ',0,this)">All</button></div>
-          </div>
-          <div class="chart-wrap"><canvas id="chartOcc3700" height="160"></canvas></div>
-        </div>
-      </div>
-      <div class="section-label">Occupancy by Unit</div>
-      <div class="chart-card" style="margin-bottom:16px"><div class="occ-unit-grid" id="occUnits3700b"></div></div>
-      <div class="section-label">Unit Breakdown</div>
-      <div class="table-wrap">
-        <table id="tbl3700">
-          <thead><tr><th>Unit</th><th class="num">Avail.</th><th class="num">Occ. Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th><th class="num">Room Revenue</th><th class="num">Cleaning</th><th class="num">Total Revenue</th><th class="num">OTA Comm.</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="tab-tabBP" style="display:none">
-      <div id="portfolioKpiBP" style="margin-bottom:14px"></div>
-      <div class="kpi-grid" id="kpiBP"></div>
-      <div class="chart-row">
-        <div class="chart-card">
-          <div class="chart-header">
-            <div><div class="chart-title">Revenue by Month</div><div class="chart-subtitle">Room revenue accrued daily</div></div>
-            <div class="period-btns" id="periodRevBP"><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','rev',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','rev',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','rev',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','rev',0,this)">All</button></div>
-          </div>
-          <div class="chart-wrap"><canvas id="chartRevBP" height="180"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Channel Mix</div>
-          <div class="chart-subtitle">Revenue by booking source</div>
-          <div id="channelBarsBP" style="margin-top:12px"></div>
-        </div>
-      </div>
-      <div class="chart-row-3">
-        <div class="chart-card">
-          <div class="chart-header"><div><div class="chart-title">ADR Trend</div></div><div class="period-btns" id="periodADRBP"><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','adr',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','adr',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','adr',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','adr',0,this)">All</button></div></div>
-          <div class="chart-wrap"><canvas id="chartADRBP" height="160"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-header"><div><div class="chart-title">RevPAR Trend</div></div><div class="period-btns" id="periodRevPARBP"><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','revpar',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','revpar',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','revpar',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','revpar',0,this)">All</button></div></div>
-          <div class="chart-wrap"><canvas id="chartRevPARBP" height="160"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-header"><div><div class="chart-title">Occupancy %</div></div><div class="period-btns" id="periodOccBP"><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','occ',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','occ',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','occ',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','occ',0,this)">All</button></div></div>
-          <div class="chart-wrap"><canvas id="chartOccBP" height="160"></canvas></div>
-        </div>
-      </div>
-      <div class="section-label">Occupancy by Unit</div>
-      <div class="chart-card" style="margin-bottom:16px"><div class="occ-unit-grid" id="occUnitsBPb"></div></div>
-      <div class="section-label">Unit Breakdown</div>
-      <div class="table-wrap">
-        <table id="tblBP">
-          <thead><tr><th>Unit</th><th class="num">Avail.</th><th class="num">Occ. Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th><th class="num">Room Revenue</th><th class="num">Cleaning</th><th class="num">Total Revenue</th><th class="num">OTA Comm.</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="tab-bookings" style="display:none">
-      <div class="table-wrap">
-        <table id="tblBookings">
-          <thead><tr><th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th><th class="num">Nights</th><th>Channel</th><th>Status</th><th class="num">Room Rev.</th><th class="num">Cleaning</th><th class="num">OTA Adj.</th><th class="num">Total Rev.</th><th class="num">OTA Comm.</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div id="tab-pipeline" style="display:none">
-    <div class="kpi-grid" id="kpiPipeline"></div>
+  <!-- ══ OVERVIEW ══════════════════════════════════════════════ -->
+  <div id="tab-overview">
+    <div class="kpi-grid" id="kpiTop"></div>
+    <div class="portfolio-kpis" id="portfolioKpis"></div>
     <div class="chart-row">
       <div class="chart-card">
-        <div class="chart-title">Confirmed Revenue Pipeline</div>
-        <div class="chart-subtitle">Room revenue by future month, stacked by portfolio</div>
-        <div class="chart-legend" id="legendPipeline"></div>
-        <div class="chart-wrap"><canvas id="chartPipeline" height="240"></canvas></div>
+        <div class="chart-header">
+          <div><div class="chart-eyebrow">Total Revenue</div><div class="chart-title-text">Monthly, stacked by portfolio</div></div>
+          <div class="period-btns" id="periodRev">
+            <button class="period-btn" onclick="setChartPeriod('rev',6,this)">6M</button>
+            <button class="period-btn active" onclick="setChartPeriod('rev',12,this)">12M</button>
+            <button class="period-btn" onclick="setChartPeriod('rev',24,this)">24M</button>
+            <button class="period-btn" onclick="setChartPeriod('rev',0,this)">All</button>
+          </div>
+        </div>
+        <div class="chart-legend" id="legendRev"></div>
+        <div class="chart-wrap"><canvas id="chartRev" height="220"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Bookings by Portfolio</div>
-        <div class="chart-subtitle">Upcoming confirmed stays</div>
-        <div id="pipelinePortBars" style="margin-top:12px"></div>
+        <div class="chart-eyebrow">Channel Mix</div>
+        <div class="chart-title-text">Revenue by booking source</div>
+        <div id="channelBars" style="margin-top:4px"></div>
       </div>
     </div>
-    <div class="section-label">Upcoming Reservations</div>
+    <div class="chart-row-3">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-eyebrow">ADR Trend</div><div class="chart-title-text">Avg. daily rate by month</div></div>
+          <div class="period-btns" id="periodADR">
+            <button class="period-btn" onclick="setChartPeriod('adr',6,this)">6M</button>
+            <button class="period-btn active" onclick="setChartPeriod('adr',12,this)">12M</button>
+            <button class="period-btn" onclick="setChartPeriod('adr',24,this)">24M</button>
+            <button class="period-btn" onclick="setChartPeriod('adr',0,this)">All</button>
+          </div>
+        </div>
+        <div class="chart-legend" id="legendADR"></div>
+        <div class="chart-wrap"><canvas id="chartADR" height="180"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-eyebrow">RevPAR Trend</div><div class="chart-title-text">Revenue per available night</div></div>
+          <div class="period-btns" id="periodRevPAR">
+            <button class="period-btn" onclick="setChartPeriod('revpar',6,this)">6M</button>
+            <button class="period-btn active" onclick="setChartPeriod('revpar',12,this)">12M</button>
+            <button class="period-btn" onclick="setChartPeriod('revpar',24,this)">24M</button>
+            <button class="period-btn" onclick="setChartPeriod('revpar',0,this)">All</button>
+          </div>
+        </div>
+        <div class="chart-legend" id="legendRevPAR"></div>
+        <div class="chart-wrap"><canvas id="chartRevPAR" height="180"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-eyebrow">Occupancy %</div><div class="chart-title-text">By portfolio per month</div></div>
+          <div class="period-btns" id="periodOcc">
+            <button class="period-btn" onclick="setChartPeriod('occ',6,this)">6M</button>
+            <button class="period-btn active" onclick="setChartPeriod('occ',12,this)">12M</button>
+            <button class="period-btn" onclick="setChartPeriod('occ',24,this)">24M</button>
+            <button class="period-btn" onclick="setChartPeriod('occ',0,this)">All</button>
+          </div>
+        </div>
+        <div class="chart-legend" id="legendOcc"></div>
+        <div class="chart-wrap"><canvas id="chartOcc" height="180"></canvas></div>
+      </div>
+    </div>
+    <div class="section-label">Occupancy by Unit</div>
+    <div class="chart-row">
+      <div class="chart-card"><div class="chart-eyebrow">3700M</div><div class="chart-title-text" style="margin-bottom:16px">Dallas — McKinney Ave</div><div class="occ-unit-grid" id="occUnits3700"></div></div>
+      <div class="chart-card"><div class="chart-eyebrow">Bayou Park</div><div class="chart-title-text" style="margin-bottom:16px">Houston — Montrose / Midtown</div><div class="occ-unit-grid" id="occUnitsBP"></div></div>
+    </div>
+  </div>
+
+  <!-- ══ SUMMARY ════════════════════════════════════════════════ -->
+  <div id="tab-summary" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div style="font-size:13px;color:var(--mid)">Monthly performance by portfolio</div>
+      <div class="period-btns">
+        <button class="period-btn" onclick="setSummaryPeriod(6,this)">6M</button>
+        <button class="period-btn active" onclick="setSummaryPeriod(12,this)">12M</button>
+        <button class="period-btn" onclick="setSummaryPeriod(24,this)">24M</button>
+        <button class="period-btn" onclick="setSummaryPeriod(0,this)">All</button>
+      </div>
+    </div>
+    <div id="summaryTable"></div>
+  </div>
+
+  <!-- ══ 3700M TAB ══════════════════════════════════════════════ -->
+  <div id="tab-tab3700" style="display:none">
+    <div id="portfolioKpi3700" style="margin-bottom:14px"></div>
+    <div class="kpi-grid" id="kpi3700"></div>
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-header"><div><div class="chart-eyebrow">Revenue by Month</div><div class="chart-title-text">Room revenue accrued daily</div></div>
+          <div class="period-btns" id="periodRev3700"><button class="period-btn" onclick="setPortChartPeriod('3700M','rev',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('3700M','rev',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','rev',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','rev',0,this)">All</button></div>
+        </div><div class="chart-wrap"><canvas id="chartRev3700" height="180"></canvas></div>
+      </div>
+      <div class="chart-card"><div class="chart-eyebrow">Channel Mix</div><div class="chart-title-text">Revenue by booking source</div><div id="channelBars3700" style="margin-top:4px"></div></div>
+    </div>
+    <div class="chart-row-3">
+      <div class="chart-card"><div class="chart-header"><div><div class="chart-eyebrow">ADR Trend</div></div><div class="period-btns" id="periodADR3700"><button class="period-btn" onclick="setPortChartPeriod('3700M','adr',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('3700M','adr',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','adr',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','adr',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="chartADR3700" height="160"></canvas></div></div>
+      <div class="chart-card"><div class="chart-header"><div><div class="chart-eyebrow">RevPAR Trend</div></div><div class="period-btns" id="periodRevPAR3700"><button class="period-btn" onclick="setPortChartPeriod('3700M','revpar',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('3700M','revpar',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','revpar',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','revpar',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="chartRevPAR3700" height="160"></canvas></div></div>
+      <div class="chart-card"><div class="chart-header"><div><div class="chart-eyebrow">Occupancy %</div></div><div class="period-btns" id="periodOcc3700"><button class="period-btn" onclick="setPortChartPeriod('3700M','occ',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('3700M','occ',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','occ',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('3700M','occ',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="chartOcc3700" height="160"></canvas></div></div>
+    </div>
+    <div class="section-label">Occupancy by Unit</div>
+    <div class="chart-card" style="margin-bottom:16px"><div class="occ-unit-grid" id="occUnits3700b"></div></div>
+    <div class="section-label">Unit Breakdown</div>
+    <div class="table-wrap"><table id="tbl3700"><thead><tr><th>Unit</th><th class="num">Avail.</th><th class="num">Occ. Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th><th class="num">Room Revenue</th><th class="num">Cleaning</th><th class="num">Total Revenue</th><th class="num">OTA Comm.</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- ══ BAYOU PARK TAB ══════════════════════════════════════════ -->
+  <div id="tab-tabBP" style="display:none">
+    <div id="portfolioKpiBP" style="margin-bottom:14px"></div>
+    <div class="kpi-grid" id="kpiBP"></div>
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-header"><div><div class="chart-eyebrow">Revenue by Month</div><div class="chart-title-text">Room revenue accrued daily</div></div>
+          <div class="period-btns" id="periodRevBP"><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','rev',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','rev',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','rev',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','rev',0,this)">All</button></div>
+        </div><div class="chart-wrap"><canvas id="chartRevBP" height="180"></canvas></div>
+      </div>
+      <div class="chart-card"><div class="chart-eyebrow">Channel Mix</div><div class="chart-title-text">Revenue by booking source</div><div id="channelBarsBP" style="margin-top:4px"></div></div>
+    </div>
+    <div class="chart-row-3">
+      <div class="chart-card"><div class="chart-header"><div><div class="chart-eyebrow">ADR Trend</div></div><div class="period-btns" id="periodADRBP"><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','adr',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','adr',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','adr',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','adr',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="chartADRBP" height="160"></canvas></div></div>
+      <div class="chart-card"><div class="chart-header"><div><div class="chart-eyebrow">RevPAR Trend</div></div><div class="period-btns" id="periodRevPARBP"><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','revpar',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','revpar',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','revpar',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','revpar',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="chartRevPARBP" height="160"></canvas></div></div>
+      <div class="chart-card"><div class="chart-header"><div><div class="chart-eyebrow">Occupancy %</div></div><div class="period-btns" id="periodOccBP"><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','occ',6,this)">6M</button><button class="period-btn active" onclick="setPortChartPeriod('Bayou Park','occ',12,this)">12M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','occ',24,this)">24M</button><button class="period-btn" onclick="setPortChartPeriod('Bayou Park','occ',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="chartOccBP" height="160"></canvas></div></div>
+    </div>
+    <div class="section-label">Occupancy by Unit</div>
+    <div class="chart-card" style="margin-bottom:16px"><div class="occ-unit-grid" id="occUnitsBPb"></div></div>
+    <div class="section-label">Unit Breakdown</div>
+    <div class="table-wrap"><table id="tblBP"><thead><tr><th>Unit</th><th class="num">Avail.</th><th class="num">Occ. Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th><th class="num">Room Revenue</th><th class="num">Cleaning</th><th class="num">Total Revenue</th><th class="num">OTA Comm.</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- ══ BOOKINGS TAB ════════════════════════════════════════════ -->
+  <div id="tab-bookings" style="display:none">
     <div class="table-wrap">
-      <table id="tblPipeline">
-        <thead><tr><th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th><th class="num">Nights</th><th>Channel</th><th class="num">Room Rev.</th><th class="num">Cleaning</th><th class="num">Total Rev.</th><th class="num">OTA Comm.</th></tr></thead>
+      <table id="tblBookings">
+        <thead><tr><th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th><th class="num">Nights</th><th>Channel</th><th>Status</th><th class="num">Room Rev.</th><th class="num">Cleaning</th><th class="num">OTA Adj.</th><th class="num">Total Rev.</th><th class="num">OTA Comm.</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
   </div>
-
-  <div id="emptyBox" class="empty-box">
-    <div class="empty-icon">◈</div>
-    <div class="empty-title">Select a period to load data</div>
-    <div class="empty-sub">Choose a date range and click Load Data</div>
-  </div>
 </div>
 
+<!-- ══ PIPELINE TAB (outside #main) ══════════════════════════════ -->
+<div id="tab-pipeline" style="display:none">
+  <div class="kpi-grid" id="kpiPipeline"></div>
+  <div class="chart-row">
+    <div class="chart-card">
+      <div class="chart-eyebrow">Confirmed Revenue Pipeline</div>
+      <div class="chart-title-text">Room revenue by future month, stacked by portfolio</div>
+      <div class="chart-legend" id="legendPipeline"></div>
+      <div class="chart-wrap"><canvas id="chartPipeline" height="240"></canvas></div>
+    </div>
+    <div class="chart-card"><div class="chart-eyebrow">Bookings by Portfolio</div><div class="chart-title-text">Upcoming confirmed stays</div><div id="pipelinePortBars" style="margin-top:8px"></div></div>
+  </div>
+  <div class="section-label">Upcoming Reservations</div>
+  <div class="table-wrap"><table id="tblPipeline"><thead><tr><th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th><th class="num">Nights</th><th>Channel</th><th class="num">Room Rev.</th><th class="num">Cleaning</th><th class="num">Total Rev.</th><th class="num">OTA Comm.</th></tr></thead><tbody></tbody></table></div>
+</div>
+
+<div id="emptyBox" class="empty-box">
+  <div class="empty-icon">◈</div>
+  <div class="empty-title">Select a period to begin</div>
+  <div class="empty-sub">Choose a date range above and click Load Data</div>
+</div>
+
+</div><!-- .page -->
 <script>
 const PROXY='https://guesty-proxy.luciano-bd7.workers.dev';
-const UNITS_3700M=12, UNITS_BP=20;
+const UNITS_3700M=12,UNITS_BP=20;
 let charts={};
 
-const CHART_OPTS={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
-
-function mkScales(xExtra,yExtra,yCb){
-  return{
-    x:{ticks:{color:'#8898B4',font:{size:11,weight:'500',family:'DM Mono'}},grid:{display:false},...xExtra},
-    y:{ticks:{color:'#A8BBCF',font:{size:11,weight:'500',family:'DM Mono'},callback:yCb},grid:{color:'rgba(255,255,255,0.05)'},...yExtra}
-  };
+// ── Date utils (US format MM/DD/YYYY) ───────────────────────────
+function isoToUS(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${m}/${d}/${y}`;}
+function syncDateDisplay(){
+  const df=document.getElementById('df').value;
+  const dt=document.getElementById('dt').value;
+  document.getElementById('dfDisplay').textContent=df?isoToUS(df):'MM/DD/YYYY';
+  document.getElementById('dtDisplay').textContent=dt?isoToUS(dt):'MM/DD/YYYY';
+}
+function fmtDateUS(isoOrDate){
+  const d=typeof isoOrDate==='string'?isoOrDate.split('T')[0]:isoOrDate.toISOString().split('T')[0];
+  return isoToUS(d);
 }
 
+// Init dates
 const now=new Date();
 document.getElementById('df').value=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
 document.getElementById('dt').value=now.toISOString().split('T')[0];
-setTimeout(updateDataSourceUI,100);
+syncDateDisplay();
+setTimeout(updateDataSourceUI,50);
 
-function showTab(name,el){
-  ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>document.getElementById('tab-'+t).style.display='none');
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active','cobalt','jade'));
-  document.getElementById('tab-'+name).style.display='';
-  el.classList.add('active');
-  if(['overview','tab3700','pipeline'].includes(name))el.classList.add('cobalt');
-  if(name==='tabBP')el.classList.add('jade');
+// ── Chart helpers ────────────────────────────────────────────────
+const CHART_OPTS={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
+function mkScales(xE,yE,yCb){
+  return{
+    x:{ticks:{color:'#6B7FA0',font:{size:10.5,weight:'500',family:'Geist Mono'}},grid:{display:false},...xE},
+    y:{ticks:{color:'#94A3B8',font:{size:10.5,weight:'500',family:'Geist Mono'},callback:yCb},grid:{color:'rgba(255,255,255,0.04)'},...yE}
+  };
 }
 
+// ── Tab management ───────────────────────────────────────────────
+function showTab(name,el){
+  ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>{
+    const el2=document.getElementById('tab-'+t);if(el2)el2.style.display='none';
+  });
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active','t-blue','t-teal'));
+  const tabEl=document.getElementById('tab-'+name);
+  if(tabEl)tabEl.style.display='';
+  el.classList.add('active');
+  if(['overview','tab3700','pipeline','summary','bookings'].includes(name))el.classList.add('t-blue');
+  if(name==='tabBP')el.classList.add('t-teal');
+}
+
+// ── Formatters ───────────────────────────────────────────────────
 function $c(v){return'$'+Math.round(v).toLocaleString('en-US')}
 function pct(v){return Math.round(v*100)+'%'}
 function fmt(v){return Math.round(v).toLocaleString('en-US')}
 function delta(cur,prev){
   if(!prev||prev===0)return'';
-  const p=((cur-prev)/prev)*100;
-  const sign=p>=0?'+':'';
-  const cls=p>=0?'up':'down';
-  const arrow=p>=0?'▲':'▼';
-  return`<div class="kpi-delta ${cls}">${arrow} ${sign}${Math.round(Math.abs(p))}%</div>`;
+  const p=((cur-prev)/prev)*100,cls=p>=0?'up':'down',a=p>=0?'▲':'▼';
+  return`<div class="kpi-delta ${cls}">${a} ${(p>=0?'+':'')}${Math.round(Math.abs(p))}% vs prev</div>`;
 }
-
 function getPortfolio(n){
   const s=(n||'').toLowerCase();
   if(s.includes('3700m')||s.includes('3700 m')||s.includes('3700'))return'3700M';
-  if(s.includes('ubp')||s.includes('bayou')||s.includes('midtown')||s.includes('montrose')||s.includes('unit 1')||s.includes('unit 2')||s.includes('unit 3')||s.includes('two bed'))return'Bayou Park';
+  if(s.includes('ubp')||s.includes('bayou')||s.includes('midtown')||s.includes('montrose')||/unit\s*[123]/.test(s)||s.includes('two bed'))return'Bayou Park';
   return null;
 }
 function getPortfolioFromRes(r){
@@ -727,13 +688,14 @@ function getPortfolioFromRes(r){
 }
 function getDaysInPeriod(from,to){return Math.max(1,Math.ceil((new Date(to+' 00:00')-new Date(from+' 00:00'))/86400000)+1)}
 
+// ── CSV / API state ──────────────────────────────────────────────
 let csvReservations=null,csvFileName=null,csvMode=false;
-(function initCSV(){try{const s=localStorage.getItem('guesty_csv');if(s){csvReservations=JSON.parse(s);csvFileName=localStorage.getItem('guesty_csv_name')||'saved';csvMode=true;}}catch(e){}})();
+(function(){try{const s=localStorage.getItem('guesty_csv');if(s){csvReservations=JSON.parse(s);csvFileName=localStorage.getItem('guesty_csv_name')||'saved file';csvMode=true;}}catch(e){}})();
 
 function updateDataSourceUI(){
-  const b=document.getElementById('csvBanner'),l=document.getElementById('btnCSVLabel');
-  if(csvMode&&csvReservations){b.style.display='flex';document.getElementById('csvInfo').textContent=csvReservations.length+' reservations — '+csvFileName;if(l)l.textContent='📂 CSV ✓';}
-  else{b.style.display='none';if(l)l.textContent='📂 CSV';}
+  const banner=document.getElementById('csvBanner'),lbl=document.getElementById('btnCSVLabel');
+  if(csvMode&&csvReservations){banner.style.display='flex';document.getElementById('csvInfo').textContent=csvReservations.length+' reservations — '+csvFileName;if(lbl)lbl.textContent='📂 CSV ✓';}
+  else{banner.style.display='none';if(lbl)lbl.textContent='📂 CSV';}
 }
 function switchToAPI(){csvMode=false;updateDataSourceUI();loadData();}
 function switchToCSV(){if(csvReservations){csvMode=true;updateDataSourceUI();loadData();}else document.getElementById('csvFile').click();}
@@ -741,81 +703,80 @@ function uploadNewCSV(){document.getElementById('csvFile').click();}
 function clearCSV(){csvReservations=null;csvFileName=null;csvMode=false;try{localStorage.removeItem('guesty_csv');localStorage.removeItem('guesty_csv_name');}catch(e){}document.getElementById('csvFile').value='';updateDataSourceUI();}
 
 function parseCSV(text){
-  const lines=text.split('\n').slice(1).filter(l=>l.trim());
-  return lines.map(line=>{
+  return text.split('\n').slice(1).filter(l=>l.trim()).map(line=>{
     const cols=[];let cur='',inQ=false;
     for(let i=0;i<line.length;i++){if(line[i]==='"')inQ=!inQ;else if(line[i]===','&&!inQ){cols.push(cur.trim());cur='';}else cur+=line[i];}
     cols.push(cur.trim());
-    const clean=c=>(c||'').replace(/^"|"$/g,'').trim();
-    const ci=clean(cols[5]),co=clean(cols[6]);
-    if(!ci||!co)return null;
+    const c=i=>(cols[i]||'').replace(/^"|"$/g,'').trim();
+    const ci=c(5),co=c(6);if(!ci||!co)return null;
     const ciD=new Date(ci+'T00:00:00'),coD=new Date(co+'T00:00:00');
     const nights=Math.max(1,Math.round((coD-ciD)/86400000));
-    return{checkIn:ciD.toISOString(),checkOut:coD.toISOString(),nightsCount:nights,status:clean(cols[9]),
-      source:clean(cols[7])==='airbnb2'?'airbnb2':clean(cols[7])==='Booking.com'?'bookingCom':clean(cols[7])==='manual'?'manual':clean(cols[7]),
-      confirmationCode:clean(cols[2]),guest:{fullName:clean(cols[4])||'—'},
-      listing:{nickname:clean(cols[11]),title:clean(cols[11]),address:{full:''}},
-      money:{fareAccommodation:parseFloat(clean(cols[12]))||0,fareCleaning:parseFloat(clean(cols[13]))||0,hostServiceFee:Math.abs(parseFloat(clean(cols[14]))||0),resolutionAmount:parseFloat(clean(cols[15]))||0}};
+    const src=c(7);
+    return{checkIn:ciD.toISOString(),checkOut:coD.toISOString(),nightsCount:nights,status:c(9),
+      source:src==='airbnb2'?'airbnb2':src==='Booking.com'?'bookingCom':src==='manual'?'manual':src,
+      confirmationCode:c(2),guest:{fullName:c(4)||'—'},
+      listing:{nickname:c(11),title:c(11),address:{full:''}},
+      money:{fareAccommodation:parseFloat(c(12))||0,fareCleaning:parseFloat(c(13))||0,hostServiceFee:Math.abs(parseFloat(c(14))||0),resolutionAmount:parseFloat(c(15))||0}};
   }).filter(Boolean);
 }
-
 async function loadCSV(input){
   const file=input.files[0];if(!file)return;
-  const l=document.getElementById('btnCSVLabel');if(l)l.textContent='⏳';
+  const lbl=document.getElementById('btnCSVLabel');if(lbl)lbl.textContent='⏳';
   const text=await file.text();
   csvReservations=parseCSV(text);csvFileName=file.name;csvMode=true;
   try{localStorage.setItem('guesty_csv',JSON.stringify(csvReservations));localStorage.setItem('guesty_csv_name',file.name);}catch(e){}
   updateDataSourceUI();loadData();
 }
 
+// ── API fetch ────────────────────────────────────────────────────
 async function fetchAll(from,to){
   const ef=new Date(from+' 00:00');ef.setDate(ef.getDate()-90);
   const r=await fetch(`${PROXY}/reservations?from=${ef.toISOString().split('T')[0]}&to=${to}`);
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  const d=await r.json();if(d.error)throw new Error(d.error);return d.results||[];
+  if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();if(d.error)throw new Error(d.error);return d.results||[];
 }
-function getPrevPeriod(from,to){const f=new Date(from+' 00:00'),t=new Date(to+' 00:00'),d=t-f+86400000;return{from:new Date(f-d).toISOString().split('T')[0],to:new Date(f-86400000).toISOString().split('T')[0]};}
-function calcTotals(reservations,from,to,u3,uB){
-  const confirmed=reservations.filter(r=>r.status!=='cancelled');
-  const diffDays=getDaysInPeriod(from,to);
+function getPrevPeriod(from,to){const f=new Date(from+' 00:00'),t=new Date(to+' 00:00'),diff=t-f+86400000;return{from:new Date(f-diff).toISOString().split('T')[0],to:new Date(f-86400000).toISOString().split('T')[0]};}
+function calcTotals(res,from,to,u3,uB){
+  const conf=res.filter(r=>r.status!=='cancelled'),diff=getDaysInPeriod(from,to);
   let roomRev=0,clean=0,otaComm=0,nights=0;
   const pS=new Date(from+'T00:00:00'),pE=new Date(to+'T23:59:59');
-  confirmed.forEach(r=>{
+  conf.forEach(r=>{
     const ci=new Date(r.checkIn),co=new Date(r.checkOut),tn=Math.max(1,Math.round((co-ci)/86400000));
-    let nin=0,cur=new Date(ci);
-    while(cur<co){if(cur>=pS&&cur<=pE)nin++;cur.setDate(cur.getDate()+1);}
+    let nin=0,cur=new Date(ci);while(cur<co){if(cur>=pS&&cur<=pE)nin++;cur.setDate(cur.getDate()+1);}
     roomRev+=(r.money?.fareAccommodation||0)*nin/tn;
     if(new Date(r.checkOut)>=pS&&new Date(r.checkOut)<=pE)clean+=(r.money?.fareCleaning||0);
     otaComm+=Math.abs(r.money?.hostServiceFee||0)*nin/tn;nights+=nin;
   });
-  const totalAvail=(u3+uB)*diffDays;
-  return{totalRev:roomRev+clean,roomRev,clean,otaComm,occ:totalAvail>0?nights/totalAvail:0,adr:nights>0?roomRev/nights:0,revpar:totalAvail>0?roomRev/totalAvail:0,nights,totalAvail};
+  const ta=(u3+uB)*diff;
+  return{totalRev:roomRev+clean,roomRev,clean,otaComm,occ:ta>0?nights/ta:0,adr:nights>0?roomRev/nights:0,revpar:ta>0?roomRev/ta:0,nights,totalAvail:ta};
 }
 
+// ── Load ─────────────────────────────────────────────────────────
 async function loadData(){
   const from=document.getElementById('df').value,to=document.getElementById('dt').value;
-  if(!from||!to){showErr('Please select a valid period.');return;}
+  if(!from||!to){showErr('Please select a valid date range.');return;}
   document.getElementById('errBox').style.display='none';
   document.getElementById('main').style.display='none';
+  document.getElementById('tab-pipeline').style.display='none';
   document.getElementById('emptyBox').style.display='none';
   document.getElementById('loadBox').style.display='block';
   document.getElementById('btnLoad').disabled=true;
   try{
     const prev=getPrevPeriod(from,to);
-    const[res,prevRes,listingsRes]=await Promise.all([
+    const[res,prevRes,listRes]=await Promise.all([
       (csvMode&&csvReservations)?Promise.resolve(csvReservations):fetchAll(from,to),
       (csvMode&&csvReservations)?Promise.resolve(csvReservations):fetchAll(prev.from,prev.to),
       fetch(`${PROXY}/listings`).then(r=>r.json()).catch(()=>({results:[]}))
     ]);
-    const allListings=(listingsRes.results||[]).filter(l=>l.nickname&&!l.nickname.toLowerCase().includes('test'));
+    const allListings=(listRes.results||[]).filter(l=>l.nickname&&!l.nickname.toLowerCase().includes('test'));
     render(res,from,to,calcTotals(prevRes,prev.from,prev.to,UNITS_3700M,UNITS_BP),allListings);
   }catch(e){showErr('Error loading data: '+e.message);}
   finally{document.getElementById('loadBox').style.display='none';document.getElementById('btnLoad').disabled=false;}
 }
-
 function showErr(m){document.getElementById('errBox').textContent=m;document.getElementById('errBox').style.display='block';document.getElementById('emptyBox').style.display='block';}
+
+// ── Chart helpers ────────────────────────────────────────────────
 function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
-function monthLabel(ym){const[y,m]=ym.split('-');return new Date(+y,+m-1).toLocaleString('en',{month:'short',year:'2-digit'});}
+function monthLabel(ym){const[y,m]=ym.split('-');return new Date(+y,+m-1).toLocaleString('en-US',{month:'short',year:'2-digit'});}
 
 let summaryPeriod=12;
 function setSummaryPeriod(months,btn){summaryPeriod=months;btn.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderSummaryTable();}
@@ -824,75 +785,110 @@ let _lastRenderData=null,_lastSummaryData=null,_lastPortRenderData={};
 const chartPeriods={rev:12,adr:12,revpar:12,occ:12};
 const portChartPeriods={'3700M':{rev:12,adr:12,revpar:12,occ:12},'Bayou Park':{rev:12,adr:12,revpar:12,occ:12}};
 
-function filterMonths(months,periodMonths){
-  if(!periodMonths)return months;
-  const toYm=_lastRenderData?.toDate?_lastRenderData.toDate.substring(0,7):null;
-  if(toYm){let ei=months.length-1;for(let i=months.length-1;i>=0;i--){if(months[i]<=toYm){ei=i;break;}}return months.slice(Math.max(0,ei-periodMonths+1),ei+1);}
-  return months.slice(months.length-periodMonths);
+function filterMonths(months,p){
+  if(!p)return months;
+  const toYm=_lastRenderData?.toDate?.substring(0,7);
+  if(toYm){let ei=months.length-1;for(let i=months.length-1;i>=0;i--){if(months[i]<=toYm){ei=i;break;}}return months.slice(Math.max(0,ei-p+1),ei+1);}
+  return months.slice(months.length-p);
 }
 
-function setChartPeriod(chartId,months,btn){chartPeriods[chartId]=months;btn.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');redrawChart(chartId);}
-function setPortChartPeriod(portfolio,chartType,months,btn){portChartPeriods[portfolio][chartType]=months;btn.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');redrawPortChart(portfolio,chartType);}
+function setChartPeriod(id,months,btn){chartPeriods[id]=months;btn.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');redrawChart(id);}
+function setPortChartPeriod(portfolio,type,months,btn){portChartPeriods[portfolio][type]=months;btn.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');redrawPortChart(portfolio,type);}
 
-function redrawChart(chartId){
+// ── Datalabel presets ────────────────────────────────────────────
+const DL_BAR={display:'auto',color:'rgba(236,242,250,0.85)',font:{size:8.5,family:'Geist Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true};
+const DL_LINE_BASE={display:ctx=>{const d=ctx.dataset.data,i=ctx.dataIndex,n=d.length;if(n<=5)return true;const v=d.filter(x=>x>0),mx=Math.max(...v),mn=Math.min(...v);return i===n-1||d[i]===mx||d[i]===mn;},font:{size:8.5,family:'Geist Mono',weight:'500'},anchor:'end',align:'top',offset:3,formatter:v=>v>0?'$'+Math.round(v):null,backgroundColor:'rgba(7,9,14,0.8)',borderRadius:3,padding:{top:2,bottom:2,left:4,right:4}};
+const DL_PCT_BASE={display:true,font:{size:8.5,family:'Geist Mono',weight:'600'},anchor:'end',align:'top',offset:3,formatter:v=>v>0?Math.round(v)+'%':null,backgroundColor:'rgba(7,9,14,0.85)',borderRadius:3,padding:{top:2,bottom:2,left:4,right:4}};
+
+function dlLine(color){return{...DL_LINE_BASE,color};}
+function dlPct(color){return{...DL_PCT_BASE,color};}
+
+// ── Channel bars renderer ────────────────────────────────────────
+const CH_COLORS={Airbnb:'#FF385C','Booking.com':'#2563EB',Direct:'#D97706',VRBO:'#0EA87A'};
+function renderChannelBars(elId,byChannel){
+  const total=Object.values(byChannel).reduce((a,b)=>a+b,0);
+  document.getElementById(elId).innerHTML=`<div class="channel-bars">${Object.entries(byChannel).sort((a,b)=>b[1]-a[1]).map(([ch,rev])=>`<div class="channel-bar-item"><div class="channel-bar-label">${ch}</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${total>0?rev/total*100:0}%;background:${CH_COLORS[ch]||'#A78BFA'}"></div></div><div class="channel-bar-val">${$c(rev)}</div><div class="channel-bar-pct">${total>0?Math.round(rev/total*100)+'%':''}</div></div>`).join('')}</div>`;
+}
+
+// ── Redraw overview charts ───────────────────────────────────────
+function redrawChart(id){
   if(!_lastRenderData)return;
   if(window.ChartDataLabels){Chart.register(ChartDataLabels);Chart.defaults.plugins.datalabels={display:false};}
   const{months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc}=_lastRenderData;
-  const DL_OPTS={display:'auto',color:'rgba(237,242,250,0.85)',font:{size:9,family:'DM Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true};
-  const DL_LINE={display:ctx=>{const d=ctx.dataset.data,i=ctx.dataIndex,n=d.length;if(n<=5)return true;const v=d.filter(x=>x>0),max=Math.max(...v),min=Math.min(...v);return i===n-1||d[i]===max||d[i]===min;},color:'rgba(237,242,250,0.9)',font:{size:9,family:'DM Mono',weight:'500'},anchor:'end',align:'top',offset:4,formatter:v=>v>0?'$'+Math.round(v):null,backgroundColor:'rgba(0,0,0,0.5)',borderRadius:3,padding:{top:2,bottom:2,left:4,right:4}};
-  const DL_PCT={display:true,color:'#EDF2FA',font:{size:9,family:'DM Mono',weight:'600'},anchor:'end',align:'top',offset:4,formatter:v=>v>0?Math.round(v)+'%':null,backgroundColor:'rgba(10,13,18,0.85)',borderRadius:3,padding:{top:2,bottom:2,left:5,right:5}};
+  const fm=filterMonths(months,chartPeriods[id]),labels=fm.map(monthLabel);
 
-  const fm=filterMonths(months,chartPeriods[chartId]),labels=fm.map(monthLabel);
-
-  if(chartId==='rev'){
+  if(id==='rev'){
     destroyChart('rev');
     charts.rev=new Chart(document.getElementById('chartRev'),{type:'bar',data:{labels,datasets:[
-      {label:'3700M',data:fm.map(m=>Math.round(byMonthPortfolio[m]['3700M']||0)),backgroundColor:'rgba(26,108,255,0.85)',borderRadius:4,borderSkipped:false,datalabels:DL_OPTS},
-      {label:'Bayou Park',data:fm.map(m=>Math.round(byMonthPortfolio[m]['Bayou Park']||0)),backgroundColor:'rgba(0,200,150,0.85)',borderRadius:4,borderSkipped:false,datalabels:DL_OPTS}
+      {label:'3700M',data:fm.map(m=>Math.round(byMonthPortfolio[m]['3700M']||0)),backgroundColor:'rgba(37,99,235,0.82)',borderRadius:4,borderSkipped:false,datalabels:DL_BAR},
+      {label:'Bayou Park',data:fm.map(m=>Math.round(byMonthPortfolio[m]['Bayou Park']||0)),backgroundColor:'rgba(14,168,122,0.82)',borderRadius:4,borderSkipped:false,datalabels:DL_BAR}
     ]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});
-  }else if(chartId==='adr'){
+  }else if(id==='adr'){
     destroyChart('adr');
     charts.adr=new Chart(document.getElementById('chartADR'),{type:'line',data:{labels,datasets:[
-      {label:'3700M',data:fm.map(m=>Math.round(byMonthADR[m]?.['3700M']||0)),borderColor:'#1A6CFF',backgroundColor:'rgba(26,108,255,0.06)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#1A6CFF',datalabels:{...DL_LINE,color:'#1A6CFF'}},
-      {label:'Bayou Park',data:fm.map(m=>Math.round(byMonthADR[m]?.['Bayou Park']||0)),borderColor:'#00C896',backgroundColor:'rgba(0,200,150,0.06)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#00C896',borderDash:[5,3],datalabels:{...DL_LINE,color:'#00C896',align:'bottom'}}
-    ]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}},datalabels:DL_LINE},scales:mkScales({},{},v=>'$'+v)}});
-  }else if(chartId==='revpar'){
+      {label:'3700M',data:fm.map(m=>Math.round(byMonthADR[m]?.['3700M']||0)),borderColor:'#3B7CFF',backgroundColor:'rgba(37,99,235,0.06)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#3B7CFF',datalabels:dlLine('#3B7CFF')},
+      {label:'Bayou Park',data:fm.map(m=>Math.round(byMonthADR[m]?.['Bayou Park']||0)),borderColor:'#2DD4A0',backgroundColor:'rgba(14,168,122,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#2DD4A0',borderDash:[4,3],datalabels:{...dlLine('#2DD4A0'),align:'bottom'}}
+    ]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}},datalabels:DL_LINE_BASE},scales:mkScales({},{},v=>'$'+v)}});
+  }else if(id==='revpar'){
     destroyChart('revpar');
     charts.revpar=new Chart(document.getElementById('chartRevPAR'),{type:'line',data:{labels,datasets:[
-      {label:'3700M',data:fm.map(m=>Math.round(byMonthRevPAR[m]?.['3700M']||0)),borderColor:'#F0A500',backgroundColor:'rgba(240,165,0,0.06)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#F0A500',datalabels:{...DL_LINE,color:'#F0A500'}},
-      {label:'Bayou Park',data:fm.map(m=>Math.round(byMonthRevPAR[m]?.['Bayou Park']||0)),borderColor:'#A78BFA',backgroundColor:'rgba(167,139,250,0.06)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#A78BFA',borderDash:[5,3],datalabels:{...DL_LINE,color:'#A78BFA',align:'bottom'}}
-    ]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}},datalabels:DL_LINE},scales:mkScales({},{},v=>'$'+v)}});
-  }else if(chartId==='occ'){
+      {label:'3700M',data:fm.map(m=>Math.round(byMonthRevPAR[m]?.['3700M']||0)),borderColor:'#D97706',backgroundColor:'rgba(217,119,6,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#D97706',datalabels:dlLine('#D97706')},
+      {label:'Bayou Park',data:fm.map(m=>Math.round(byMonthRevPAR[m]?.['Bayou Park']||0)),borderColor:'#A78BFA',backgroundColor:'rgba(167,139,250,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#A78BFA',borderDash:[4,3],datalabels:{...dlLine('#A78BFA'),align:'bottom'}}
+    ]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}},datalabels:DL_LINE_BASE},scales:mkScales({},{},v=>'$'+v)}});
+  }else if(id==='occ'){
     destroyChart('occ');
     charts.occ=new Chart(document.getElementById('chartOcc'),{type:'line',data:{labels,datasets:[
-      {label:'3700M',data:fm.map(m=>Math.round(byMonthOcc[m]?.['3700M']||0)),borderColor:'#1A6CFF',backgroundColor:'rgba(26,108,255,0.06)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#1A6CFF',datalabels:{...DL_PCT,color:'#1A6CFF'}},
-      {label:'Bayou Park',data:fm.map(m=>Math.round(byMonthOcc[m]?.['Bayou Park']||0)),borderColor:'#00C896',backgroundColor:'rgba(0,200,150,0.06)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#00C896',borderDash:[5,3],datalabels:{...DL_PCT,color:'#00C896',align:'bottom'}}
-    ]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}},datalabels:DL_PCT},scales:mkScales({},{min:0,max:100},v=>v+'%')}});
+      {label:'3700M',data:fm.map(m=>Math.round(byMonthOcc[m]?.['3700M']||0)),borderColor:'#3B7CFF',backgroundColor:'rgba(37,99,235,0.06)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#3B7CFF',datalabels:dlPct('#3B7CFF')},
+      {label:'Bayou Park',data:fm.map(m=>Math.round(byMonthOcc[m]?.['Bayou Park']||0)),borderColor:'#2DD4A0',backgroundColor:'rgba(14,168,122,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#2DD4A0',borderDash:[4,3],datalabels:{...dlPct('#2DD4A0'),align:'bottom'}}
+    ]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}},datalabels:DL_PCT_BASE},scales:mkScales({},{min:0,max:100},v=>v+'%')}});
   }
 }
 
-function redrawPortChart(portfolio,chartType){
+// ── Redraw portfolio charts ──────────────────────────────────────
+function redrawPortChart(portfolio,type){
   if(!_lastPortRenderData)return;
   const pd=_lastPortRenderData[portfolio];if(!pd)return;
-  const{months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc,hexColor,rgbaColor,rgbaFill,ids}=pd;
+  const{months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc,hex,rgba,fill,ids}=pd;
   if(window.ChartDataLabels){Chart.register(ChartDataLabels);Chart.defaults.plugins.datalabels={display:false};}
-  const fm=filterMonths(months,portChartPeriods[portfolio][chartType]),labels=fm.map(monthLabel);
-
-  if(chartType==='rev'){
+  const fm=filterMonths(months,portChartPeriods[portfolio][type]),labels=fm.map(monthLabel);
+  if(type==='rev'){
     destroyChart(ids.rev);
-    charts[ids.rev]=new Chart(document.getElementById(ids.rev),{type:'bar',data:{labels,datasets:[{data:fm.map(m=>Math.round(byMonthPortfolio[m]?.[portfolio]||0)),backgroundColor:rgbaColor,borderRadius:4,datalabels:{display:'auto',color:'rgba(237,242,250,0.85)',font:{size:9,family:'DM Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true}}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+Math.round(ctx.parsed.y).toLocaleString()}}},scales:mkScales({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});
-  }else if(chartType==='adr'){
+    charts[ids.rev]=new Chart(document.getElementById(ids.rev),{type:'bar',data:{labels,datasets:[{data:fm.map(m=>Math.round(byMonthPortfolio[m]?.[portfolio]||0)),backgroundColor:rgba,borderRadius:4,datalabels:DL_BAR}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});
+  }else if(type==='adr'){
     destroyChart(ids.adr);
-    charts[ids.adr]=new Chart(document.getElementById(ids.adr),{type:'line',data:{labels,datasets:[{data:fm.map(m=>Math.round(byMonthADR[m]?.[portfolio]||0)),borderColor:hexColor,backgroundColor:rgbaFill,tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:hexColor}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y}}},scales:mkScales({},{},v=>'$'+v)}});
-  }else if(chartType==='revpar'){
+    charts[ids.adr]=new Chart(document.getElementById(ids.adr),{type:'line',data:{labels,datasets:[{data:fm.map(m=>Math.round(byMonthADR[m]?.[portfolio]||0)),borderColor:hex,backgroundColor:fill,tension:.4,fill:true,pointRadius:3,pointBackgroundColor:hex}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({},{},v=>'$'+v)}});
+  }else if(type==='revpar'){
     destroyChart(ids.revpar);
-    charts[ids.revpar]=new Chart(document.getElementById(ids.revpar),{type:'line',data:{labels,datasets:[{data:fm.map(m=>Math.round(byMonthRevPAR[m]?.[portfolio]||0)),borderColor:'#F0A500',backgroundColor:'rgba(240,165,0,0.06)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#F0A500'}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y}}},scales:mkScales({},{},v=>'$'+v)}});
-  }else if(chartType==='occ'){
+    charts[ids.revpar]=new Chart(document.getElementById(ids.revpar),{type:'line',data:{labels,datasets:[{data:fm.map(m=>Math.round(byMonthRevPAR[m]?.[portfolio]||0)),borderColor:'#D97706',backgroundColor:'rgba(217,119,6,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#D97706'}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({},{},v=>'$'+v)}});
+  }else if(type==='occ'){
     destroyChart(ids.occ);
-    charts[ids.occ]=new Chart(document.getElementById(ids.occ),{type:'line',data:{labels,datasets:[{data:fm.map(m=>Math.round(byMonthOcc[m]?.[portfolio]||0)),borderColor:hexColor,backgroundColor:rgbaFill,tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:hexColor}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},scales:mkScales({},{min:0,max:100},v=>v+'%')}});
+    charts[ids.occ]=new Chart(document.getElementById(ids.occ),{type:'line',data:{labels,datasets:[{data:fm.map(m=>Math.round(byMonthOcc[m]?.[portfolio]||0)),borderColor:hex,backgroundColor:fill,tension:.4,fill:true,pointRadius:3,pointBackgroundColor:hex}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},scales:mkScales({},{min:0,max:100},v=>v+'%')}});
   }
 }
 
+// ── Occ units renderer ───────────────────────────────────────────
+function renderOccUnits(elId,portfolio,diffDays,byUnit,allListings){
+  const defColor=portfolio==='3700M'?'#3B7CFF':'#2DD4A0';
+  const allNames=(allListings||[]).filter(l=>getPortfolio(l.nickname)===portfolio).map(l=>l.nickname.trim());
+  const resNames=Object.entries(byUnit).filter(([,u])=>u.portfolio===portfolio).map(([n])=>n);
+  const nameSet=new Set([...allNames,...resNames]);
+  const unitData=Array.from(nameSet).map(name=>{
+    const num=name.match(/\d+/)?.[0];
+    const match=Object.entries(byUnit).find(([k,u])=>u.portfolio===portfolio&&k.match(/\d+/)?.[0]===num);
+    return[name,match?match[1]:{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,portfolio,count:0}];
+  }).sort((a,b)=>a[1].nights-b[1].nights);
+  document.getElementById(elId).innerHTML=unitData.map(([name,u])=>{
+    const occ=diffDays>0?Math.min(100,u.nights/diffDays*100):0;
+    const isLow=occ<30,isMed=occ>=30&&occ<60;
+    const bc=isLow?'#E11D48':isMed?'#D97706':defColor;
+    const bdr=isLow?'border-color:rgba(225,29,72,0.28)':isMed?'border-color:rgba(217,119,6,0.22)':'';
+    const sn=name.replace(/^(Unit\s+|Apt\s+|Two Bed,?\s*)/i,'').replace(/[-*].*$/,'').trim().split(' ')[0];
+    const badge=isLow?'<span style="font-size:8px;background:rgba(225,29,72,0.12);color:#E11D48;padding:1px 5px;border-radius:3px;margin-left:5px">LOW</span>':isMed?'<span style="font-size:8px;background:rgba(217,119,6,0.12);color:#D97706;padding:1px 5px;border-radius:3px;margin-left:5px">MED</span>':'';
+    return`<div class="occ-unit-card" style="${bdr}"><div class="occ-unit-name" title="${name}">${sn}${badge}</div><div class="occ-unit-bar-track"><div class="occ-unit-bar-fill" style="width:${occ}%;background:${bc}"></div></div><div class="occ-unit-pct" style="color:${bc}">${Math.round(occ)}%</div></div>`;
+  }).join('');
+}
+
+// ── Main render function ─────────────────────────────────────────
 function render(reservations,from,to,prev,allListings){
   if(window.ChartDataLabels){Chart.register(ChartDataLabels);Chart.defaults.plugins.datalabels={display:false};}
   const confirmed=reservations.filter(r=>r.status!=='cancelled');
@@ -906,53 +902,52 @@ function render(reservations,from,to,prev,allListings){
     const otaAdj=r.money?.resolutionAmount||0,otaComm=Math.abs(r.money?.hostServiceFee||0);
     const portfolio=getPortfolioFromRes(r);
     const shortProp=(r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
-    const channelLabel=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
-    const checkIn=new Date(r.checkIn),checkOut=new Date(r.checkOut);
-    const totalNights=Math.max(1,Math.round((checkOut-checkIn)/86400000));
-    const dailyRoom=roomRevTotal/totalNights,dailyComm=otaComm/totalNights;
-    const coYm=checkOut.toISOString().substring(0,7);
-    const checkoutInPeriod=checkOut>=pS&&checkOut<=pE;
-    let nightsInPeriod=0,cur=new Date(checkIn);
-    while(cur<checkOut){
+    const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+    const ci=new Date(r.checkIn),co=new Date(r.checkOut);
+    const tn=Math.max(1,Math.round((co-ci)/86400000));
+    const dailyRoom=roomRevTotal/tn,dailyComm=otaComm/tn;
+    const coYm=co.toISOString().substring(0,7);
+    const checkoutInPeriod=co>=pS&&co<=pE;
+    let nin=0,cur=new Date(ci);
+    while(cur<co){
       const ym=cur.toISOString().substring(0,7);
       if(!byMonthPortfolio[ym])byMonthPortfolio[ym]={'3700M':0,'Bayou Park':0};
       if(byMonthPortfolio[ym][portfolio]!==undefined)byMonthPortfolio[ym][portfolio]+=dailyRoom;
-      if(cur>=pS&&cur<=pE)nightsInPeriod++;
+      if(cur>=pS&&cur<=pE)nin++;
       cur.setDate(cur.getDate()+1);
     }
     if(!byMonthPortfolio[coYm])byMonthPortfolio[coYm]={'3700M':0,'Bayou Park':0};
-    const roomRev=dailyRoom*nightsInPeriod,clean=checkoutInPeriod?cleanTotal:0;
-    const comm=dailyComm*nightsInPeriod,nights=nightsInPeriod;
-    const otaAdjInPeriod=checkoutInPeriod?(r.money?.resolutionAmount||0):0;
+    const roomRev=dailyRoom*nin,clean=checkoutInPeriod?cleanTotal:0;
+    const comm=dailyComm*nin,oAdj=checkoutInPeriod?(r.money?.resolutionAmount||0):0;
     if(!byUnit[shortProp])byUnit[shortProp]={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,portfolio,count:0};
-    byUnit[shortProp].roomRev+=roomRev;byUnit[shortProp].clean+=clean;byUnit[shortProp].otaAdj+=otaAdjInPeriod;byUnit[shortProp].otaComm+=comm;byUnit[shortProp].nights+=nights;
-    if(nightsInPeriod>0||checkoutInPeriod)byUnit[shortProp].count++;
-    if(byPortfolio[portfolio]){byPortfolio[portfolio].roomRev+=roomRev;byPortfolio[portfolio].clean+=clean;byPortfolio[portfolio].otaAdj+=otaAdjInPeriod;byPortfolio[portfolio].otaComm+=comm;byPortfolio[portfolio].nights+=nights;if(nightsInPeriod>0||checkoutInPeriod)byPortfolio[portfolio].count++;}
-    if(!byChannel[channelLabel])byChannel[channelLabel]=0;byChannel[channelLabel]+=roomRev+clean;
+    byUnit[shortProp].roomRev+=roomRev;byUnit[shortProp].clean+=clean;byUnit[shortProp].otaAdj+=oAdj;byUnit[shortProp].otaComm+=comm;byUnit[shortProp].nights+=nin;
+    if(nin>0||checkoutInPeriod)byUnit[shortProp].count++;
+    if(byPortfolio[portfolio]){byPortfolio[portfolio].roomRev+=roomRev;byPortfolio[portfolio].clean+=clean;byPortfolio[portfolio].otaAdj+=oAdj;byPortfolio[portfolio].otaComm+=comm;byPortfolio[portfolio].nights+=nin;if(nin>0||checkoutInPeriod)byPortfolio[portfolio].count++;}
+    if(!byChannel[ch])byChannel[ch]=0;byChannel[ch]+=roomRev+clean;
   });
 
   const months=Object.keys(byMonthPortfolio).sort();
   _lastRenderData={months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc,toDate:to};
 
+  // Per-month per-portfolio stats
   const byMonthClean3700={},byMonthCleanBP={},byMonthOtaAdj3700={},byMonthOtaAdjBP={};
   const byMonthOtaComm3700={},byMonthOtaCommBP={},byMonthNights3700={},byMonthNightsBP={};
 
   confirmed.forEach(r=>{
     const portfolio=getPortfolioFromRes(r);
     if(portfolio!=='3700M'&&portfolio!=='Bayou Park')return;
-    const checkOut=new Date(r.checkOut),coYm=checkOut.toISOString().substring(0,7);
-    const checkIn=new Date(r.checkIn),totalNights=Math.max(1,Math.round((checkOut-checkIn)/86400000));
-    const cleanTotal=r.money?.fareCleaning||0,otaAdj=r.money?.resolutionAmount||0;
-    const otaComm=Math.abs(r.money?.hostServiceFee||0),dailyComm=otaComm/totalNights;
-    let cur=new Date(checkIn);
-    while(cur<checkOut){
+    const co=new Date(r.checkOut),coYm=co.toISOString().substring(0,7);
+    const ci=new Date(r.checkIn),tn=Math.max(1,Math.round((co-ci)/86400000));
+    const otaComm=Math.abs(r.money?.hostServiceFee||0),dailyComm=otaComm/tn;
+    let cur=new Date(ci);
+    while(cur<co){
       const ym=cur.toISOString().substring(0,7);
       if(portfolio==='3700M'){byMonthNights3700[ym]=(byMonthNights3700[ym]||0)+1;byMonthOtaComm3700[ym]=(byMonthOtaComm3700[ym]||0)+dailyComm;}
       else{byMonthNightsBP[ym]=(byMonthNightsBP[ym]||0)+1;byMonthOtaCommBP[ym]=(byMonthOtaCommBP[ym]||0)+dailyComm;}
       cur.setDate(cur.getDate()+1);
     }
-    if(portfolio==='3700M'){byMonthClean3700[coYm]=(byMonthClean3700[coYm]||0)+cleanTotal;byMonthOtaAdj3700[coYm]=(byMonthOtaAdj3700[coYm]||0)+otaAdj;}
-    else{byMonthCleanBP[coYm]=(byMonthCleanBP[coYm]||0)+cleanTotal;byMonthOtaAdjBP[coYm]=(byMonthOtaAdjBP[coYm]||0)+otaAdj;}
+    if(portfolio==='3700M'){byMonthClean3700[coYm]=(byMonthClean3700[coYm]||0)+(r.money?.fareCleaning||0);byMonthOtaAdj3700[coYm]=(byMonthOtaAdj3700[coYm]||0)+(r.money?.resolutionAmount||0);}
+    else{byMonthCleanBP[coYm]=(byMonthCleanBP[coYm]||0)+(r.money?.fareCleaning||0);byMonthOtaAdjBP[coYm]=(byMonthOtaAdjBP[coYm]||0)+(r.money?.resolutionAmount||0);}
   });
 
   _lastSummaryData={byMonthClean3700,byMonthCleanBP,byMonthOtaAdj3700,byMonthOtaAdjBP,byMonthOtaComm3700,byMonthOtaCommBP,byMonthNights3700,byMonthNightsBP,units3700:UNITS_3700M,unitsBP:UNITS_BP};
@@ -960,11 +955,11 @@ function render(reservations,from,to,prev,allListings){
   months.forEach(ym=>{
     const[y,m]=ym.split('-'),dIM=new Date(+y,+m,0).getDate();
     ['3700M','Bayou Park'].forEach(port=>{
-      const unitCount=port==='3700M'?UNITS_3700M:UNITS_BP;
-      const portRes=confirmed.filter(r=>getPortfolioFromRes(r)===port&&r.checkIn&&r.checkIn.substring(0,7)===ym);
+      const uc=port==='3700M'?UNITS_3700M:UNITS_BP;
+      const portRes=confirmed.filter(r=>getPortfolioFromRes(r)===port&&r.checkIn?.substring(0,7)===ym);
       const portNights=portRes.reduce((a,r)=>a+(r.nightsCount||0),0);
       const portRev=portRes.reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
-      const avail=unitCount*dIM;
+      const avail=uc*dIM;
       if(!byMonthADR[ym])byMonthADR[ym]={};if(!byMonthRevPAR[ym])byMonthRevPAR[ym]={};if(!byMonthOcc[ym])byMonthOcc[ym]={};
       byMonthADR[ym][port]=portNights>0?portRev/portNights:0;
       byMonthRevPAR[ym][port]=avail>0?portRev/avail:0;
@@ -972,226 +967,167 @@ function render(reservations,from,to,prev,allListings){
     });
   });
 
-  const dynUnits3700=allListings?allListings.filter(l=>getPortfolio(l.nickname)==='3700M').length||UNITS_3700M:UNITS_3700M;
-  const dynUnitsBP=allListings?allListings.filter(l=>getPortfolio(l.nickname)==='Bayou Park').length||UNITS_BP:UNITS_BP;
+  const du3=allListings?allListings.filter(l=>getPortfolio(l.nickname)==='3700M').length||UNITS_3700M:UNITS_3700M;
+  const duBP=allListings?allListings.filter(l=>getPortfolio(l.nickname)==='Bayou Park').length||UNITS_BP:UNITS_BP;
   const totalRoomRev=byPortfolio['3700M'].roomRev+byPortfolio['Bayou Park'].roomRev;
   const totalClean=byPortfolio['3700M'].clean+byPortfolio['Bayou Park'].clean;
   const totalOtaComm=byPortfolio['3700M'].otaComm+byPortfolio['Bayou Park'].otaComm;
   const totalNights=byPortfolio['3700M'].nights+byPortfolio['Bayou Park'].nights;
-  const totalAvail=(dynUnits3700+dynUnitsBP)*diffDays;
+  const totalAvail=(du3+duBP)*diffDays;
   const totalOtaAdj=byPortfolio['3700M'].otaAdj+byPortfolio['Bayou Park'].otaAdj;
   const totalRev=totalRoomRev+totalClean+totalOtaAdj;
   const totalOcc=totalAvail>0?totalNights/totalAvail:0;
   const totalADR=totalNights>0?totalRoomRev/totalNights:0;
   const totalRevPAR=totalAvail>0?totalRoomRev/totalAvail:0;
 
+  // KPI TOP
   document.getElementById('kpiTop').innerHTML=`
-    <div class="kpi" style="--accent:var(--cobalt)"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${$c(totalRev)}</div><div class="kpi-sub">${confirmed.length} bookings</div>${prev?delta(totalRev,prev.totalRev):''}</div>
-    <div class="kpi" style="--accent:var(--cobalt)"><div class="kpi-label">Room Revenue</div><div class="kpi-value">${$c(totalRoomRev)}</div><div class="kpi-sub">Net accommodation fare</div>${prev?delta(totalRoomRev,prev.roomRev):''}</div>
-    <div class="kpi" style="--accent:var(--fog)"><div class="kpi-label">Cleaning Fee</div><div class="kpi-value">${$c(totalClean)}</div><div class="kpi-sub">fareCleaning</div>${prev?delta(totalClean,prev.clean):''}</div>
-    <div class="kpi" style="--accent:var(--crimson)"><div class="kpi-label">OTA Commission</div><div class="kpi-value">${$c(totalOtaComm)}</div><div class="kpi-sub">Channel commission</div>${prev?delta(totalOtaComm,prev.otaComm):''}</div>
-    <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">OTA Adjustment</div><div class="kpi-value">${totalOtaAdj<0?'-$'+Math.round(Math.abs(totalOtaAdj)).toLocaleString('en-US'):$c(totalOtaAdj)}</div><div class="kpi-sub">Resolution center</div></div>
-    <div class="kpi" style="--accent:var(--jade)"><div class="kpi-label">Occupancy</div><div class="kpi-value">${pct(totalOcc)}</div><div class="kpi-sub">${fmt(totalNights)} / ${fmt(totalAvail)} nights</div>${prev?delta(totalOcc,prev.occ):''}</div>
-    <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">ADR</div><div class="kpi-value">${$c(totalADR)}</div><div class="kpi-sub">Avg. daily rate</div>${prev?delta(totalADR,prev.adr):''}</div>
-    <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">RevPAR</div><div class="kpi-value">${$c(totalRevPAR)}</div><div class="kpi-sub">Per available night</div>${prev?delta(totalRevPAR,prev.revpar):''}</div>`;
+    <div class="kpi" style="--accent:#2563EB"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${$c(totalRev)}</div><div class="kpi-sub">${confirmed.length} confirmed bookings</div>${prev?delta(totalRev,prev.totalRev):''}</div>
+    <div class="kpi" style="--accent:#2563EB"><div class="kpi-label">Room Revenue</div><div class="kpi-value">${$c(totalRoomRev)}</div><div class="kpi-sub">Net accommodation fare</div>${prev?delta(totalRoomRev,prev.roomRev):''}</div>
+    <div class="kpi" style="--accent:#6B7FA0"><div class="kpi-label">Cleaning Fee</div><div class="kpi-value">${$c(totalClean)}</div><div class="kpi-sub">At checkout</div>${prev?delta(totalClean,prev.clean):''}</div>
+    <div class="kpi" style="--accent:#E11D48"><div class="kpi-label">OTA Commission</div><div class="kpi-value">${$c(totalOtaComm)}</div><div class="kpi-sub">Channel fees</div>${prev?delta(totalOtaComm,prev.otaComm):''}</div>
+    <div class="kpi" style="--accent:#D97706"><div class="kpi-label">OTA Adjustment</div><div class="kpi-value">${totalOtaAdj<0?'-$'+Math.round(Math.abs(totalOtaAdj)).toLocaleString('en-US'):$c(totalOtaAdj)}</div><div class="kpi-sub">Resolution center</div></div>
+    <div class="kpi" style="--accent:#0EA87A"><div class="kpi-label">Occupancy</div><div class="kpi-value">${pct(totalOcc)}</div><div class="kpi-sub">${fmt(totalNights)} / ${fmt(totalAvail)} nights</div>${prev?delta(totalOcc,prev.occ):''}</div>
+    <div class="kpi" style="--accent:#D97706"><div class="kpi-label">ADR</div><div class="kpi-value">${$c(totalADR)}</div><div class="kpi-sub">Avg. daily rate</div>${prev?delta(totalADR,prev.adr):''}</div>
+    <div class="kpi" style="--accent:#D97706"><div class="kpi-label">RevPAR</div><div class="kpi-value">${$c(totalRevPAR)}</div><div class="kpi-sub">Per available night</div>${prev?delta(totalRevPAR,prev.revpar):''}</div>`;
 
-  function portKpiHtml(port,color,colorVar,unitCount){
-    const p=byPortfolio[port],avail=unitCount*diffDays;
+  function portCardHtml(port,cls,accent,pcAccent,uc){
+    const p=byPortfolio[port],avail=uc*diffDays;
     const occ=avail>0?p.nights/avail:0,adr=p.nights>0?p.roomRev/p.nights:0,revpar=avail>0?p.roomRev/avail:0;
-    return`<div class="portfolio-kpi-card ${color}"><div class="portfolio-kpi-title"><div class="dot" style="background:${colorVar}"></div><span style="color:${colorVar}">${port}</span><span style="font-size:11px;color:var(--fog);font-weight:400;margin-left:4px">${unitCount} units · ${p.count} bookings</span></div><div class="portfolio-stats"><div><div class="pstat-label">Occ.</div><div class="pstat-value" style="color:${colorVar}">${pct(occ)}</div></div><div><div class="pstat-label">ADR</div><div class="pstat-value">${$c(adr)}</div></div><div><div class="pstat-label">RevPAR</div><div class="pstat-value">${$c(revpar)}</div></div><div><div class="pstat-label">Revenue</div><div class="pstat-value">${$c(p.roomRev)}</div></div></div></div>`;
+    return`<div class="port-card ${cls}" style="--pc-accent:${pcAccent}"><div class="port-card-top"><div class="port-card-name">${port}</div><div class="port-card-meta">${uc} units · ${p.count} bookings</div></div><div class="port-stats"><div><div class="ps-label">Occupancy</div><div class="ps-val" style="color:${pcAccent}">${pct(occ)}</div></div><div><div class="ps-label">ADR</div><div class="ps-val">${$c(adr)}</div></div><div><div class="ps-label">RevPAR</div><div class="ps-val">${$c(revpar)}</div></div><div><div class="ps-label">Room Rev.</div><div class="ps-val">${$c(p.roomRev)}</div></div><div><div class="ps-label">Cleaning</div><div class="ps-val">${$c(p.clean)}</div></div><div><div class="ps-label">Total Rev.</div><div class="ps-val">${$c(p.roomRev+p.clean+p.otaAdj)}</div></div><div><div class="ps-label">OTA Comm.</div><div class="ps-val" style="color:#FB7185">${$c(p.otaComm)}</div></div></div></div>`;
   }
-  document.getElementById('portfolioKpis').innerHTML=portKpiHtml('3700M','cobalt','var(--cobalt)',dynUnits3700)+portKpiHtml('Bayou Park','jade','var(--jade)',dynUnitsBP);
+  document.getElementById('portfolioKpis').innerHTML=portCardHtml('3700M','pc-blue','#2563EB','#3B7CFF',du3)+portCardHtml('Bayou Park','pc-teal','#0EA87A','#2DD4A0',duBP);
 
-  document.getElementById('legendRev').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:var(--cobalt)"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:var(--jade)"></div>Bayou Park</div>`;
+  // Legends
+  document.getElementById('legendRev').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:#3B7CFF"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:#2DD4A0"></div>Bayou Park</div>`;
   redrawChart('rev');
-
-  const chTotal=Object.values(byChannel).reduce((a,b)=>a+b,0);
-  const chColors={Airbnb:'#FF5A5F','Booking.com':'#1A6CFF',Direct:'#F0A500',VRBO:'#00C896'};
-  document.getElementById('channelBars').innerHTML=`<div class="channel-bars">${Object.entries(byChannel).sort((a,b)=>b[1]-a[1]).map(([ch,rev])=>`<div class="channel-bar-item"><div class="channel-bar-label">${ch}</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${chTotal>0?rev/chTotal*100:0}%;background:${chColors[ch]||'#A78BFA'}"></div></div><div class="channel-bar-val">${$c(rev)}</div><div class="channel-bar-pct">${chTotal>0?Math.round(rev/chTotal*100)+'%':''}</div></div>`).join('')}</div>`;
-
-  document.getElementById('legendADR').innerHTML=`<div class="legend-item"><div class="legend-line" style="background:var(--cobalt)"></div>3700M</div><div class="legend-item"><div class="legend-line" style="background:var(--jade)"></div>Bayou Park</div>`;
+  renderChannelBars('channelBars',byChannel);
+  document.getElementById('legendADR').innerHTML=`<div class="legend-item"><div class="legend-dash" style="background:#3B7CFF"></div>3700M</div><div class="legend-item"><div class="legend-dash" style="background:#2DD4A0;border-top:2px dashed #2DD4A0;height:0"></div>Bayou Park</div>`;
   redrawChart('adr');
-  document.getElementById('legendRevPAR').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:#A78BFA"></div>Bayou Park</div>`;
+  document.getElementById('legendRevPAR').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:#A78BFA"></div>Bayou Park</div>`;
   redrawChart('revpar');
   document.getElementById('legendOcc').innerHTML=document.getElementById('legendADR').innerHTML;
   redrawChart('occ');
 
-  function renderOccUnits(containerId,portfolio,unitCount){
-    const defColor=portfolio==='3700M'?'var(--cobalt)':'var(--jade)';
-    const avail=diffDays;
-    const allNames=(allListings||[]).filter(l=>getPortfolio(l.nickname)===portfolio).map(l=>l.nickname.trim());
-    const reservationNames=Object.entries(byUnit).filter(([,u])=>u.portfolio===portfolio).map(([n])=>n);
-    const nameSet=new Set([...allNames,...reservationNames]);
-    const unitData=Array.from(nameSet).map(name=>{
-      const unitNum=name.match(/\d+/)?.[0];
-      const match=Object.entries(byUnit).find(([k,u])=>u.portfolio===portfolio&&k.match(/\d+/)?.[0]===unitNum);
-      return[name,match?match[1]:{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,portfolio,count:0}];
-    }).sort((a,b)=>a[1].nights-b[1].nights);
-    document.getElementById(containerId).innerHTML=unitData.map(([name,u])=>{
-      const occPct=avail>0?Math.min(100,u.nights/avail*100):0;
-      const isLow=occPct<30,isMed=occPct>=30&&occPct<60;
-      const barColor=isLow?'var(--crimson)':isMed?'var(--amber)':defColor;
-      const bdr=isLow?'border-color:rgba(255,77,106,0.3)':isMed?'border-color:rgba(240,165,0,0.2)':'';
-      const shortName=name.replace(/^(Unit\s+|Apt\s+|Two Bed,?\s*)/i,'').replace(/[-*].*$/,'').trim().split(' ')[0];
-      const badge=isLow?'<span style="font-size:9px;background:rgba(255,77,106,0.12);color:var(--crimson);padding:1px 5px;border-radius:3px;margin-left:4px">LOW</span>':isMed?'<span style="font-size:9px;background:rgba(240,165,0,0.12);color:var(--amber);padding:1px 5px;border-radius:3px;margin-left:4px">MED</span>':'';
-      return`<div class="occ-unit-card" style="${bdr}"><div class="occ-unit-name" style="display:flex;align-items:center" title="${name}">${shortName}${badge}</div><div class="occ-unit-bar-track"><div class="occ-unit-bar-fill" style="width:${occPct}%;background:${barColor}"></div></div><div class="occ-unit-pct" style="color:${barColor}">${Math.round(occPct)}%</div></div>`;
-    }).join('');
-  }
-  renderOccUnits('occUnits3700','3700M',dynUnits3700);
-  renderOccUnits('occUnitsBP','Bayou Park',dynUnitsBP);
+  // Occ units
+  renderOccUnits('occUnits3700','3700M',diffDays,byUnit,allListings);
+  renderOccUnits('occUnitsBP','Bayou Park',diffDays,byUnit,allListings);
 
+  // Portfolio unit table builder
   function buildPortTable(portfolio,tableId,unitCount){
     const allNames=(allListings||[]).filter(l=>getPortfolio(l.nickname)===portfolio).map(l=>l.nickname.trim());
-    const reservationNames=Object.entries(byUnit).filter(([,u])=>u.portfolio===portfolio).map(([name])=>name);
-    const nameSet=new Set([...allNames,...reservationNames]);
+    const resNames=Object.entries(byUnit).filter(([,u])=>u.portfolio===portfolio).map(([n])=>n);
+    const nameSet=new Set([...allNames,...resNames]);
     const units=Array.from(nameSet).map(name=>{
-      const unitNum=name.match(/\d+/)?.[0];
-      const match=Object.entries(byUnit).find(([k,u])=>u.portfolio===portfolio&&k.match(/\d+/)?.[0]===unitNum);
+      const num=name.match(/\d+/)?.[0];
+      const match=Object.entries(byUnit).find(([k,u])=>u.portfolio===portfolio&&k.match(/\d+/)?.[0]===num);
       return[name,match?match[1]:{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,portfolio,count:0}];
     }).sort((a,b)=>b[1].roomRev-a[1].roomRev);
     const avail=diffDays;
-    let totRoomRev=0,totClean=0,totOtaAdj=0,totOtaComm=0,totNights=0;
+    let tRR=0,tCl=0,tOA=0,tOC=0,tNi=0;
     const rows=units.map(([name,u])=>{
       const occ=avail>0?u.nights/avail:0,adr=u.nights>0?u.roomRev/u.nights:0,revpar=avail>0?u.roomRev/avail:0;
-      const totRev=u.roomRev+u.clean+(u.otaAdj||0);
-      totRoomRev+=u.roomRev;totClean+=u.clean;totOtaAdj+=(u.otaAdj||0);totOtaComm+=u.otaComm;totNights+=u.nights;
-      const op=occ*100;
-      const rowS=op<30?'style="background:rgba(255,77,106,0.04)"':op<60?'style="background:rgba(240,165,0,0.03)"':'';
-      const occS=op<30?'color:var(--crimson);font-weight:600':op<60?'color:var(--amber)':'';
-      return`<tr ${rowS}><td>${name}</td><td class="num">${avail}</td><td class="num">${Math.round(u.nights)}</td><td class="num" style="${occS}">${pct(occ)}</td><td class="num">${$c(adr)}</td><td class="num">${$c(revpar)}</td><td class="num">${$c(u.roomRev)}</td><td class="num">${$c(u.clean)}</td><td class="num">${$c(totRev)}</td><td class="num">${$c(u.otaComm)}</td></tr>`;
+      tRR+=u.roomRev;tCl+=u.clean;tOA+=(u.otaAdj||0);tOC+=u.otaComm;tNi+=u.nights;
+      const op=occ*100,rs=op<30?'style="background:rgba(225,29,72,0.04)"':op<60?'style="background:rgba(217,119,6,0.03)"':'';
+      const os=op<30?'color:#E11D48;font-weight:600':op<60?'color:#D97706':'';
+      return`<tr ${rs}><td>${name}</td><td class="num">${avail}</td><td class="num">${Math.round(u.nights)}</td><td class="num" style="${os}">${pct(occ)}</td><td class="num">${$c(adr)}</td><td class="num">${$c(revpar)}</td><td class="num">${$c(u.roomRev)}</td><td class="num">${$c(u.clean)}</td><td class="num">${$c(u.roomRev+u.clean+(u.otaAdj||0))}</td><td class="num">${$c(u.otaComm)}</td></tr>`;
     }).join('');
-    const tAvail=unitCount*diffDays,tOcc=tAvail>0?totNights/tAvail:0,tADR=totNights>0?totRoomRev/totNights:0,tRevPAR=tAvail>0?totRoomRev/tAvail:0,tRev=totRoomRev+totClean+totOtaAdj;
-    document.querySelector(`#${tableId} tbody`).innerHTML=rows+`<tr class="total-row"><td>TOTAL</td><td class="num">${tAvail}</td><td class="num">${Math.round(totNights)}</td><td class="num">${pct(tOcc)}</td><td class="num">${$c(tADR)}</td><td class="num">${$c(tRevPAR)}</td><td class="num">${$c(totRoomRev)}</td><td class="num">${$c(totClean)}</td><td class="num">${$c(tRev)}</td><td class="num">${$c(totOtaComm)}</td></tr>`;
-    const lowUnits=units.filter(([,u])=>{const o=avail>0?u.nights/avail*100:0;return o<30;});
-    if(lowUnits.length>0){const b=document.createElement('div');b.style.cssText='background:rgba(255,77,106,0.07);border:1px solid rgba(255,77,106,0.18);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--crimson);display:flex;align-items:center;gap:8px';b.innerHTML=`⚠ <strong>${lowUnits.length} unit${lowUnits.length>1?'s':''} with low occupancy (&lt;30%):</strong> ${lowUnits.map(([n])=>n.split('-')[0].trim()).join(', ')}`;document.getElementById(tableId).closest('.table-wrap').parentNode.insertBefore(b,document.getElementById(tableId).closest('.table-wrap'));}
+    const tA=unitCount*diffDays,tO=tA>0?tNi/tA:0,tADR=tNi>0?tRR/tNi:0,tRP=tA>0?tRR/tA:0;
+    document.querySelector(`#${tableId} tbody`).innerHTML=rows+`<tr class="total-row"><td>TOTAL</td><td class="num">${tA}</td><td class="num">${Math.round(tNi)}</td><td class="num">${pct(tO)}</td><td class="num">${$c(tADR)}</td><td class="num">${$c(tRP)}</td><td class="num">${$c(tRR)}</td><td class="num">${$c(tCl)}</td><td class="num">${$c(tRR+tCl+tOA)}</td><td class="num">${$c(tOC)}</td></tr>`;
+    const low=units.filter(([,u])=>(avail>0?u.nights/avail*100:0)<30);
+    if(low.length){const b=document.createElement('div');b.className='low-alert';b.innerHTML=`⚠ <strong>${low.length} unit${low.length>1?'s':''} below 30% occupancy:</strong> ${low.map(([n])=>n.split('-')[0].trim()).join(', ')}`;document.getElementById(tableId).closest('.table-wrap').parentNode.insertBefore(b,document.getElementById(tableId).closest('.table-wrap'));}
   }
-  buildPortTable('3700M','tbl3700',dynUnits3700);
-  buildPortTable('Bayou Park','tblBP',dynUnitsBP);
+  buildPortTable('3700M','tbl3700',du3);
+  buildPortTable('Bayou Park','tblBP',duBP);
 
-  function buildPortDashboard(portfolio,color,colorVar,unitCount,ids){
+  // Portfolio dashboards
+  function buildPortDash(portfolio,cls,pcAccent,hex,rgba,fill,unitCount,ids){
     const p=byPortfolio[portfolio],avail=unitCount*diffDays;
     const occ=avail>0?p.nights/avail:0,adr=p.nights>0?p.roomRev/p.nights:0,revpar=avail>0?p.roomRev/avail:0;
-    const totalRev=p.roomRev+p.clean+(p.otaAdj||0);
-    const hexColor=colorVar,rgbaColor=portfolio==='3700M'?'rgba(26,108,255,0.85)':'rgba(0,200,150,0.85)';
-    const rgbaFill=portfolio==='3700M'?'rgba(26,108,255,0.06)':'rgba(0,200,150,0.06)';
-
     const pkId=portfolio==='3700M'?'portfolioKpi3700':'portfolioKpiBP';
-    document.getElementById(pkId).innerHTML=`<div class="portfolio-kpi-card ${color}"><div class="portfolio-kpi-title"><div class="dot" style="background:${colorVar}"></div><span style="color:${colorVar}">${portfolio}</span><span style="font-size:11px;color:var(--fog);font-weight:400;margin-left:4px">${unitCount} units · ${p.count} bookings</span></div><div class="portfolio-stats"><div><div class="pstat-label">Occ.</div><div class="pstat-value" style="color:${colorVar}">${pct(occ)}</div></div><div><div class="pstat-label">ADR</div><div class="pstat-value">${$c(adr)}</div></div><div><div class="pstat-label">RevPAR</div><div class="pstat-value">${$c(revpar)}</div></div><div><div class="pstat-label">Room Rev.</div><div class="pstat-value">${$c(p.roomRev)}</div></div><div><div class="pstat-label">Cleaning</div><div class="pstat-value">${$c(p.clean)}</div></div><div><div class="pstat-label">Total Rev.</div><div class="pstat-value">${$c(totalRev)}</div></div><div><div class="pstat-label">OTA Comm.</div><div class="pstat-value" style="color:var(--crimson)">${$c(p.otaComm)}</div></div></div></div>`;
-
+    document.getElementById(pkId).innerHTML=portCardHtml(portfolio,cls,pcAccent,hex,unitCount);
     document.getElementById(ids.kpi).innerHTML=`
-      <div class="kpi" style="--accent:${hexColor}"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${$c(totalRev)}</div><div class="kpi-sub">${p.count} bookings</div></div>
-      <div class="kpi" style="--accent:${hexColor}"><div class="kpi-label">Room Revenue</div><div class="kpi-value">${$c(p.roomRev)}</div><div class="kpi-sub">Net accommodation fare</div></div>
-      <div class="kpi" style="--accent:var(--fog)"><div class="kpi-label">Cleaning Fee</div><div class="kpi-value">${$c(p.clean)}</div><div class="kpi-sub">fareCleaning</div></div>
-      <div class="kpi" style="--accent:var(--crimson)"><div class="kpi-label">OTA Commission</div><div class="kpi-value">${$c(p.otaComm)}</div><div class="kpi-sub">Channel commission</div></div>
-      <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">OTA Adjustment</div><div class="kpi-value">${p.otaAdj<0?'-$'+Math.round(Math.abs(p.otaAdj)).toLocaleString('en-US'):$c(p.otaAdj)}</div><div class="kpi-sub">Resolution center</div></div>
-      <div class="kpi" style="--accent:var(--jade)"><div class="kpi-label">Occupancy</div><div class="kpi-value">${pct(occ)}</div><div class="kpi-sub">${fmt(p.nights)} / ${fmt(avail)} nights</div></div>
-      <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">ADR</div><div class="kpi-value">${$c(adr)}</div><div class="kpi-sub">Avg. daily rate</div></div>
-      <div class="kpi" style="--accent:var(--amber)"><div class="kpi-label">RevPAR</div><div class="kpi-value">${$c(revpar)}</div><div class="kpi-sub">Per available night</div></div>`;
-
+      <div class="kpi" style="--accent:${hex}"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${$c(p.roomRev+p.clean+(p.otaAdj||0))}</div><div class="kpi-sub">${p.count} bookings</div></div>
+      <div class="kpi" style="--accent:${hex}"><div class="kpi-label">Room Revenue</div><div class="kpi-value">${$c(p.roomRev)}</div><div class="kpi-sub">Net accommodation fare</div></div>
+      <div class="kpi" style="--accent:#6B7FA0"><div class="kpi-label">Cleaning Fee</div><div class="kpi-value">${$c(p.clean)}</div><div class="kpi-sub">At checkout</div></div>
+      <div class="kpi" style="--accent:#E11D48"><div class="kpi-label">OTA Commission</div><div class="kpi-value">${$c(p.otaComm)}</div><div class="kpi-sub">Channel fees</div></div>
+      <div class="kpi" style="--accent:#D97706"><div class="kpi-label">OTA Adjustment</div><div class="kpi-value">${p.otaAdj<0?'-$'+Math.round(Math.abs(p.otaAdj)).toLocaleString('en-US'):$c(p.otaAdj||0)}</div><div class="kpi-sub">Resolution center</div></div>
+      <div class="kpi" style="--accent:#0EA87A"><div class="kpi-label">Occupancy</div><div class="kpi-value">${pct(occ)}</div><div class="kpi-sub">${fmt(p.nights)} / ${fmt(avail)} nights</div></div>
+      <div class="kpi" style="--accent:#D97706"><div class="kpi-label">ADR</div><div class="kpi-value">${$c(adr)}</div><div class="kpi-sub">Avg. daily rate</div></div>
+      <div class="kpi" style="--accent:#D97706"><div class="kpi-label">RevPAR</div><div class="kpi-value">${$c(revpar)}</div><div class="kpi-sub">Per available night</div></div>`;
     const portChannel={};
     confirmed.filter(r=>getPortfolioFromRes(r)===portfolio).forEach(r=>{
       const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
-      const rev=(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0);
-      if(!portChannel[ch])portChannel[ch]=0;portChannel[ch]+=rev;
+      if(!portChannel[ch])portChannel[ch]=0;portChannel[ch]+=(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0);
     });
-    const chTotal=Object.values(portChannel).reduce((a,b)=>a+b,0);
-    const chColors={Airbnb:'#FF5A5F','Booking.com':'#1A6CFF',Direct:'#F0A500',VRBO:'#00C896'};
-    document.getElementById(ids.channels).innerHTML=`<div class="channel-bars">${Object.entries(portChannel).sort((a,b)=>b[1]-a[1]).map(([ch,rev])=>`<div class="channel-bar-item"><div class="channel-bar-label">${ch}</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${chTotal>0?rev/chTotal*100:0}%;background:${chColors[ch]||'#A78BFA'}"></div></div><div class="channel-bar-val">${$c(rev)}</div><div class="channel-bar-pct">${chTotal>0?Math.round(rev/chTotal*100)+'%':''}</div></div>`).join('')}</div>`;
-
-    _lastPortRenderData[portfolio]={months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc,hexColor,rgbaColor,rgbaFill,ids};
-
-    const fRev=filterMonths(months,portChartPeriods[portfolio].rev);
-    destroyChart(ids.rev);
-    charts[ids.rev]=new Chart(document.getElementById(ids.rev),{type:'bar',data:{labels:fRev.map(monthLabel),datasets:[{data:fRev.map(m=>Math.round(byMonthPortfolio[m]?.[portfolio]||0)),backgroundColor:rgbaColor,borderRadius:4,datalabels:{display:'auto',color:'rgba(237,242,250,0.85)',font:{size:9,family:'DM Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true}}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});
-
-    const fADR=filterMonths(months,portChartPeriods[portfolio].adr);
-    destroyChart(ids.adr);
-    charts[ids.adr]=new Chart(document.getElementById(ids.adr),{type:'line',data:{labels:fADR.map(monthLabel),datasets:[{data:fADR.map(m=>Math.round(byMonthADR[m]?.[portfolio]||0)),borderColor:hexColor,backgroundColor:rgbaFill,tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:hexColor}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({},{},v=>'$'+v)}});
-
-    const fRevPAR=filterMonths(months,portChartPeriods[portfolio].revpar);
-    destroyChart(ids.revpar);
-    charts[ids.revpar]=new Chart(document.getElementById(ids.revpar),{type:'line',data:{labels:fRevPAR.map(monthLabel),datasets:[{data:fRevPAR.map(m=>Math.round(byMonthRevPAR[m]?.[portfolio]||0)),borderColor:'#F0A500',backgroundColor:'rgba(240,165,0,0.06)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#F0A500'}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({},{},v=>'$'+v)}});
-
-    const fOcc=filterMonths(months,portChartPeriods[portfolio].occ);
-    destroyChart(ids.occ);
-    charts[ids.occ]=new Chart(document.getElementById(ids.occ),{type:'line',data:{labels:fOcc.map(monthLabel),datasets:[{data:fOcc.map(m=>Math.round(byMonthOcc[m]?.[portfolio]||0)),borderColor:hexColor,backgroundColor:rgbaFill,tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:hexColor}]},options:{...CHART_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+'%'}}},scales:mkScales({},{min:0,max:100},v=>v+'%')}});
-
-    renderOccUnits(ids.occUnits,portfolio,unitCount);
+    renderChannelBars(ids.channels,portChannel);
+    _lastPortRenderData[portfolio]={months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc,hex,rgba,fill,ids};
+    // Draw all port charts
+    ['rev','adr','revpar','occ'].forEach(t=>redrawPortChart(portfolio,t));
+    renderOccUnits(ids.occUnits,portfolio,diffDays,byUnit,allListings);
   }
 
-  buildPortDashboard('3700M','cobalt','var(--cobalt)',dynUnits3700,{kpi:'kpi3700',channels:'channelBars3700',rev:'chartRev3700',adr:'chartADR3700',revpar:'chartRevPAR3700',occ:'chartOcc3700',occUnits:'occUnits3700b'});
-  buildPortDashboard('Bayou Park','jade','var(--jade)',dynUnitsBP,{kpi:'kpiBP',channels:'channelBarsBP',rev:'chartRevBP',adr:'chartADRBP',revpar:'chartRevPARBP',occ:'chartOccBP',occUnits:'occUnitsBPb'});
+  buildPortDash('3700M','pc-blue','#2563EB','#3B7CFF','rgba(37,99,235,0.82)','rgba(37,99,235,0.06)',du3,{kpi:'kpi3700',channels:'channelBars3700',rev:'chartRev3700',adr:'chartADR3700',revpar:'chartRevPAR3700',occ:'chartOcc3700',occUnits:'occUnits3700b'});
+  buildPortDash('Bayou Park','pc-teal','#0EA87A','#2DD4A0','rgba(14,168,122,0.82)','rgba(14,168,122,0.05)',duBP,{kpi:'kpiBP',channels:'channelBarsBP',rev:'chartRevBP',adr:'chartADRBP',revpar:'chartRevPARBP',occ:'chartOccBP',occUnits:'occUnitsBPb'});
 
+  // Bookings table — dates in US format
   const sorted=[...reservations].sort((a,b)=>(b.checkIn||'').localeCompare(a.checkIn||''));
   document.querySelector('#tblBookings tbody').innerHTML=sorted.slice(0,500).map(r=>{
-    const roomRev=r.money?.fareAccommodation||0,clean=r.money?.fareCleaning||0;
-    const otaAdj=r.money?.resolutionAmount||0,otaComm=Math.abs(r.money?.hostServiceFee||0);
+    const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oa=r.money?.resolutionAmount||0,oc=Math.abs(r.money?.hostServiceFee||0);
     const prop=(r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
-    const ci=r.checkIn?r.checkIn.split('T')[0]:'—',co=r.checkOut?r.checkOut.split('T')[0]:'—';
+    const ci=r.checkIn?fmtDateUS(r.checkIn):'—',co=r.checkOut?fmtDateUS(r.checkOut):'—';
     const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
-    const st=r.status||'confirmed',badge=st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok';
-    return`<tr><td>${prop}</td><td>${r.guest?.fullName||'—'}</td><td>${ci}</td><td>${co}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td><span class="badge ${badge}">${st==='cancelled'?'Cancelled':st==='inquiry'?'Inquiry':'Confirmed'}</span></td><td class="num">${$c(roomRev)}</td><td class="num">${$c(clean)}</td><td class="num">${otaAdj!==0?$c(otaAdj):'—'}</td><td class="num">${$c(roomRev+clean+otaAdj)}</td><td class="num">${$c(otaComm)}</td></tr>`;
+    const st=r.status||'confirmed',bc=st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok';
+    return`<tr><td>${prop}</td><td>${r.guest?.fullName||'—'}</td><td>${ci}</td><td>${co}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td><span class="badge ${bc}">${st==='cancelled'?'Cancelled':st==='inquiry'?'Inquiry':'Confirmed'}</span></td><td class="num">${$c(rr)}</td><td class="num">${$c(cl)}</td><td class="num">${oa!==0?$c(oa):'—'}</td><td class="num">${$c(rr+cl+oa)}</td><td class="num">${$c(oc)}</td></tr>`;
   }).join('');
 
+  // Pipeline
   const today=new Date().toISOString().split('T')[0];
   const upcoming=reservations.filter(r=>r.status!=='cancelled'&&r.checkIn&&r.checkIn.split('T')[0]>=today).sort((a,b)=>(a.checkIn||'').localeCompare(b.checkIn||''));
   const pipelineByMonth={};
-  upcoming.forEach(r=>{
-    const ym=(r.checkIn||'').substring(0,7);if(!ym)return;
-    const portfolio=getPortfolioFromRes(r);
-    if(!pipelineByMonth[ym])pipelineByMonth[ym]={'3700M':0,'Bayou Park':0};
-    if(pipelineByMonth[ym][portfolio]!==undefined)pipelineByMonth[ym][portfolio]+=r.money?.fareAccommodation||0;
-  });
-  const pipeMonths=Object.keys(pipelineByMonth).sort(),pipeLabels=pipeMonths.map(monthLabel);
-  const pipe3700Rev=upcoming.filter(r=>getPortfolioFromRes(r)==='3700M').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
-  const pipeBPRev=upcoming.filter(r=>getPortfolioFromRes(r)==='Bayou Park').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
-  const pipeClean=upcoming.reduce((a,r)=>a+(r.money?.fareCleaning||0),0);
-  const pipeComm=upcoming.reduce((a,r)=>a+Math.abs(r.money?.hostServiceFee||0),0);
-  const pipeNights=upcoming.reduce((a,r)=>a+(r.nightsCount||0),0);
+  upcoming.forEach(r=>{const ym=(r.checkIn||'').substring(0,7);if(!ym)return;const pf=getPortfolioFromRes(r);if(!pipelineByMonth[ym])pipelineByMonth[ym]={'3700M':0,'Bayou Park':0};if(pipelineByMonth[ym][pf]!==undefined)pipelineByMonth[ym][pf]+=r.money?.fareAccommodation||0;});
+  const pM=Object.keys(pipelineByMonth).sort(),pL=pM.map(monthLabel);
+  const p3Rev=upcoming.filter(r=>getPortfolioFromRes(r)==='3700M').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
+  const pBRev=upcoming.filter(r=>getPortfolioFromRes(r)==='Bayou Park').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
+  const pCl=upcoming.reduce((a,r)=>a+(r.money?.fareCleaning||0),0);
+  const pCom=upcoming.reduce((a,r)=>a+Math.abs(r.money?.hostServiceFee||0),0);
+  const pNi=upcoming.reduce((a,r)=>a+(r.nightsCount||0),0);
 
-  function revBetweenDays(res,f,t){
+  function revBtwDays(res,f,t){
     const n=new Date();n.setHours(0,0,0,0);
-    const start=new Date(n);start.setDate(start.getDate()+f);
-    const end=new Date(n);end.setDate(end.getDate()+t);
-    let total=0;
-    res.forEach(r=>{
-      const ci=new Date(r.checkIn);ci.setHours(0,0,0,0);const co=new Date(r.checkOut);co.setHours(0,0,0,0);
-      const tn=Math.max(1,Math.round((co-ci)/86400000));
-      const dailyRate=((r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0))/tn;
-      let cur=new Date(Math.max(ci,start));
-      while(cur<co&&cur<end){total+=dailyRate;cur.setDate(cur.getDate()+1);}
-    });
-    return total;
+    const s=new Date(n);s.setDate(s.getDate()+f);const e=new Date(n);e.setDate(e.getDate()+t);
+    let total=0;res.forEach(r=>{const ci=new Date(r.checkIn);ci.setHours(0,0,0,0);const co=new Date(r.checkOut);co.setHours(0,0,0,0);const tn=Math.max(1,Math.round((co-ci)/86400000));const dr=((r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0))/tn;let cur=new Date(Math.max(ci,s));while(cur<co&&cur<e){total+=dr;cur.setDate(cur.getDate()+1);}});return total;
   }
 
   document.getElementById('kpiPipeline').innerHTML=`
-    <div class="kpi" style="--accent:var(--cobalt)"><div class="kpi-label">Total Pipeline</div><div class="kpi-value">${$c(pipe3700Rev+pipeBPRev+pipeClean)}</div><div class="kpi-sub">${upcoming.length} upcoming bookings</div></div>
-    <div class="kpi" style="--accent:var(--cobalt)"><div class="kpi-label">Days 0–30</div><div class="kpi-value">${$c(revBetweenDays(upcoming,0,30))}</div><div class="kpi-sub">Confirmed revenue</div></div>
-    <div class="kpi" style="--accent:var(--cobalt)"><div class="kpi-label">Days 31–60</div><div class="kpi-value">${$c(revBetweenDays(upcoming,30,60))}</div><div class="kpi-sub">Confirmed revenue</div></div>
-    <div class="kpi" style="--accent:var(--cobalt)"><div class="kpi-label">Days 61–90</div><div class="kpi-value">${$c(revBetweenDays(upcoming,60,90))}</div><div class="kpi-sub">Confirmed revenue</div></div>
-    <div class="kpi" style="--accent:var(--jade)"><div class="kpi-label">Nights Booked</div><div class="kpi-value">${fmt(pipeNights)}</div><div class="kpi-sub">Upcoming nights</div></div>
-    <div class="kpi" style="--accent:var(--crimson)"><div class="kpi-label">OTA Commission</div><div class="kpi-value">${$c(pipeComm)}</div><div class="kpi-sub">On upcoming bookings</div></div>`;
+    <div class="kpi" style="--accent:#2563EB"><div class="kpi-label">Total Pipeline</div><div class="kpi-value">${$c(p3Rev+pBRev+pCl)}</div><div class="kpi-sub">${upcoming.length} upcoming bookings</div></div>
+    <div class="kpi" style="--accent:#2563EB"><div class="kpi-label">Days 0–30</div><div class="kpi-value">${$c(revBtwDays(upcoming,0,30))}</div><div class="kpi-sub">Confirmed revenue</div></div>
+    <div class="kpi" style="--accent:#2563EB"><div class="kpi-label">Days 31–60</div><div class="kpi-value">${$c(revBtwDays(upcoming,30,60))}</div><div class="kpi-sub">Confirmed revenue</div></div>
+    <div class="kpi" style="--accent:#2563EB"><div class="kpi-label">Days 61–90</div><div class="kpi-value">${$c(revBtwDays(upcoming,60,90))}</div><div class="kpi-sub">Confirmed revenue</div></div>
+    <div class="kpi" style="--accent:#0EA87A"><div class="kpi-label">Nights Booked</div><div class="kpi-value">${fmt(pNi)}</div><div class="kpi-sub">Upcoming nights</div></div>
+    <div class="kpi" style="--accent:#E11D48"><div class="kpi-label">OTA Commission</div><div class="kpi-value">${$c(pCom)}</div><div class="kpi-sub">On upcoming bookings</div></div>`;
 
-  document.getElementById('legendPipeline').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:var(--cobalt)"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:var(--jade)"></div>Bayou Park</div>`;
+  document.getElementById('legendPipeline').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:#3B7CFF"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:#2DD4A0"></div>Bayou Park</div>`;
   destroyChart('pipeline');
-  charts.pipeline=new Chart(document.getElementById('chartPipeline'),{type:'bar',data:{labels:pipeLabels,datasets:[
-    {label:'3700M',data:pipeMonths.map(m=>Math.round(pipelineByMonth[m]['3700M']||0)),backgroundColor:'rgba(26,108,255,0.85)',borderRadius:4,datalabels:{display:'auto',color:'rgba(237,242,250,0.85)',font:{size:9,family:'DM Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true}},
-    {label:'Bayou Park',data:pipeMonths.map(m=>Math.round(pipelineByMonth[m]['Bayou Park']||0)),backgroundColor:'rgba(0,200,150,0.85)',borderRadius:4,datalabels:{display:'auto',color:'rgba(237,242,250,0.85)',font:{size:9,family:'DM Mono',weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true}}
+  charts.pipeline=new Chart(document.getElementById('chartPipeline'),{type:'bar',data:{labels:pL,datasets:[
+    {label:'3700M',data:pM.map(m=>Math.round(pipelineByMonth[m]['3700M']||0)),backgroundColor:'rgba(37,99,235,0.82)',borderRadius:4,datalabels:DL_BAR},
+    {label:'Bayou Park',data:pM.map(m=>Math.round(pipelineByMonth[m]['Bayou Park']||0)),backgroundColor:'rgba(14,168,122,0.82)',borderRadius:4,datalabels:DL_BAR}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+$c(ctx.parsed.y)}}},scales:mkScales({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});
 
-  const portTotal=pipe3700Rev+pipeBPRev||1;
-  const pipe3700Count=upcoming.filter(r=>getPortfolioFromRes(r)==='3700M').length;
-  const pipeBPCount=upcoming.filter(r=>getPortfolioFromRes(r)==='Bayou Park').length;
-  document.getElementById('pipelinePortBars').innerHTML=`<div class="channel-bars" style="margin-top:16px"><div class="channel-bar-item"><div class="channel-bar-label" style="color:var(--cobalt)">3700M</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${pipe3700Rev/portTotal*100}%;background:var(--cobalt)"></div></div><div class="channel-bar-val">${$c(pipe3700Rev)}</div><div class="channel-bar-pct">${pipe3700Count} bkgs</div></div><div class="channel-bar-item"><div class="channel-bar-label" style="color:var(--jade)">Bayou Park</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${pipeBPRev/portTotal*100}%;background:var(--jade)"></div></div><div class="channel-bar-val">${$c(pipeBPRev)}</div><div class="channel-bar-pct">${pipeBPCount} bkgs</div></div></div>`;
+  const portTotal=p3Rev+pBRev||1;
+  const p3C=upcoming.filter(r=>getPortfolioFromRes(r)==='3700M').length;
+  const pBC=upcoming.filter(r=>getPortfolioFromRes(r)==='Bayou Park').length;
+  document.getElementById('pipelinePortBars').innerHTML=`<div class="channel-bars" style="margin-top:8px"><div class="channel-bar-item"><div class="channel-bar-label" style="color:#3B7CFF">3700M</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${p3Rev/portTotal*100}%;background:#3B7CFF"></div></div><div class="channel-bar-val">${$c(p3Rev)}</div><div class="channel-bar-pct">${p3C} bkgs</div></div><div class="channel-bar-item"><div class="channel-bar-label" style="color:#2DD4A0">Bayou Park</div><div class="channel-bar-track"><div class="channel-bar-fill" style="width:${pBRev/portTotal*100}%;background:#2DD4A0"></div></div><div class="channel-bar-val">${$c(pBRev)}</div><div class="channel-bar-pct">${pBC} bkgs</div></div></div>`;
 
+  // Pipeline table — dates in US format
   document.querySelector('#tblPipeline tbody').innerHTML=upcoming.slice(0,200).map(r=>{
-    const roomRev=r.money?.fareAccommodation||0,clean=r.money?.fareCleaning||0,otaComm=Math.abs(r.money?.hostServiceFee||0);
+    const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oc=Math.abs(r.money?.hostServiceFee||0);
     const prop=(r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
-    const ci=r.checkIn?r.checkIn.split('T')[0]:'—',co=r.checkOut?r.checkOut.split('T')[0]:'—';
+    const ci=r.checkIn?fmtDateUS(r.checkIn):'—',co=r.checkOut?fmtDateUS(r.checkOut):'—';
     const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
-    const daysUntil=Math.ceil((new Date(ci)-new Date())/86400000);
-    const daysLabel=daysUntil===0?'<span style="color:var(--amber)">Today</span>':daysUntil===1?'<span style="color:var(--amber)">Tomorrow</span>':`<span style="color:var(--fog)">in ${daysUntil}d</span>`;
-    return`<tr><td>${prop}</td><td>${r.guest?.fullName||'—'}</td><td>${ci} ${daysLabel}</td><td>${co}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td class="num">${$c(roomRev)}</td><td class="num">${$c(clean)}</td><td class="num">${$c(roomRev+clean)}</td><td class="num">${$c(otaComm)}</td></tr>`;
+    const du=Math.ceil((new Date(r.checkIn)-new Date())/86400000);
+    const dl=du===0?'<span style="color:#D97706">Today</span>':du===1?'<span style="color:#D97706">Tomorrow</span>':`<span style="color:#6B7FA0">in ${du}d</span>`;
+    return`<tr><td>${prop}</td><td>${r.guest?.fullName||'—'}</td><td>${ci} ${dl}</td><td>${co}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td class="num">${$c(rr)}</td><td class="num">${$c(cl)}</td><td class="num">${$c(rr+cl)}</td><td class="num">${$c(oc)}</td></tr>`;
   }).join('');
 
   document.getElementById('main').style.display='block';
@@ -1200,116 +1136,118 @@ function render(reservations,from,to,prev,allListings){
   renderSummaryTable();
 }
 
+// ── Summary table renderer ───────────────────────────────────────
 function renderSummaryTable(){
   if(!_lastRenderData||!_lastSummaryData)return;
   const{months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc}=_lastRenderData;
   const{byMonthClean3700,byMonthCleanBP,byMonthOtaAdj3700,byMonthOtaAdjBP,byMonthOtaComm3700,byMonthOtaCommBP,byMonthNights3700,byMonthNightsBP,units3700,unitsBP}=_lastSummaryData;
-  const filteredMonths=filterMonths(months,summaryPeriod);
-  const fmt$=v=>v===0?'-':'$'+Math.round(Math.abs(v)).toLocaleString('en-US');
-  const fmtPct=v=>v===0?'-':Math.round(v*100)+'%';
-  const fmtN=v=>v===0?'-':Math.round(v).toLocaleString('en-US');
-  const fmtNeg=v=>{if(v===0)return'-';const s='$'+Math.round(Math.abs(v)).toLocaleString('en-US');return v<0?'<span class="summary-negative">('+s+')</span>':s;};
-  const monthCols=filteredMonths.map(m=>{const[y,mo]=m.split('-');return new Date(+y,+mo-1).toLocaleString('en',{month:'short',year:'2-digit'});});
-  const dIM=filteredMonths.map(m=>{const[y,mo]=m.split('-');return new Date(+y,+mo,0).getDate();});
-  const header=`<tr><th>Monthly</th>${filteredMonths.map((m,i)=>`<th>${dIM[i]}<br><span style="font-weight:400">${monthCols[i]}</span></th>`).join('')}</tr>`;
+  const fm=filterMonths(months,summaryPeriod);
+  const f$=v=>v===0?'—':'$'+Math.round(Math.abs(v)).toLocaleString('en-US');
+  const fP=v=>v===0?'—':Math.round(v*100)+'%';
+  const fN=v=>v===0?'—':Math.round(v).toLocaleString('en-US');
+  const fNeg=v=>{if(v===0)return'—';const s='$'+Math.round(Math.abs(v)).toLocaleString('en-US');return v<0?'<span class="summary-negative">('+s+')</span>':s;};
+  const mLabels=fm.map(m=>{const[y,mo]=m.split('-');return new Date(+y,+mo-1).toLocaleString('en-US',{month:'short',year:'2-digit'});});
+  const dIM=fm.map(m=>{const[y,mo]=m.split('-');return new Date(+y,+mo,0).getDate();});
+  const hdr=`<tr><th>Metric</th>${fm.map((m,i)=>`<th>${dIM[i]}d<br><span style="font-weight:400;letter-spacing:0">${mLabels[i]}</span></th>`).join('')}</tr>`;
 
-  function portRows(port,hexColor,unitCount,byMonthRev,byMonthClean,byMonthOtaAdj,byMonthOtaComm,byMonthNights){
+  function portRows(port,color,uc,bMR,bMCl,bMOA,bMOC,bMN){
     const rows=[
-      {label:'Units',vals:filteredMonths.map(()=>unitCount),fmt:v=>v},
-      {label:'Available Nights',vals:filteredMonths.map((m,i)=>dIM[i]*unitCount),fmt:fmtN},
-      {label:'Occupied Nights',vals:filteredMonths.map(m=>byMonthNights[m]||0),fmt:fmtN},
-      {label:'Occupancy',vals:filteredMonths.map((m,i)=>{const avail=dIM[i]*unitCount;return avail>0?(byMonthNights[m]||0)/avail:0;}),fmt:fmtPct},
-      {label:'ADR',vals:filteredMonths.map(m=>byMonthADR[m]?.[port]||0),fmt:fmt$},
-      {label:'RevPAR',vals:filteredMonths.map(m=>byMonthRevPAR[m]?.[port]||0),fmt:fmt$},
-      {label:'Room Revenue',vals:filteredMonths.map(m=>byMonthRev[m]?.[port]||0),fmt:fmt$,bold:true},
-      {label:'Cleaning Fee',vals:filteredMonths.map(m=>byMonthClean[m]||0),fmt:fmt$},
-      {label:'OTA Adjustment',vals:filteredMonths.map(m=>byMonthOtaAdj[m]||0),fmt:fmtNeg,html:true},
-      {label:'Total Revenue',vals:filteredMonths.map(m=>(byMonthRev[m]?.[port]||0)+(byMonthClean[m]||0)+(byMonthOtaAdj[m]||0)),fmt:fmt$,total:true},
-      {label:'OTA Commission',vals:filteredMonths.map(m=>byMonthOtaComm[m]||0),fmt:fmtNeg,html:true},
+      {l:'Units',v:fm.map(()=>uc),f:v=>v},
+      {l:'Available Nights',v:fm.map((m,i)=>dIM[i]*uc),f:fN},
+      {l:'Occupied Nights',v:fm.map(m=>bMN[m]||0),f:fN},
+      {l:'Occupancy',v:fm.map((m,i)=>{const a=dIM[i]*uc;return a>0?(bMN[m]||0)/a:0;}),f:fP},
+      {l:'ADR',v:fm.map(m=>byMonthADR[m]?.[port]||0),f:f$},
+      {l:'RevPAR',v:fm.map(m=>byMonthRevPAR[m]?.[port]||0),f:f$},
+      {l:'Room Revenue',v:fm.map(m=>bMR[m]?.[port]||0),f:f$,bold:true},
+      {l:'Cleaning Fee',v:fm.map(m=>bMCl[m]||0),f:f$},
+      {l:'OTA Adjustment',v:fm.map(m=>bMOA[m]||0),f:fNeg,html:true},
+      {l:'Total Revenue',v:fm.map(m=>(bMR[m]?.[port]||0)+(bMCl[m]||0)+(bMOA[m]||0)),f:f$,total:true},
+      {l:'OTA Commission',v:fm.map(m=>bMOC[m]||0),f:fNeg,html:true},
     ];
-    return`<tr class="summary-section-header"><td colspan="${filteredMonths.length+1}" style="color:${hexColor} !important">${port}</td></tr>`+rows.map(row=>`<tr class="${row.total?'summary-total-row':''}"><td style="${row.bold?'font-weight:600;color:var(--snow)':''}">${row.label}</td>${row.vals.map(v=>`<td>${row.fmt(v)}</td>`).join('')}</tr>`).join('');
+    return`<tr class="summary-section-header"><td colspan="${fm.length+1}" style="color:${color}!important">${port}</td></tr>`+rows.map(r=>`<tr class="${r.total?'summary-total-row':''}"><td style="${r.bold?'font-weight:600;color:var(--white)':''}">${r.l}</td>${r.v.map(v=>`<td>${r.f(v)}</td>`).join('')}</tr>`).join('');
   }
-
-  const spacer=`<tr><td colspan="${filteredMonths.length+1}" style="height:8px;background:var(--ink)"></td></tr>`;
-  document.getElementById('summaryTable').innerHTML=`<div class="summary-wrap"><table class="summary-table"><thead>${header}</thead><tbody>
-    ${portRows('3700M','var(--cobalt)',units3700,byMonthPortfolio,byMonthClean3700,byMonthOtaAdj3700,byMonthOtaComm3700,byMonthNights3700)}
-    ${spacer}
-    ${portRows('Bayou Park','var(--jade)',unitsBP,byMonthPortfolio,byMonthCleanBP,byMonthOtaAdjBP,byMonthOtaCommBP,byMonthNightsBP)}
-  </tbody></table></div>`;
+  const spacer=`<tr><td colspan="${fm.length+1}" style="height:6px;background:var(--bg)"></td></tr>`;
+  document.getElementById('summaryTable').innerHTML=`<div class="summary-wrap"><table class="summary-table"><thead>${hdr}</thead><tbody>${portRows('3700M','#3B7CFF',units3700,byMonthPortfolio,byMonthClean3700,byMonthOtaAdj3700,byMonthOtaComm3700,byMonthNights3700)}${spacer}${portRows('Bayou Park','#2DD4A0',unitsBP,byMonthPortfolio,byMonthCleanBP,byMonthOtaAdjBP,byMonthOtaCommBP,byMonthNightsBP)}</tbody></table></div>`;
 }
 
+// ── PDF export ───────────────────────────────────────────────────
 async function exportPDF(){
   const from=document.getElementById('df').value,to=document.getElementById('dt').value;
-  const btn=document.getElementById('btnPDF');
-  btn.textContent='⏳ Generating...';btn.disabled=true;
+  const btn=document.getElementById('btnPDF');btn.textContent='⏳ Generating…';btn.disabled=true;
   try{
     const{jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-    const W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight(),margin=14;
-    const DARK=[10,13,18],COBALT=[26,108,255],JADE=[0,200,150],AMBER=[240,165,0],RED=[255,77,106];
-    const TEXT=[237,242,250],TEXT2=[168,187,207],TEXT3=[136,152,180],BG2=[24,30,42],BG3=[30,39,54],BORDER=[42,52,65];
-    const fmt$=v=>'$'+Math.round(Math.abs(v)).toLocaleString('en-US');
-    const fmtPct=v=>Math.round(v*100)+'%';
+    const W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight(),mg=14;
+    const INK=[7,9,14],S1=[13,16,23],S2=[17,21,32],BLUE=[37,99,235],TEAL=[14,168,122],GOLD=[217,119,6],RED=[225,29,72];
+    const TXT=[236,242,250],TXT2=[148,163,184],TXT3=[107,127,160],BORD=[42,52,65];
+    const f$=v=>'$'+Math.round(Math.abs(v)).toLocaleString('en-US');
+    const fP=v=>Math.round(v*100)+'%';
+    const fUS=iso=>{if(!iso)return'—';const[y,m,d]=iso.split('-');return`${m}/${d}/${y}`;};
 
-    function addPage(title,subtitle){
-      pdf.setFillColor(...DARK);pdf.rect(0,0,W,H,'F');
-      pdf.setFillColor(...BG2);pdf.rect(0,0,W,14,'F');
-      pdf.setFillColor(...COBALT);pdf.roundedRect(margin,3,8,8,1.5,1.5,'F');
-      pdf.setTextColor(255,255,255);pdf.setFontSize(6);pdf.setFont('helvetica','bold');pdf.text('US',margin+4,8.2,{align:'center'});
-      pdf.setTextColor(...TEXT);pdf.setFontSize(8);pdf.setFont('helvetica','bold');pdf.text('US Living',margin+11,7.5);
-      pdf.setTextColor(...TEXT3);pdf.setFontSize(6);pdf.setFont('helvetica','normal');pdf.text('Revenue Intelligence',margin+11,11);
-      pdf.setTextColor(...TEXT);pdf.setFontSize(9);pdf.setFont('helvetica','bold');pdf.text(title,W/2,8,{align:'center'});
-      if(subtitle){pdf.setTextColor(...TEXT3);pdf.setFontSize(6);pdf.setFont('helvetica','normal');pdf.text(subtitle,W/2,12,{align:'center'});}
-      pdf.setTextColor(...TEXT2);pdf.setFontSize(6.5);pdf.text(from+' → '+to,W-margin,8,{align:'right'});
-      pdf.setDrawColor(...BORDER);pdf.setLineWidth(0.3);pdf.line(margin,14,W-margin,14);
+    function addPage(title,sub){
+      pdf.setFillColor(...INK);pdf.rect(0,0,W,H,'F');
+      pdf.setFillColor(...S1);pdf.rect(0,0,W,14,'F');
+      pdf.setFillColor(...BLUE);pdf.roundedRect(mg,3,8,8,1.5,1.5,'F');
+      pdf.setTextColor(255,255,255);pdf.setFontSize(6);pdf.setFont('helvetica','bold');pdf.text('US',mg+4,8.2,{align:'center'});
+      pdf.setTextColor(...TXT);pdf.setFontSize(8);pdf.setFont('helvetica','bold');pdf.text('US Living',mg+11,7.5);
+      pdf.setTextColor(...TXT3);pdf.setFontSize(5.5);pdf.setFont('helvetica','normal');pdf.text('Revenue Intelligence',mg+11,11.2);
+      pdf.setTextColor(...TXT);pdf.setFontSize(9);pdf.setFont('helvetica','bold');pdf.text(title,W/2,8,{align:'center'});
+      if(sub){pdf.setTextColor(...TXT3);pdf.setFontSize(6);pdf.setFont('helvetica','normal');pdf.text(sub,W/2,12,{align:'center'});}
+      pdf.setTextColor(...TXT2);pdf.setFontSize(6.5);pdf.text(fUS(from)+' – '+fUS(to),W-mg,8,{align:'right'});
+      pdf.setDrawColor(...BORD);pdf.setLineWidth(0.25);pdf.line(mg,14,W-mg,14);
     }
 
     if(!_lastRenderData||!_lastSummaryData){alert('Load data first');return;}
-    const{months,byMonthPortfolio,byMonthADR,byMonthRevPAR,byMonthOcc}=_lastRenderData;
+    const{months,byMonthPortfolio}=_lastRenderData;
     const{byMonthClean3700,byMonthCleanBP,byMonthOtaAdj3700,byMonthOtaAdjBP,byMonthOtaComm3700,byMonthOtaCommBP,byMonthNights3700,byMonthNightsBP}=_lastSummaryData;
-    const p3700={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0},pBP={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0};
+    const p3={rr:0,cl:0,oa:0,oc:0,ni:0},pB={rr:0,cl:0,oa:0,oc:0,ni:0};
     months.forEach(m=>{
-      p3700.roomRev+=byMonthPortfolio[m]?.['3700M']||0;p3700.clean+=byMonthClean3700[m]||0;p3700.otaAdj+=byMonthOtaAdj3700[m]||0;p3700.otaComm+=byMonthOtaComm3700[m]||0;p3700.nights+=byMonthNights3700[m]||0;
-      pBP.roomRev+=byMonthPortfolio[m]?.['Bayou Park']||0;pBP.clean+=byMonthCleanBP[m]||0;pBP.otaAdj+=byMonthOtaAdjBP[m]||0;pBP.otaComm+=byMonthOtaCommBP[m]||0;pBP.nights+=byMonthNightsBP[m]||0;
+      p3.rr+=byMonthPortfolio[m]?.['3700M']||0;p3.cl+=byMonthClean3700[m]||0;p3.oa+=byMonthOtaAdj3700[m]||0;p3.oc+=byMonthOtaComm3700[m]||0;p3.ni+=byMonthNights3700[m]||0;
+      pB.rr+=byMonthPortfolio[m]?.['Bayou Park']||0;pB.cl+=byMonthCleanBP[m]||0;pB.oa+=byMonthOtaAdjBP[m]||0;pB.oc+=byMonthOtaCommBP[m]||0;pB.ni+=byMonthNightsBP[m]||0;
     });
     const days=Math.max(1,Math.ceil((new Date(to)-new Date(from))/86400000)+1);
-    const avail3700=UNITS_3700M*days,availBP=UNITS_BP*days;
-    const occ3700=avail3700>0?p3700.nights/avail3700:0,occBP=availBP>0?pBP.nights/availBP:0;
-    const adr3700=p3700.nights>0?p3700.roomRev/p3700.nights:0,adrBP=pBP.nights>0?pBP.roomRev/pBP.nights:0;
+    const a3=UNITS_3700M*days,aB=UNITS_BP*days;
+    const o3=a3>0?p3.ni/a3:0,oB=aB>0?pB.ni/aB:0;
+    const adr3=p3.ni>0?p3.rr/p3.ni:0,adrB=pB.ni>0?pB.rr/pB.ni:0;
 
     addPage('Revenue Overview','Combined Portfolio Performance');
-    let cy=20;
-    const kpiW=(W-margin*2-9)/4,kpiH=20;
-    [{label:'Total Revenue',value:fmt$(p3700.roomRev+p3700.clean+p3700.otaAdj+pBP.roomRev+pBP.clean+pBP.otaAdj),sub:'Room + Cleaning + Adj',color:COBALT},{label:'Room Revenue',value:fmt$(p3700.roomRev+pBP.roomRev),sub:'Net accommodation fare',color:COBALT},{label:'Cleaning Fee',value:fmt$(p3700.clean+pBP.clean),sub:'At checkout',color:TEXT2},{label:'OTA Commission',value:fmt$(p3700.otaComm+pBP.otaComm),sub:'Channel commission',color:RED}].forEach((k,i)=>{
-      pdf.setFillColor(...BG2);pdf.roundedRect(margin+i*(kpiW+3),cy,kpiW,kpiH,2,2,'F');
-      pdf.setFillColor(...k.color);pdf.rect(margin+i*(kpiW+3),cy,kpiW,0.8,'F');
-      pdf.setTextColor(...TEXT3);pdf.setFontSize(5.5);pdf.setFont('helvetica','bold');pdf.text(k.label.toUpperCase(),margin+i*(kpiW+3)+4,cy+5);
-      pdf.setTextColor(...TEXT);pdf.setFontSize(11);pdf.setFont('helvetica','bold');pdf.text(k.value,margin+i*(kpiW+3)+4,cy+12);
-      if(k.sub){pdf.setTextColor(...TEXT3);pdf.setFontSize(5);pdf.setFont('helvetica','normal');pdf.text(k.sub,margin+i*(kpiW+3)+4,cy+16);}
+    let cy=20;const kW=(W-mg*2-9)/4,kH=20;
+
+    const kpis=[
+      {l:'Total Revenue',v:f$(p3.rr+p3.cl+p3.oa+pB.rr+pB.cl+pB.oa),c:BLUE},
+      {l:'Room Revenue',v:f$(p3.rr+pB.rr),c:BLUE},
+      {l:'Cleaning Fee',v:f$(p3.cl+pB.cl),c:TXT2},
+      {l:'OTA Commission',v:f$(p3.oc+pB.oc),c:RED},
+      {l:'Occupancy',v:fP((p3.ni+pB.ni)/(a3+aB)),c:TEAL},
+      {l:'ADR',v:f$((p3.ni+pB.ni)>0?(p3.rr+pB.rr)/(p3.ni+pB.ni):0),c:GOLD},
+      {l:'RevPAR',v:f$((p3.rr+pB.rr)/(a3+aB)),c:GOLD},
+      {l:'OTA Adjustment',v:f$(p3.oa+pB.oa),c:GOLD}
+    ];
+    kpis.forEach((k,i)=>{
+      const row=Math.floor(i/4),col=i%4,x=mg+col*(kW+3),y=cy+row*(kH+3);
+      pdf.setFillColor(...S1);pdf.roundedRect(x,y,kW,kH,1.5,1.5,'F');
+      pdf.setFillColor(...k.c);pdf.rect(x,y,kW,0.7,'F');
+      pdf.setTextColor(...TXT3);pdf.setFontSize(5.5);pdf.setFont('helvetica','bold');pdf.text(k.l.toUpperCase(),x+4,y+5);
+      pdf.setTextColor(...TXT);pdf.setFontSize(11);pdf.setFont('helvetica','bold');pdf.text(k.v,x+4,y+13);
     });
-    cy+=kpiH+3;
-    [{label:'Occupancy',value:fmtPct((p3700.nights+pBP.nights)/(avail3700+availBP)),color:JADE},{label:'ADR',value:fmt$((p3700.nights+pBP.nights)>0?(p3700.roomRev+pBP.roomRev)/(p3700.nights+pBP.nights):0),color:AMBER},{label:'RevPAR',value:fmt$((p3700.roomRev+pBP.roomRev)/(avail3700+availBP)),color:AMBER},{label:'OTA Adjustment',value:(p3700.otaAdj+pBP.otaAdj)<0?'('+fmt$(p3700.otaAdj+pBP.otaAdj)+')':fmt$(p3700.otaAdj+pBP.otaAdj),color:AMBER}].forEach((k,i)=>{
-      pdf.setFillColor(...BG2);pdf.roundedRect(margin+i*(kpiW+3),cy,kpiW,kpiH,2,2,'F');
-      pdf.setFillColor(...k.color);pdf.rect(margin+i*(kpiW+3),cy,kpiW,0.8,'F');
-      pdf.setTextColor(...TEXT3);pdf.setFontSize(5.5);pdf.setFont('helvetica','bold');pdf.text(k.label.toUpperCase(),margin+i*(kpiW+3)+4,cy+5);
-      pdf.setTextColor(...TEXT);pdf.setFontSize(11);pdf.setFont('helvetica','bold');pdf.text(k.value,margin+i*(kpiW+3)+4,cy+12);
+    cy+=kH*2+3*3+8;
+    const pW=(W-mg*2-4)/2;
+    [{port:'3700M',c:BLUE,sub:'Dallas — McKinney Ave · '+UNITS_3700M+' units',st:[{l:'OCC',v:fP(o3)},{l:'ADR',v:f$(adr3)},{l:'RevPAR',v:f$(a3>0?p3.rr/a3:0)},{l:'Room Rev.',v:f$(p3.rr)},{l:'Total Rev.',v:f$(p3.rr+p3.cl+p3.oa)}]},{port:'Bayou Park',c:TEAL,sub:'Houston — Montrose / Midtown · '+UNITS_BP+' units',st:[{l:'OCC',v:fP(oB)},{l:'ADR',v:f$(adrB)},{l:'RevPAR',v:f$(aB>0?pB.rr/aB:0)},{l:'Room Rev.',v:f$(pB.rr)},{l:'Total Rev.',v:f$(pB.rr+pB.cl+pB.oa)}]}].forEach((pc,i)=>{
+      const x=mg+i*(pW+4);
+      pdf.setFillColor(...S1);pdf.roundedRect(x,cy,pW,22,2,2,'F');
+      pdf.setDrawColor(...pc.c);pdf.setLineWidth(0.5);pdf.roundedRect(x,cy,pW,22,2,2,'S');
+      pdf.setFillColor(...pc.c);pdf.rect(x,cy,2,22,'F');
+      pdf.setTextColor(...pc.c);pdf.setFontSize(8);pdf.setFont('helvetica','bold');pdf.text(pc.port,x+7,cy+7);
+      pdf.setTextColor(...TXT3);pdf.setFontSize(5.5);pdf.setFont('helvetica','normal');pdf.text(pc.sub,x+7,cy+11.5);
+      const sw=(pW-12)/pc.st.length;
+      pc.st.forEach((s,j)=>{const sx=x+7+j*sw;pdf.setTextColor(...TXT3);pdf.setFontSize(5);pdf.text(s.l,sx,cy+16);pdf.setTextColor(...TXT);pdf.setFontSize(7.5);pdf.setFont('helvetica','bold');pdf.text(s.v,sx,cy+21);pdf.setFont('helvetica','normal');});
     });
-    cy+=kpiH+8;
-    const portW=(W-margin*2-4)/2;
-    [{port:'3700M',color:COBALT,sub:'Dallas — McKinney Ave · '+UNITS_3700M+' units',stats:[{l:'OCC',v:fmtPct(occ3700)},{l:'ADR',v:fmt$(adr3700)},{l:'RevPAR',v:fmt$(avail3700>0?p3700.roomRev/avail3700:0)},{l:'Room Revenue',v:fmt$(p3700.roomRev)},{l:'Total Rev.',v:fmt$(p3700.roomRev+p3700.clean+p3700.otaAdj)}]},{port:'Bayou Park',color:JADE,sub:'Houston — Montrose / Midtown · '+UNITS_BP+' units',stats:[{l:'OCC',v:fmtPct(occBP)},{l:'ADR',v:fmt$(adrBP)},{l:'RevPAR',v:fmt$(availBP>0?pBP.roomRev/availBP:0)},{l:'Room Revenue',v:fmt$(pBP.roomRev)},{l:'Total Rev.',v:fmt$(pBP.roomRev+pBP.clean+pBP.otaAdj)}]}].forEach((pc,i)=>{
-      const x=margin+i*(portW+4);
-      pdf.setFillColor(...BG2);pdf.roundedRect(x,cy,portW,22,2,2,'F');
-      pdf.setDrawColor(...pc.color);pdf.setLineWidth(0.5);pdf.roundedRect(x,cy,portW,22,2,2,'S');
-      pdf.setTextColor(...pc.color);pdf.setFontSize(7);pdf.setFont('helvetica','bold');pdf.text(pc.port,x+5,cy+6);
-      pdf.setTextColor(...TEXT3);pdf.setFontSize(5.5);pdf.setFont('helvetica','normal');pdf.text(pc.sub,x+5,cy+10);
-      const sw=(portW-10)/pc.stats.length;
-      pc.stats.forEach((s,j)=>{const sx=x+5+j*sw;pdf.setTextColor(...TEXT3);pdf.setFontSize(5);pdf.text(s.l,sx,cy+15);pdf.setTextColor(...TEXT);pdf.setFontSize(7);pdf.setFont('helvetica','bold');pdf.text(s.v,sx,cy+20);pdf.setFont('helvetica','normal');});
-    });
+
     const pgCount=pdf.internal.getNumberOfPages();
-    for(let i=1;i<=pgCount;i++){pdf.setPage(i);pdf.setTextColor(...TEXT3);pdf.setFontSize(5.5);pdf.text('US Living — Revenue Intelligence  |  Confidential',margin,H-5);pdf.text('Page '+i+' of '+pgCount,W-margin,H-5,{align:'right'});}
-    pdf.save('US-Living-Revenue-'+from+'-'+to+'.pdf');
+    for(let i=1;i<=pgCount;i++){pdf.setPage(i);pdf.setTextColor(...TXT3);pdf.setFontSize(5.5);pdf.text('US Living — Revenue Intelligence  |  Confidential',mg,H-5);pdf.text('Page '+i+' of '+pgCount,W-mg,H-5,{align:'right'});}
+    pdf.save('US-Living-Revenue-'+from+'-to-'+to+'.pdf');
   }catch(e){alert('Error generating PDF: '+e.message);console.error(e);}
-  finally{btn.textContent='⬇ Export PDF';btn.disabled=false;}
+  finally{document.getElementById('btnPDF').textContent='↓ Export PDF';document.getElementById('btnPDF').disabled=false;}
 }
 </script>
 </body>
