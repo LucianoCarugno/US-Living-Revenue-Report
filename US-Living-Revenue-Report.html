@@ -95,22 +95,22 @@ body::after{
 
 /* Custom date pickers */
 .date-group{
-  display:flex;align-items:center;gap:6px;
+  display:flex;align-items:center;gap:4px;
   background:var(--s2);border:1px solid var(--wire2);
-  border-radius:var(--r);padding:0;overflow:hidden;
+  border-radius:var(--r);padding:6px 12px;
 }
-.date-input-wrap{
-  display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;
-  position:relative;
-}
-.date-input-wrap:hover{background:var(--s3)}
+.date-field{display:flex;flex-direction:column;gap:2px}
 .date-label-tiny{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
-.date-display{font-family:'Geist Mono',monospace;font-size:12px;color:var(--lit);white-space:nowrap;min-width:76px}
-.date-input-real{
-  position:absolute;inset:0;opacity:0;cursor:pointer;
-  width:100%;height:100%;
+.date-field input[type=date]{
+  background:transparent;border:none;outline:none;
+  font-family:'Geist Mono',monospace;font-size:12px;
+  color:var(--lit);cursor:pointer;color-scheme:dark;
+  width:110px;
 }
-.date-sep{color:var(--wire3);font-size:12px;padding:0 2px}
+.date-field input[type=date]::-webkit-calendar-picker-indicator{
+  filter:invert(0.6);cursor:pointer;margin-left:2px;
+}
+.date-sep{color:var(--wire3);font-size:14px;padding:0 4px;align-self:center;margin-top:10px}
 
 .btn{
   font-size:12px;font-family:'Geist',sans-serif;font-weight:500;
@@ -402,22 +402,16 @@ tr.total-row td{
     </div>
   </div>
   <div class="controls">
-    <!-- Custom US-format date pickers -->
+    <!-- Date range pickers (US format display) -->
     <div class="date-group">
-      <div class="date-input-wrap" title="Start date">
-        <div>
-          <div class="date-label-tiny">From</div>
-          <div class="date-display" id="dfDisplay">MM/DD/YYYY</div>
-        </div>
-        <input type="date" id="df" class="date-input-real" onchange="syncDateDisplay()">
+      <div class="date-field">
+        <div class="date-label-tiny">From</div>
+        <input type="date" id="df">
       </div>
       <div class="date-sep">→</div>
-      <div class="date-input-wrap" title="End date">
-        <div>
-          <div class="date-label-tiny">To</div>
-          <div class="date-display" id="dtDisplay">MM/DD/YYYY</div>
-        </div>
-        <input type="date" id="dt" class="date-input-real" onchange="syncDateDisplay()">
+      <div class="date-field">
+        <div class="date-label-tiny">To</div>
+        <input type="date" id="dt">
       </div>
     </div>
     <button class="btn btn-primary" id="btnLoad" onclick="loadData()">Load Data</button>
@@ -624,13 +618,7 @@ const UNITS_3700M=12,UNITS_BP=20;
 let charts={};
 
 // ── Date utils (US format MM/DD/YYYY) ───────────────────────────
-function isoToUS(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return`${m}/${d}/${y}`;}
-function syncDateDisplay(){
-  const df=document.getElementById('df').value;
-  const dt=document.getElementById('dt').value;
-  document.getElementById('dfDisplay').textContent=df?isoToUS(df):'MM/DD/YYYY';
-  document.getElementById('dtDisplay').textContent=dt?isoToUS(dt):'MM/DD/YYYY';
-}
+function isoToUS(iso){if(!iso)return'—';const[y,m,d]=iso.split('-');return`${m}/${d}/${y}`;}
 function fmtDateUS(isoOrDate){
   const d=typeof isoOrDate==='string'?isoOrDate.split('T')[0]:isoOrDate.toISOString().split('T')[0];
   return isoToUS(d);
@@ -640,7 +628,6 @@ function fmtDateUS(isoOrDate){
 const now=new Date();
 document.getElementById('df').value=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
 document.getElementById('dt').value=now.toISOString().split('T')[0];
-syncDateDisplay();
 setTimeout(updateDataSourceUI,50);
 
 // ── Chart helpers ────────────────────────────────────────────────
