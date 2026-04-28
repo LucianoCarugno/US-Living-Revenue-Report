@@ -901,7 +901,7 @@ function fmtDate(v){return isoToUS(typeof v==='string'?v.split('T')[0]:v.toISOSt
 
 // ─── CSV State ───────────────────────────────────────────────────
 let csvRes=null,csvName=null,csvMode=false;
-(function(){try{const s=localStorage.getItem('g_csv');if(s){csvRes=JSON.parse(s);csvName=localStorage.getItem('g_csv_name')||'saved';csvMode=true;}}catch(e){}})();
+(function(){try{const s=localStorage.getItem('guesty_csv')||localStorage.getItem('g_csv');const n=localStorage.getItem('guesty_csv_name')||localStorage.getItem('g_csv_name');if(s){csvRes=JSON.parse(s);csvName=n||'saved file';csvMode=true;}}catch(e){}})();
 setTimeout(updateSourceUI,60);
 
 function updateSourceUI(){
@@ -924,7 +924,7 @@ function switchToCSV(){
   else document.getElementById('csvFile').click();
 }
 function uploadNewCSV(){document.getElementById('csvFile').click();}
-function clearCSV(){csvRes=null;csvName=null;csvMode=false;try{localStorage.removeItem('g_csv');localStorage.removeItem('g_csv_name');}catch(e){}document.getElementById('csvFile').value='';updateSourceUI();}
+function clearCSV(){csvRes=null;csvName=null;csvMode=false;try{localStorage.removeItem('guesty_csv');localStorage.removeItem('guesty_csv_name');localStorage.removeItem('g_csv');localStorage.removeItem('g_csv_name');}catch(e){}document.getElementById('csvFile').value='';updateSourceUI();}
 
 function parseCSV(text){
   return text.split('\n').slice(1).filter(l=>l.trim()).map(line=>{
@@ -944,7 +944,7 @@ async function loadCSV(inp){
   const file=inp.files[0];if(!file)return;
   document.getElementById('csvBtnLabel').textContent='...';
   const text=await file.text();csvRes=parseCSV(text);csvName=file.name;csvMode=true;
-  try{localStorage.setItem('g_csv',JSON.stringify(csvRes));localStorage.setItem('g_csv_name',file.name);}catch(e){}
+  try{localStorage.setItem('guesty_csv',JSON.stringify(csvRes));localStorage.setItem('guesty_csv_name',file.name);}catch(e){}
   updateSourceUI();loadData();
 }
 
