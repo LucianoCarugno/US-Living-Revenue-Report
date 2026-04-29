@@ -213,7 +213,7 @@ tr.total-row td:first-child{font-family:var(--mono);font-size:11px;font-weight:7
         <button class="source-btn" id="btnCSV" onclick="switchToCSV()"><span id="csvBtnLabel">CSV</span></button>
         <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="loadCSV(this)">
       </div>
-      <button class="btn btn-ghost" id="btnPDF" onclick="exportPDF()" style="display:none">
+      <button class="btn btn-ghost" id="btnPDF" onclick="exportPDF()" style="display:none !important">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 4h4M4 6.5h4M4 9h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         PDF
       </button>
@@ -675,7 +675,7 @@ function render(reservations,from,to,prev,lists){
   window._lastBP=bP;window._lastDiffDays=diffDays;window._lastDu3=du3;window._lastDuBP=duBP;
   document.getElementById('main').style.display='block';
   document.getElementById('emptyBox').style.display='none';
-  document.getElementById('btnPDF').style.display='';
+  // document.getElementById('btnPDF').style.display=''; // PDF disabled
   document.getElementById('btnXLSX').style.display='';
   renderSummary();
 }
@@ -804,10 +804,13 @@ async function exportPDF(){
     const activePre=document.querySelector('.tab.active');
     const activeNamePre=activePre?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1]||'overview';
 
-    // Hide topbar during capture so it doesn't appear in screenshots
+    // Hide UI chrome during capture
     const topbar=document.querySelector('.topbar');
+    const tabsBar=document.getElementById('tabsBar');
     const topbarDisplay=topbar?topbar.style.display:'';
+    const tabsDisplay=tabsBar?tabsBar.style.display:'';
     if(topbar) topbar.style.display='none';
+    if(tabsBar) tabsBar.style.display='none';
 
     for(const{tab,label} of tabs){
       ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>{
@@ -820,8 +823,9 @@ async function exportPDF(){
       await addElement(tabEl, label);
     }
 
-    // Restore topbar
+    // Restore UI chrome
     if(topbar) topbar.style.display=topbarDisplay;
+    if(tabsBar) tabsBar.style.display=tabsDisplay;
 
     // Add footers
     const total=pdf.internal.getNumberOfPages();
