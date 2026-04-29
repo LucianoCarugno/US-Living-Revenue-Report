@@ -8,8 +8,1591 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   RESET & TOKENS
+───────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark;scroll-behavior:smooth}
+
+:root{
+  /* Surface stack */
+  --bg:      #050709;
+  --s0:      #080B10;
+  --s1:      #0C1018;
+  --s2:      #111620;
+  --s3:      #161D2B;
+  --s4:      #1C2436;
+
+  /* Borders */
+  --b0: rgba(255,255,255,0.04);
+  --b1: rgba(255,255,255,0.07);
+  --b2: rgba(255,255,255,0.11);
+  --b3: rgba(255,255,255,0.17);
+
+  /* Text */
+  --t0: #F1F5FB;
+  --t1: #CBD5E1;
+  --t2: #8896AA;
+  --t3: #526070;
+
+  /* Brand: Electric Blue */
+  --blue:       #3B6EFF;
+  --blue-dim:   rgba(59,110,255,0.12);
+  --blue-ring:  rgba(59,110,255,0.3);
+  --blue-glow:  rgba(59,110,255,0.5);
+
+  /* Brand: Emerald */
+  --emerald:      #10C98A;
+  --emerald-dim:  rgba(16,201,138,0.1);
+  --emerald-ring: rgba(16,201,138,0.28);
+
+  /* Accents */
+  --amber:     #F59E0B;
+  --amber-dim: rgba(245,158,11,0.1);
+  --rose:      #F43F5E;
+  --rose-dim:  rgba(244,63,94,0.1);
+  --violet:    #8B5CF6;
+  --violet-dim:rgba(139,92,246,0.1);
+
+  /* Radii */
+  --r1: 4px;
+  --r2: 8px;
+  --r3: 12px;
+  --r4: 16px;
+
+  /* Mono font */
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+}
+
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--t0);
+  min-height:100vh;
+  font-size:13px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+
+/* ── Ambient background ── */
+#ambient{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  overflow:hidden;
+}
+#ambient::before{
+  content:'';position:absolute;
+  width:800px;height:800px;border-radius:50%;
+  top:-300px;left:-200px;
+  background:radial-gradient(circle,rgba(59,110,255,0.07) 0%,transparent 70%);
+}
+#ambient::after{
+  content:'';position:absolute;
+  width:600px;height:600px;border-radius:50%;
+  bottom:-200px;right:-100px;
+  background:radial-gradient(circle,rgba(16,201,138,0.055) 0%,transparent 70%);
+}
+/* Subtle grid */
+.grid-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--b0) 1px,transparent 1px),
+    linear-gradient(90deg,var(--b0) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);
+}
+
+.page{
+  max-width:1440px;margin:0 auto;
+  padding:0 32px 80px;
+  position:relative;z-index:1;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TOPBAR — full-width, frosted
+───────────────────────────────────────────────────────────── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(5,7,9,0.85);
+  backdrop-filter:blur(20px) saturate(1.4);
+  -webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border-bottom:1px solid var(--b1);
+  margin:0 -32px 40px;
+  padding:0 32px;
+}
+.topbar-inner{
+  max-width:calc(1440px - 64px);margin:0 auto;
+  display:flex;align-items:center;
+  height:56px;gap:24px;
+}
+
+/* Brand */
+.brand{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.brand-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;letter-spacing:-.3px;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.1),0 4px 16px var(--blue-glow);
+  position:relative;flex-shrink:0;
+}
+.brand-icon::after{
+  content:'';position:absolute;inset:0;border-radius:8px;
+  background:linear-gradient(135deg,rgba(255,255,255,0.18) 0%,transparent 55%);
+}
+.brand-text{display:flex;flex-direction:column;gap:0}
+.brand-name{font-size:14px;font-weight:600;color:var(--t0);letter-spacing:-.3px;line-height:1.2}
+.brand-sub{font-size:9.5px;color:var(--t3);font-weight:500;letter-spacing:.8px;text-transform:uppercase;line-height:1}
+
+/* Nav divider */
+.nav-divider{width:1px;height:20px;background:var(--b2);flex-shrink:0}
+
+/* Status badge */
+.status-live{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:500;color:var(--emerald);
+  background:var(--emerald-dim);
+  border:1px solid var(--emerald-ring);
+  border-radius:20px;padding:3px 8px 3px 6px;
+  flex-shrink:0;
+}
+.status-live-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--emerald);
+  animation:pulse 2s ease infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(16,201,138,0.5)}
+  50%{box-shadow:0 0 0 4px rgba(16,201,138,0)}
+}
+
+.topbar-spacer{flex:1}
+
+/* Controls in topbar */
+.controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+.date-group{
+  display:flex;align-items:center;gap:0;
+  background:var(--s2);border:1px solid var(--b2);
+  border-radius:var(--r2);overflow:hidden;
+}
+.date-field{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 12px;border-right:1px solid var(--b1);
+}
+.date-field:last-of-type{border-right:none}
+.date-field-label{
+  font-size:8.5px;font-weight:600;color:var(--t3);
+  text-transform:uppercase;letter-spacing:1px;white-space:nowrap;
+}
+.date-field input[type=date]{
+  background:transparent;border:none;outline:none;
+  font-family:var(--mono);font-size:11.5px;font-weight:400;
+  color:var(--t1);cursor:pointer;color-scheme:dark;
+  width:116px;
+}
+.date-field input[type=date]::-webkit-calendar-picker-indicator{
+  filter:invert(0.55) sepia(0.1) hue-rotate(200deg);
+  cursor:pointer;opacity:.7;
+}
+.date-field input[type=date]:hover::-webkit-calendar-picker-indicator{opacity:1}
+
+.btn{
+  font-family:var(--sans);font-size:12px;font-weight:500;
+  padding:7px 14px;border-radius:var(--r2);
+  border:1px solid var(--b2);background:var(--s2);
+  color:var(--t2);cursor:pointer;transition:all .15s;
+  white-space:nowrap;letter-spacing:.1px;display:flex;align-items:center;gap:6px;
+}
+.btn:hover{background:var(--s3);color:var(--t0);border-color:var(--b3)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn:active{transform:scale(.98)}
+
+.btn-primary{
+  background:var(--blue);color:#fff;border-color:transparent;font-weight:600;
+  box-shadow:0 1px 0 rgba(255,255,255,0.1) inset,0 4px 16px var(--blue-glow);
+}
+.btn-primary:hover{background:#527AFF;box-shadow:0 4px 24px var(--blue-glow)}
+.btn-primary:active{background:#2A5EFF;transform:scale(.98)}
+
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-ghost:hover{background:var(--s2);border-color:var(--b1)}
+
+/* Source toggle */
+.source-toggle{
+  display:flex;align-items:center;
+  background:var(--s1);border:1px solid var(--b1);
+  border-radius:var(--r2);padding:3px;gap:2px;
+}
+.source-btn{
+  font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;
+  border:none;background:transparent;color:var(--t3);cursor:pointer;
+  transition:all .15s;font-family:var(--sans);
+}
+.source-btn:hover{color:var(--t1)}
+.source-btn.active{background:var(--s4);color:var(--t0);box-shadow:0 1px 3px rgba(0,0,0,0.4)}
+
+/* ─────────────────────────────────────────────────────────────
+   TABS
+───────────────────────────────────────────────────────────── */
+.tabs{
+  display:flex;align-items:center;gap:2px;
+  border-bottom:1px solid var(--b1);
+  margin-bottom:32px;
+}
+.tab{
+  font-size:12.5px;font-weight:500;
+  padding:10px 16px 11px;cursor:pointer;
+  color:var(--t3);border-bottom:2px solid transparent;
+  margin-bottom:-1px;transition:all .15s;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+  letter-spacing:.1px;
+}
+.tab:hover{color:var(--t1)}
+.tab.active{color:var(--t0);border-bottom-color:var(--blue)}
+.tab-badge{
+  font-size:9px;font-weight:600;
+  padding:1px 5px;border-radius:10px;
+  background:var(--b2);color:var(--t3);
+  font-family:var(--mono);
+}
+.tab.active .tab-badge{background:var(--blue-dim);color:var(--blue)}
+
+/* ─────────────────────────────────────────────────────────────
+   KPI GRID
+───────────────────────────────────────────────────────────── */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(8,1fr);
+  gap:1px;background:var(--b1);
+  border:1px solid var(--b1);border-radius:var(--r3);
+  overflow:hidden;margin-bottom:24px;
+}
+.kpi{
+  background:var(--s1);padding:20px 18px 18px;
+  position:relative;
+  transition:background .15s;
+}
+.kpi:hover{background:var(--s2)}
+.kpi::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--kpi-accent,var(--b2));
+  transition:opacity .2s;
+}
+.kpi:hover::before{opacity:1}
+
+.kpi-label{
+  font-size:9px;font-weight:600;
+  color:var(--t3);text-transform:uppercase;
+  letter-spacing:1.2px;margin-bottom:12px;
+  display:flex;align-items:center;gap:5px;
+}
+.kpi-label-dot{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--kpi-accent,var(--b3));flex-shrink:0;
+}
+.kpi-value{
+  font-size:22px;font-weight:600;
+  color:var(--t0);line-height:1;
+  margin-bottom:8px;letter-spacing:-.6px;
+  font-variant-numeric:tabular-nums;
+}
+.kpi-sub{font-size:10px;color:var(--t3);font-family:var(--mono)}
+.kpi-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:10px;font-weight:500;
+  padding:2px 6px;border-radius:var(--r1);
+  margin-top:8px;font-family:var(--mono);letter-spacing:.3px;
+}
+.kpi-delta.up{background:rgba(16,201,138,0.1);color:#10C98A}
+.kpi-delta.down{background:rgba(244,63,94,0.1);color:#F43F5E}
+
+/* ─────────────────────────────────────────────────────────────
+   PORTFOLIO HEADER CARDS
+───────────────────────────────────────────────────────────── */
+.portfolio-row{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;margin-bottom:24px;
+}
+.pf-card{
+  background:var(--s1);border:1px solid var(--b1);
+  border-radius:var(--r3);padding:0;overflow:hidden;
+  transition:border-color .2s;
+}
+.pf-card:hover{border-color:var(--b2)}
+.pf-card-head{
+  padding:16px 20px 14px;
+  border-bottom:1px solid var(--b0);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.pf-card-head-left{display:flex;align-items:center;gap:10px}
+.pf-accent-bar{width:3px;height:28px;border-radius:2px;flex-shrink:0}
+.pf-name{font-size:13px;font-weight:600;letter-spacing:-.2px}
+.pf-location{font-size:11px;color:var(--t3);margin-top:1px}
+.pf-meta{display:flex;align-items:center;gap:8px}
+.pf-pill{
+  font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px;
+  font-family:var(--mono);letter-spacing:.2px;
+}
+.pf-stats{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  padding:16px 20px;gap:0;
+}
+.pf-stat{padding:0 14px 0 0}
+.pf-stat:first-child{padding-left:0}
+.pf-stat-label{
+  font-size:8.5px;font-weight:600;color:var(--t3);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;
+}
+.pf-stat-val{
+  font-family:var(--mono);font-size:14px;font-weight:500;
+  color:var(--t1);letter-spacing:-.3px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CHART CARDS
+───────────────────────────────────────────────────────────── */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.chart-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.chart-card{
+  background:var(--s1);border:1px solid var(--b1);
+  border-radius:var(--r3);padding:22px;
+  transition:border-color .2s;
+}
+.chart-card:hover{border-color:var(--b2)}
+
+.chart-card-head{
+  display:flex;align-items:flex-start;
+  justify-content:space-between;margin-bottom:18px;gap:12px;
+}
+.chart-eyebrow{
+  font-size:8.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.8px;
+  color:var(--t3);margin-bottom:3px;
+}
+.chart-h2{font-size:13px;font-weight:500;color:var(--t1)}
+.chart-wrap{position:relative;width:100%}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)}
+.legend-swatch{width:20px;height:2px;border-radius:1px;flex-shrink:0}
+.legend-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* Period buttons */
+.period-btns{display:flex;gap:1px;background:var(--s0);border:1px solid var(--b1);border-radius:var(--r1);padding:2px;flex-shrink:0}
+.period-btn{
+  font-size:10px;font-weight:500;padding:3px 8px;
+  border-radius:3px;border:none;
+  background:transparent;color:var(--t3);cursor:pointer;
+  font-family:var(--sans);transition:all .12s;letter-spacing:.2px;
+}
+.period-btn:hover{color:var(--t1)}
+.period-btn.active{background:var(--s4);color:var(--t0);box-shadow:0 1px 3px rgba(0,0,0,0.5)}
+
+/* ─────────────────────────────────────────────────────────────
+   SECTION DIVIDER
+───────────────────────────────────────────────────────────── */
+.section-div{
+  display:flex;align-items:center;gap:14px;
+  margin:40px 0 20px;
+}
+.section-div-label{
+  font-size:9px;font-weight:700;color:var(--t3);
+  text-transform:uppercase;letter-spacing:2px;white-space:nowrap;
+}
+.section-div-line{
+  flex:1;height:1px;
+  background:linear-gradient(90deg,var(--b2),transparent);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TABLES
+───────────────────────────────────────────────────────────── */
+.table-wrap{
+  border:1px solid var(--b1);border-radius:var(--r3);
+  overflow:hidden;margin-bottom:16px;overflow-x:auto;
+}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{
+  padding:10px 14px;text-align:left;
+  font-size:8.5px;font-weight:700;color:var(--t3);
+  text-transform:uppercase;letter-spacing:1.3px;
+  background:var(--s0);border-bottom:1px solid var(--b1);
+  white-space:nowrap;
+}
+thead th.num{text-align:right}
+tbody td{
+  padding:10px 14px;
+  border-bottom:1px solid var(--b0);
+  color:var(--t1);white-space:nowrap;
+  font-family:var(--mono);font-size:11.5px;
+}
+tbody td:first-child{
+  font-family:var(--sans);font-size:12px;
+  font-weight:500;color:var(--t0);
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,0.015)}
+tbody tr:hover td:first-child{color:var(--t0)}
+.num{text-align:right}
+tr.total-row td{
+  font-weight:600;
+  background:rgba(59,110,255,0.05);
+  border-top:1px solid var(--b2);
+  color:#6B9EFF;
+}
+tr.total-row td:first-child{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.5px}
+
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:500;padding:2px 8px;
+  border-radius:20px;font-family:var(--sans);letter-spacing:.2px;
+}
+.badge::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor}
+.badge-ok{background:rgba(16,201,138,0.1);color:#10C98A}
+.badge-warn{background:rgba(245,158,11,0.1);color:#F59E0B}
+.badge-cancel{background:rgba(244,63,94,0.1);color:#F43F5E}
+
+/* ─────────────────────────────────────────────────────────────
+   CHANNEL BARS
+───────────────────────────────────────────────────────────── */
+.channel-bars{display:flex;flex-direction:column;gap:14px}
+.ch-row{display:flex;align-items:center;gap:10px}
+.ch-label{font-size:11px;color:var(--t2);width:88px;flex-shrink:0;font-weight:400}
+.ch-track{flex:1;height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.ch-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.ch-val{font-size:11px;font-family:var(--mono);color:var(--t1);width:64px;text-align:right;flex-shrink:0}
+.ch-pct{font-size:10px;font-family:var(--mono);color:var(--t3);width:28px;text-align:right;flex-shrink:0}
+
+/* ─────────────────────────────────────────────────────────────
+   OCC UNIT GRID
+───────────────────────────────────────────────────────────── */
+.occ-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.occ-card{
+  background:var(--s2);border:1px solid var(--b0);
+  border-radius:var(--r2);padding:11px 12px;
+  transition:border-color .2s;
+}
+.occ-card:hover{border-color:var(--b2)}
+.occ-name{
+  font-size:10px;color:var(--t3);margin-bottom:9px;
+  display:flex;align-items:center;justify-content:space-between;
+  white-space:nowrap;overflow:hidden;
+}
+.occ-name-text{overflow:hidden;text-overflow:ellipsis}
+.occ-badge-low{font-size:8px;background:rgba(244,63,94,0.12);color:#F43F5E;padding:1px 4px;border-radius:3px;flex-shrink:0;font-weight:600}
+.occ-badge-med{font-size:8px;background:rgba(245,158,11,0.12);color:#F59E0B;padding:1px 4px;border-radius:3px;flex-shrink:0;font-weight:600}
+.occ-bar-track{height:2px;background:var(--s4);border-radius:1px;overflow:hidden;margin-bottom:8px}
+.occ-bar-fill{height:100%;border-radius:1px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.occ-pct{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ─────────────────────────────────────────────────────────────
+   SUMMARY TABLE
+───────────────────────────────────────────────────────────── */
+.stbl-wrap{border:1px solid var(--b1);border-radius:var(--r3);overflow:hidden;overflow-x:auto;margin-bottom:16px}
+.stbl{width:100%;border-collapse:collapse;font-size:11px}
+.stbl th{
+  padding:9px 12px;text-align:right;
+  font-size:8px;font-weight:700;color:var(--t3);
+  text-transform:uppercase;letter-spacing:.9px;
+  background:var(--s0);border-bottom:1px solid var(--b1);white-space:nowrap;
+}
+.stbl th:first-child{text-align:left;min-width:154px}
+.stbl td{
+  padding:7px 12px;text-align:right;
+  border-bottom:1px solid var(--b0);
+  color:var(--t1);font-family:var(--mono);font-size:10.5px;white-space:nowrap;
+}
+.stbl td:first-child{
+  text-align:left;font-family:var(--sans);
+  font-size:11px;color:var(--t2);
+}
+.stbl-section td{
+  background:var(--s0)!important;
+  font-family:var(--sans)!important;font-size:11px!important;
+  font-weight:600!important;padding:9px 12px!important;
+}
+.stbl-total td{
+  font-weight:600!important;
+  background:rgba(59,110,255,0.05);
+  border-top:1px solid var(--b2);
+  color:#6B9EFF!important;
+}
+.neg{color:#F43F5E!important}
+
+/* ─────────────────────────────────────────────────────────────
+   ALERTS & STATE
+───────────────────────────────────────────────────────────── */
+.alert-low{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.15);
+  border-radius:var(--r2);padding:10px 14px;margin-bottom:10px;
+  font-size:11.5px;color:#F87189;
+}
+.alert-icon{font-size:13px;flex-shrink:0}
+
+.loading-box{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;
+  padding:80px;border:1px solid var(--b1);
+  border-radius:var(--r3);background:var(--s1);
+}
+.spinner{
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--b2);border-top-color:var(--blue);
+  animation:spin .65s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:12px;color:var(--t3);font-family:var(--mono)}
+
+.err-box{
+  background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.18);
+  border-radius:var(--r2);padding:12px 16px;font-size:12px;
+  color:#F87189;margin-bottom:14px;display:none;
+}
+.empty-box{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;
+  padding:120px 40px;
+  border:1px solid var(--b1);border-radius:var(--r3);
+  background:var(--s1);text-align:center;
+}
+.empty-icon{
+  width:48px;height:48px;border-radius:var(--r3);
+  background:var(--s3);border:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:var(--t3);
+}
+.empty-title{font-size:14px;font-weight:500;color:var(--t2)}
+.empty-sub{font-size:12px;color:var(--t3);max-width:280px}
+
+/* CSV Banner */
+#csvBanner{
+  display:none;align-items:center;gap:8px;
+  background:var(--blue-dim);border:1px solid var(--blue-ring);
+  border-radius:var(--r2);padding:9px 14px;margin-bottom:14px;
+  font-size:11.5px;color:#6B9EFF;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────────────────────────── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.kpi-grid{animation:fadeUp .35s ease both}
+.portfolio-row .pf-card:nth-child(1){animation:fadeUp .3s .05s ease both}
+.portfolio-row .pf-card:nth-child(2){animation:fadeUp .3s .12s ease both}
+.chart-card{animation:fadeUp .3s ease both}
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────────────────────── */
+@media(max-width:1100px){
+  .chart-row,.chart-row-3,.portfolio-row{grid-template-columns:1fr}
+  .pf-stats{grid-template-columns:repeat(4,1fr)}
+  .kpi-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:640px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.topbar-inner{gap:12px}.controls{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div id="ambient"></div>
+<div class="grid-bg"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TOPBAR
+══════════════════════════════════════════════════════════ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-icon">US</div>
+      <div class="brand-text">
+        <div class="brand-name">US Living</div>
+        <div class="brand-sub">Revenue Intel</div>
+      </div>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="status-live" id="statusBadge">
+      <div class="status-live-dot"></div>
+      Live
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="controls">
+      <div class="date-group">
+        <div class="date-field">
+          <span class="date-field-label">From</span>
+          <input type="date" id="df">
+        </div>
+        <div class="date-field">
+          <span class="date-field-label">To</span>
+          <input type="date" id="dt">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btnLoad" onclick="loadData()">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 10h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Load Data
+      </button>
+      <div class="source-toggle">
+        <button class="source-btn active" id="btnAPI" onclick="switchToAPI()">API</button>
+        <button class="source-btn" id="btnCSV" onclick="switchToCSV()"><span id="csvBtnLabel">CSV</span></button>
+        <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="loadCSV(this)">
+      </div>
+      <button class="btn btn-ghost" id="btnPDF" onclick="exportPDF()" style="display:none">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 4h4M4 6.5h4M4 9h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        PDF
+      </button>
+      <button class="btn btn-ghost" id="btnXLSX" onclick="exportExcel()" style="display:none">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 4L5.5 6L3.5 8M6.5 8H8.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Excel
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="err-box" id="errBox"></div>
+  <div id="csvBanner" style="display:none;align-items:center;gap:8px">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 2V1.5M8 2V1.5M1 5h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <strong>CSV mode</strong> — <span id="csvInfo"></span>
+    <button onclick="uploadNewCSV()" style="margin-left:auto;background:var(--blue-dim);border:1px solid var(--blue-ring);color:#6B9EFF;border-radius:4px;padding:3px 9px;cursor:pointer;font-size:10.5px;font-family:var(--sans)">Upload new</button>
+    <button onclick="clearCSV()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;line-height:1;padding:0 2px">×</button>
+  </div>
+
+  <div id="loadBox" class="loading-box" style="display:none">
+    <div class="spinner"></div>
+    <div class="loading-text">fetching reservations from guesty...</div>
+  </div>
+
+  <!-- ══ MAIN ══ -->
+  <div id="main" style="display:none">
+    <div class="tabs" id="tabsBar">
+      <div class="tab active" onclick="showTab('overview',this)">Overview</div>
+      <div class="tab" onclick="showTab('summary',this)">Summary</div>
+      <div class="tab" onclick="showTab('tab3700',this)">3700M</div>
+      <div class="tab" onclick="showTab('tabBP',this)">Bayou Park</div>
+      <div class="tab" onclick="showTab('bookings',this)" id="tabBookingsEl">Bookings <span class="tab-badge" id="bookingsCount">—</span></div>
+      <div class="tab" onclick="showTab('pipeline',this)" id="tabPipelineEl">Pipeline <span class="tab-badge" id="pipelineCount">—</span></div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div id="tab-overview">
+      <div class="kpi-grid" id="kpiTop"></div>
+      <div class="portfolio-row" id="portfolioRow"></div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <div>
+              <div class="chart-eyebrow">Monthly Revenue</div>
+              <div class="chart-h2">Stacked by portfolio</div>
+            </div>
+            <div class="period-btns" id="periodRev">
+              <button class="period-btn" onclick="setCP('rev',6,this)">6M</button>
+              <button class="period-btn active" onclick="setCP('rev',12,this)">12M</button>
+              <button class="period-btn" onclick="setCP('rev',24,this)">24M</button>
+              <button class="period-btn" onclick="setCP('rev',0,this)">All</button>
+            </div>
+          </div>
+          <div class="legend" id="lgRev"></div>
+          <div class="chart-wrap"><canvas id="chartRev" height="220"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-eyebrow">Channel Mix</div>
+          <div class="chart-h2" style="margin-bottom:20px">Revenue by booking source</div>
+          <div id="channelBars"></div>
+        </div>
+      </div>
+      <div class="chart-row-3">
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <div><div class="chart-eyebrow">ADR Trend</div><div class="chart-h2">Avg. daily rate</div></div>
+            <div class="period-btns" id="periodADR">
+              <button class="period-btn" onclick="setCP('adr',6,this)">6M</button>
+              <button class="period-btn active" onclick="setCP('adr',12,this)">12M</button>
+              <button class="period-btn" onclick="setCP('adr',24,this)">24M</button>
+              <button class="period-btn" onclick="setCP('adr',0,this)">All</button>
+            </div>
+          </div>
+          <div class="legend" id="lgADR"></div>
+          <div class="chart-wrap"><canvas id="chartADR" height="180"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <div><div class="chart-eyebrow">RevPAR Trend</div><div class="chart-h2">Revenue / available night</div></div>
+            <div class="period-btns" id="periodRevPAR">
+              <button class="period-btn" onclick="setCP('revpar',6,this)">6M</button>
+              <button class="period-btn active" onclick="setCP('revpar',12,this)">12M</button>
+              <button class="period-btn" onclick="setCP('revpar',24,this)">24M</button>
+              <button class="period-btn" onclick="setCP('revpar',0,this)">All</button>
+            </div>
+          </div>
+          <div class="legend" id="lgRevPAR"></div>
+          <div class="chart-wrap"><canvas id="chartRevPAR" height="180"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <div><div class="chart-eyebrow">Occupancy</div><div class="chart-h2">% by portfolio / month</div></div>
+            <div class="period-btns" id="periodOcc">
+              <button class="period-btn" onclick="setCP('occ',6,this)">6M</button>
+              <button class="period-btn active" onclick="setCP('occ',12,this)">12M</button>
+              <button class="period-btn" onclick="setCP('occ',24,this)">24M</button>
+              <button class="period-btn" onclick="setCP('occ',0,this)">All</button>
+            </div>
+          </div>
+          <div class="legend" id="lgOcc"></div>
+          <div class="chart-wrap"><canvas id="chartOcc" height="180"></canvas></div>
+        </div>
+      </div>
+      <div class="section-div"><div class="section-div-label">Occupancy by Unit</div><div class="section-div-line"></div></div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-eyebrow">3700M · Dallas</div>
+          <div class="chart-h2" style="margin-bottom:16px">McKinney Avenue</div>
+          <div class="occ-grid" id="occU3700"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-eyebrow">Bayou Park · Houston</div>
+          <div class="chart-h2" style="margin-bottom:16px">Montrose / Midtown</div>
+          <div class="occ-grid" id="occUBP"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div id="tab-summary" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--t1)">Monthly Performance Summary</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:2px">Key metrics by portfolio per month</div>
+        </div>
+        <div class="period-btns">
+          <button class="period-btn" onclick="setSP(6,this)">6M</button>
+          <button class="period-btn active" onclick="setSP(12,this)">12M</button>
+          <button class="period-btn" onclick="setSP(24,this)">24M</button>
+          <button class="period-btn" onclick="setSP(0,this)">All</button>
+        </div>
+      </div>
+      <div id="summaryTable"></div>
+    </div>
+
+    <!-- 3700M -->
+    <div id="tab-tab3700" style="display:none">
+      <div id="pfCard3700" style="margin-bottom:14px"></div>
+      <div class="kpi-grid" id="kpi3700"></div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <div><div class="chart-eyebrow">Monthly Revenue</div><div class="chart-h2">Room revenue accrued daily</div></div>
+            <div class="period-btns" id="pRev3700"><button class="period-btn" onclick="setPP('3700M','rev',6,this)">6M</button><button class="period-btn active" onclick="setPP('3700M','rev',12,this)">12M</button><button class="period-btn" onclick="setPP('3700M','rev',24,this)">24M</button><button class="period-btn" onclick="setPP('3700M','rev',0,this)">All</button></div>
+          </div>
+          <div class="chart-wrap"><canvas id="cRev3700" height="180"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-eyebrow">Channel Mix</div>
+          <div class="chart-h2" style="margin-bottom:20px">Revenue by booking source</div>
+          <div id="chBars3700"></div>
+        </div>
+      </div>
+      <div class="chart-row-3">
+        <div class="chart-card"><div class="chart-card-head"><div><div class="chart-eyebrow">ADR Trend</div></div><div class="period-btns" id="pADR3700"><button class="period-btn" onclick="setPP('3700M','adr',6,this)">6M</button><button class="period-btn active" onclick="setPP('3700M','adr',12,this)">12M</button><button class="period-btn" onclick="setPP('3700M','adr',24,this)">24M</button><button class="period-btn" onclick="setPP('3700M','adr',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="cADR3700" height="160"></canvas></div></div>
+        <div class="chart-card"><div class="chart-card-head"><div><div class="chart-eyebrow">RevPAR Trend</div></div><div class="period-btns" id="pRevPAR3700"><button class="period-btn" onclick="setPP('3700M','revpar',6,this)">6M</button><button class="period-btn active" onclick="setPP('3700M','revpar',12,this)">12M</button><button class="period-btn" onclick="setPP('3700M','revpar',24,this)">24M</button><button class="period-btn" onclick="setPP('3700M','revpar',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="cRevPAR3700" height="160"></canvas></div></div>
+        <div class="chart-card"><div class="chart-card-head"><div><div class="chart-eyebrow">Occupancy %</div></div><div class="period-btns" id="pOcc3700"><button class="period-btn" onclick="setPP('3700M','occ',6,this)">6M</button><button class="period-btn active" onclick="setPP('3700M','occ',12,this)">12M</button><button class="period-btn" onclick="setPP('3700M','occ',24,this)">24M</button><button class="period-btn" onclick="setPP('3700M','occ',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="cOcc3700" height="160"></canvas></div></div>
+      </div>
+      <div class="section-div"><div class="section-div-label">Occupancy by Unit</div><div class="section-div-line"></div></div>
+      <div class="chart-card" style="margin-bottom:14px"><div class="occ-grid" id="occU3700b"></div></div>
+      <div class="section-div"><div class="section-div-label">Unit Breakdown</div><div class="section-div-line"></div></div>
+      <div class="table-wrap"><table id="tbl3700"><thead><tr><th>Unit</th><th class="num">Avail.</th><th class="num">Occ. Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th><th class="num">Room Rev.</th><th class="num">Cleaning</th><th class="num">Total Rev.</th><th class="num">OTA Comm.</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- BAYOU PARK -->
+    <div id="tab-tabBP" style="display:none">
+      <div id="pfCardBP" style="margin-bottom:14px"></div>
+      <div class="kpi-grid" id="kpiBP"></div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-card-head">
+            <div><div class="chart-eyebrow">Monthly Revenue</div><div class="chart-h2">Room revenue accrued daily</div></div>
+            <div class="period-btns" id="pRevBP"><button class="period-btn" onclick="setPP('Bayou Park','rev',6,this)">6M</button><button class="period-btn active" onclick="setPP('Bayou Park','rev',12,this)">12M</button><button class="period-btn" onclick="setPP('Bayou Park','rev',24,this)">24M</button><button class="period-btn" onclick="setPP('Bayou Park','rev',0,this)">All</button></div>
+          </div>
+          <div class="chart-wrap"><canvas id="cRevBP" height="180"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-eyebrow">Channel Mix</div>
+          <div class="chart-h2" style="margin-bottom:20px">Revenue by booking source</div>
+          <div id="chBarsBP"></div>
+        </div>
+      </div>
+      <div class="chart-row-3">
+        <div class="chart-card"><div class="chart-card-head"><div><div class="chart-eyebrow">ADR Trend</div></div><div class="period-btns" id="pADRBP"><button class="period-btn" onclick="setPP('Bayou Park','adr',6,this)">6M</button><button class="period-btn active" onclick="setPP('Bayou Park','adr',12,this)">12M</button><button class="period-btn" onclick="setPP('Bayou Park','adr',24,this)">24M</button><button class="period-btn" onclick="setPP('Bayou Park','adr',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="cADRBP" height="160"></canvas></div></div>
+        <div class="chart-card"><div class="chart-card-head"><div><div class="chart-eyebrow">RevPAR Trend</div></div><div class="period-btns" id="pRevPARBP"><button class="period-btn" onclick="setPP('Bayou Park','revpar',6,this)">6M</button><button class="period-btn active" onclick="setPP('Bayou Park','revpar',12,this)">12M</button><button class="period-btn" onclick="setPP('Bayou Park','revpar',24,this)">24M</button><button class="period-btn" onclick="setPP('Bayou Park','revpar',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="cRevPARBP" height="160"></canvas></div></div>
+        <div class="chart-card"><div class="chart-card-head"><div><div class="chart-eyebrow">Occupancy %</div></div><div class="period-btns" id="pOccBP"><button class="period-btn" onclick="setPP('Bayou Park','occ',6,this)">6M</button><button class="period-btn active" onclick="setPP('Bayou Park','occ',12,this)">12M</button><button class="period-btn" onclick="setPP('Bayou Park','occ',24,this)">24M</button><button class="period-btn" onclick="setPP('Bayou Park','occ',0,this)">All</button></div></div><div class="chart-wrap"><canvas id="cOccBP" height="160"></canvas></div></div>
+      </div>
+      <div class="section-div"><div class="section-div-label">Occupancy by Unit</div><div class="section-div-line"></div></div>
+      <div class="chart-card" style="margin-bottom:14px"><div class="occ-grid" id="occUBPb"></div></div>
+      <div class="section-div"><div class="section-div-label">Unit Breakdown</div><div class="section-div-line"></div></div>
+      <div class="table-wrap"><table id="tblBP"><thead><tr><th>Unit</th><th class="num">Avail.</th><th class="num">Occ. Nights</th><th class="num">Occupancy</th><th class="num">ADR</th><th class="num">RevPAR</th><th class="num">Room Rev.</th><th class="num">Cleaning</th><th class="num">Total Rev.</th><th class="num">OTA Comm.</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div id="tab-bookings" style="display:none">
+      <div class="table-wrap">
+        <table id="tblBookings">
+          <thead><tr><th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th><th class="num">Nights</th><th>Channel</th><th>Status</th><th class="num">Room Rev.</th><th class="num">Cleaning</th><th class="num">OTA Adj.</th><th class="num">Total Rev.</th><th class="num">OTA Comm.</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PIPELINE -->
+    <div id="tab-pipeline" style="display:none">
+      <div class="kpi-grid" id="kpiPipeline"></div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-eyebrow">Revenue Pipeline</div>
+          <div class="chart-h2" style="margin-bottom:16px">Confirmed room revenue by future month</div>
+          <div class="legend" id="lgPipeline"></div>
+          <div class="chart-wrap"><canvas id="chartPipeline" height="240"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-eyebrow">Portfolio Split</div>
+          <div class="chart-h2" style="margin-bottom:16px">Upcoming confirmed stays</div>
+          <div id="pipePortBars"></div>
+        </div>
+      </div>
+      <div class="section-div"><div class="section-div-label">Upcoming Reservations</div><div class="section-div-line"></div></div>
+      <div class="table-wrap">
+        <table id="tblPipeline">
+          <thead><tr><th>Property</th><th>Guest</th><th>Check-in</th><th>Check-out</th><th class="num">Nights</th><th>Channel</th><th class="num">Room Rev.</th><th class="num">Cleaning</th><th class="num">Total Rev.</th><th class="num">OTA Comm.</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /#main -->
+
+  <div id="emptyBox" class="empty-box">
+    <div class="empty-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="14" rx="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M2 7h16M7 3v4M13 3v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="empty-title">Select a period to begin</div>
+    <div class="empty-sub">Choose a date range in the top bar and click Load Data</div>
+  </div>
+</div><!-- /.page -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+// CONFIG & STATE
+// ─────────────────────────────────────────────────────────────────
+const PROXY='https://guesty-proxy.luciano-bd7.workers.dev';
+const U3=12,UBP=20; // default unit counts
+let charts={};
+let _LD=null,_SD=null,_PD={};
+const CP={rev:12,adr:12,revpar:12,occ:12};
+const PP={'3700M':{rev:12,adr:12,revpar:12,occ:12},'Bayou Park':{rev:12,adr:12,revpar:12,occ:12}};
+let summaryP=12;
+const MONO="'JetBrains Mono',monospace";
+
+// ─── Dates ───────────────────────────────────────────────────────
+const now=new Date();
+const df=document.getElementById('df'),dt=document.getElementById('dt');
+df.value=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
+dt.value=now.toISOString().split('T')[0];
+
+function isoToUS(iso){if(!iso||!iso.includes('-'))return iso||'—';const[y,m,d]=iso.split('-');return`${m}/${d}/${y}`;}
+function fmtDate(v){return isoToUS(typeof v==='string'?v.split('T')[0]:v.toISOString().split('T')[0]);}
+
+// ─── CSV State ───────────────────────────────────────────────────
+let csvRes=null,csvName=null,csvMode=false;
+(function(){try{const s=localStorage.getItem('guesty_csv')||localStorage.getItem('g_csv');const n=localStorage.getItem('guesty_csv_name')||localStorage.getItem('g_csv_name');if(s){csvRes=JSON.parse(s);csvName=n||'saved file';csvMode=true;}}catch(e){}})();
+setTimeout(updateSourceUI,60);
+
+function updateSourceUI(){
+  const b=document.getElementById('csvBanner'),l=document.getElementById('csvBtnLabel');
+  const api=document.getElementById('btnAPI'),csv=document.getElementById('btnCSV');
+  if(csvMode&&csvRes){
+    b.style.display='flex';
+    document.getElementById('csvInfo').textContent=csvRes.length+' reservations — '+csvName;
+    if(l)l.textContent='CSV ✓';
+    api.classList.remove('active');csv.classList.add('active');
+  }else{
+    b.style.display='none';
+    if(l)l.textContent='CSV';
+    api.classList.add('active');csv.classList.remove('active');
+  }
+}
+function switchToAPI(){csvMode=false;updateSourceUI();loadData();}
+function switchToCSV(){
+  if(csvRes){csvMode=true;updateSourceUI();loadData();}
+  else document.getElementById('csvFile').click();
+}
+function uploadNewCSV(){document.getElementById('csvFile').click();}
+function clearCSV(){csvRes=null;csvName=null;csvMode=false;try{localStorage.removeItem('guesty_csv');localStorage.removeItem('guesty_csv_name');localStorage.removeItem('g_csv');localStorage.removeItem('g_csv_name');}catch(e){}document.getElementById('csvFile').value='';updateSourceUI();}
+
+function parseCSV(text){
+  return text.split('\n').slice(1).filter(l=>l.trim()).map(line=>{
+    const cols=[];let cur='',q=false;
+    for(let i=0;i<line.length;i++){if(line[i]==='"')q=!q;else if(line[i]===','&&!q){cols.push(cur.trim());cur='';}else cur+=line[i];}
+    cols.push(cur.trim());
+    const c=i=>(cols[i]||'').replace(/^"|"$/g,'').trim();
+    const ci=c(5),co=c(6);if(!ci||!co)return null;
+    const ciD=new Date(ci+'T00:00:00'),coD=new Date(co+'T00:00:00');
+    return{checkIn:ciD.toISOString(),checkOut:coD.toISOString(),nightsCount:Math.max(1,Math.round((coD-ciD)/86400000)),
+      status:c(9),source:c(7),confirmationCode:c(2),guest:{fullName:c(4)||'—'},
+      listing:{nickname:c(11),title:c(11),address:{full:''}},
+      money:{fareAccommodation:parseFloat(c(12))||0,fareCleaning:parseFloat(c(13))||0,hostServiceFee:Math.abs(parseFloat(c(14))||0),resolutionAmount:parseFloat(c(15))||0}};
+  }).filter(Boolean);
+}
+async function loadCSV(inp){
+  const file=inp.files[0];if(!file)return;
+  document.getElementById('csvBtnLabel').textContent='...';
+  const text=await file.text();csvRes=parseCSV(text);csvName=file.name;csvMode=true;
+  try{localStorage.setItem('guesty_csv',JSON.stringify(csvRes));localStorage.setItem('guesty_csv_name',file.name);}catch(e){}
+  updateSourceUI();loadData();
+}
+
+// ─── Fetch ───────────────────────────────────────────────────────
+async function fetchAll(from,to){
+  const ef=new Date(from+' 00:00');ef.setDate(ef.getDate()-90);
+  const r=await fetch(`${PROXY}/reservations?from=${ef.toISOString().split('T')[0]}&to=${to}`);
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const d=await r.json();if(d.error)throw new Error(d.error);return d.results||[];
+}
+function getPrev(from,to){const f=new Date(from+' 00:00'),t=new Date(to+' 00:00'),d=t-f+86400000;return{from:new Date(f-d).toISOString().split('T')[0],to:new Date(f-86400000).toISOString().split('T')[0]};}
+function getDays(from,to){return Math.max(1,Math.ceil((new Date(to+' 00:00')-new Date(from+' 00:00'))/86400000)+1);}
+
+function calcTotals(res,from,to,u3,uB){
+  const conf=res.filter(r=>r.status!=='cancelled'),diff=getDays(from,to);
+  let rr=0,cl=0,oc=0,ni=0;
+  const pS=new Date(from+'T00:00:00'),pE=new Date(to+'T23:59:59');
+  conf.forEach(r=>{
+    const ci=new Date(r.checkIn),co=new Date(r.checkOut),tn=Math.max(1,Math.round((co-ci)/86400000));
+    let nin=0,cur=new Date(ci);while(cur<co){if(cur>=pS&&cur<=pE)nin++;cur.setDate(cur.getDate()+1);}
+    rr+=(r.money?.fareAccommodation||0)*nin/tn;
+    if(new Date(r.checkOut)>=pS&&new Date(r.checkOut)<=pE)cl+=(r.money?.fareCleaning||0);
+    oc+=Math.abs(r.money?.hostServiceFee||0)*nin/tn;ni+=nin;
+  });
+  const ta=(u3+uB)*diff;
+  return{totalRev:rr+cl,roomRev:rr,clean:cl,otaComm:oc,occ:ta>0?ni/ta:0,adr:ni>0?rr/ni:0,revpar:ta>0?rr/ta:0,nights:ni,totalAvail:ta};
+}
+
+async function loadData(){
+  const from=df.value,to=dt.value;
+  if(!from||!to){showErr('Please select a valid date range.');return;}
+  document.getElementById('errBox').style.display='none';
+  document.getElementById('main').style.display='none';
+  document.getElementById('emptyBox').style.display='none';
+  document.getElementById('loadBox').style.display='flex';
+  document.getElementById('btnLoad').disabled=true;
+  document.getElementById('statusBadge').innerHTML='<div class="status-live-dot"></div>Loading';
+  try{
+    const prev=getPrev(from,to);
+    const[res,prevRes,listRes]=await Promise.all([
+      (csvMode&&csvRes)?Promise.resolve(csvRes):fetchAll(from,to),
+      (csvMode&&csvRes)?Promise.resolve(csvRes):fetchAll(prev.from,prev.to),
+      fetch(`${PROXY}/listings`).then(r=>r.json()).catch(()=>({results:[]}))
+    ]);
+    const lists=(listRes.results||[]).filter(l=>l.nickname&&!l.nickname.toLowerCase().includes('test'));
+    render(res,from,to,calcTotals(prevRes,prev.from,prev.to,U3,UBP),lists);
+    document.getElementById('statusBadge').innerHTML='<div class="status-live-dot"></div>Live';
+  }catch(e){showErr('Error: '+e.message);document.getElementById('statusBadge').innerHTML='<div class="status-live-dot" style="background:var(--rose);animation:none"></div>Error';}
+  finally{document.getElementById('loadBox').style.display='none';document.getElementById('btnLoad').disabled=false;}
+}
+function showErr(m){document.getElementById('errBox').textContent=m;document.getElementById('errBox').style.display='block';document.getElementById('emptyBox').style.display='flex';}
+
+// ─── Tab management ───────────────────────────────────────────────
+function showTab(name,el){
+  ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display='none';});
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const te=document.getElementById('tab-'+name);if(te)te.style.display='';
+  el.classList.add('active');
+}
+
+// ─── Formatters ───────────────────────────────────────────────────
+const $c=v=>'$'+Math.round(v).toLocaleString('en-US');
+const pct=v=>Math.round(v*100)+'%';
+const fmt=v=>Math.round(v).toLocaleString('en-US');
+function delta(cur,prev){
+  if(!prev||prev===0)return'';
+  const p=((cur-prev)/prev)*100,up=p>=0;
+  return`<div class="kpi-delta ${up?'up':'down'}">${up?'↑':'↓'} ${(up?'+':'')}${Math.round(Math.abs(p))}%</div>`;
+}
+
+function getPF(n){
+  const s=(n||'').toLowerCase();
+  if(s.includes('3700m')||s.includes('3700 m')||s.includes('3700'))return'3700M';
+  if(s.includes('ubp')||s.includes('bayou')||s.includes('midtown')||s.includes('montrose')||/unit\s*[123]/.test(s)||s.includes('two bed'))return'Bayou Park';
+  return null;
+}
+function getPFR(r){
+  const n=r.listing?.nickname||r.listing?.title||'',a=r.listing?.address?.full||'';
+  let p=getPF(n);
+  if(!p){if(a.includes('Dallas')||a.includes('McKinney'))p='3700M';else if(a.includes('Houston'))p='Bayou Park';else p='Other';}
+  return p;
+}
+
+// ─── Chart helpers ────────────────────────────────────────────────
+const COPTS={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
+function mks(xE,yE,yCb){
+  return{
+    x:{ticks:{color:'#526070',font:{size:10,weight:'500',family:MONO}},grid:{display:false},...xE},
+    y:{ticks:{color:'#8896AA',font:{size:10,weight:'500',family:MONO},callback:yCb},grid:{color:'rgba(255,255,255,0.035)',drawTicks:false},border:{dash:[4,4]},...yE}
+  };
+}
+function mLabel(ym){const[y,m]=ym.split('-');return new Date(+y,+m-1).toLocaleString('en-US',{month:'short',year:'2-digit'});}
+function dC(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+
+function fltM(months,p){
+  if(!p)return months;
+  const ty=_LD?.toDate?.substring(0,7);
+  if(ty){let ei=months.length-1;for(let i=months.length-1;i>=0;i--){if(months[i]<=ty){ei=i;break;}}return months.slice(Math.max(0,ei-p+1),ei+1);}
+  return months.slice(months.length-p);
+}
+
+const DL_B={display:'auto',color:'rgba(241,245,251,0.9)',font:{size:8,family:MONO,weight:'500'},anchor:'center',align:'center',formatter:v=>v>=1000?'$'+Math.round(v/1000)+'k':(v>0?'$'+Math.round(v):null),clamp:true};
+const DL_L={display:ctx=>{const d=ctx.dataset.data,i=ctx.dataIndex,n=d.length;if(n<=5)return true;const v=d.filter(x=>x>0),mx=Math.max(...v),mn=Math.min(...v);return i===n-1||d[i]===mx||d[i]===mn;},font:{size:8,family:MONO,weight:'500'},anchor:'end',align:'top',offset:4,formatter:v=>v>0?'$'+Math.round(v):null,backgroundColor:'rgba(5,7,9,0.85)',borderRadius:3,padding:{top:2,bottom:2,left:4,right:4}};
+const DL_P={display:true,font:{size:8,family:MONO,weight:'600'},anchor:'end',align:'top',offset:4,formatter:v=>v>0?Math.round(v)+'%':null,backgroundColor:'rgba(5,7,9,0.85)',borderRadius:3,padding:{top:2,bottom:2,left:4,right:4}};
+const dlL=c=>({...DL_L,color:c});const dlP=c=>({...DL_P,color:c});
+
+const CH_CLR={Airbnb:'#FF385C','Booking.com':'#3B6EFF',Direct:'#F59E0B',VRBO:'#10C98A'};
+function mkChBars(el,byCh){
+  const tot=Object.values(byCh).reduce((a,b)=>a+b,0);
+  document.getElementById(el).innerHTML=`<div class="channel-bars">${Object.entries(byCh).sort((a,b)=>b[1]-a[1]).map(([ch,rev])=>`<div class="ch-row"><div class="ch-label">${ch}</div><div class="ch-track"><div class="ch-fill" style="width:${tot>0?rev/tot*100:0}%;background:${CH_CLR[ch]||'#8B5CF6'}"></div></div><div class="ch-val">${$c(rev)}</div><div class="ch-pct">${tot>0?Math.round(rev/tot*100)+'%':''}</div></div>`).join('')}</div>`;
+}
+
+// Period handlers
+function setCP(id,m,btn){CP[id]=m;btn.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rC(id);}
+function setPP(pf,t,m,btn){PP[pf][t]=m;btn.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rPC(pf,t);}
+function setSP(m,btn){summaryP=m;btn.parentElement.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderSummary();}
+
+// ─── Redraw overview charts ────────────────────────────────────────
+function rC(id){
+  if(!_LD)return;
+  if(window.ChartDataLabels){Chart.register(ChartDataLabels);Chart.defaults.plugins.datalabels={display:false};}
+  const{months:M,bMP,bADR,bRevPAR,bOcc}=_LD;
+  const fm=fltM(M,CP[id]),lb=fm.map(mLabel);
+
+  if(id==='rev'){
+    dC('rev');
+    charts.rev=new Chart(document.getElementById('chartRev'),{type:'bar',data:{labels:lb,datasets:[
+      {label:'3700M',data:fm.map(m=>Math.round(bMP[m]['3700M']||0)),backgroundColor:'rgba(59,110,255,0.85)',borderRadius:4,borderSkipped:false,datalabels:DL_B},
+      {label:'Bayou Park',data:fm.map(m=>Math.round(bMP[m]['Bayou Park']||0)),backgroundColor:'rgba(16,201,138,0.85)',borderRadius:4,borderSkipped:false,datalabels:DL_B}
+    ]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});
+  }else if(id==='adr'){
+    dC('adr');
+    charts.adr=new Chart(document.getElementById('chartADR'),{type:'line',data:{labels:lb,datasets:[
+      {label:'3700M',data:fm.map(m=>Math.round(bADR[m]?.['3700M']||0)),borderColor:'#3B6EFF',backgroundColor:'rgba(59,110,255,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#3B6EFF',borderWidth:2,datalabels:{...dlL('#3B6EFF')}},
+      {label:'Bayou Park',data:fm.map(m=>Math.round(bADR[m]?.['Bayou Park']||0)),borderColor:'#10C98A',backgroundColor:'rgba(16,201,138,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#10C98A',borderDash:[4,3],borderWidth:2,datalabels:{...dlL('#10C98A'),align:'bottom'}}
+    ]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}},datalabels:DL_L},scales:mks({},{},v=>'$'+v)}});
+  }else if(id==='revpar'){
+    dC('revpar');
+    charts.revpar=new Chart(document.getElementById('chartRevPAR'),{type:'line',data:{labels:lb,datasets:[
+      {label:'3700M',data:fm.map(m=>Math.round(bRevPAR[m]?.['3700M']||0)),borderColor:'#F59E0B',backgroundColor:'rgba(245,158,11,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#F59E0B',borderWidth:2,datalabels:{...dlL('#F59E0B')}},
+      {label:'Bayou Park',data:fm.map(m=>Math.round(bRevPAR[m]?.['Bayou Park']||0)),borderColor:'#8B5CF6',backgroundColor:'rgba(139,92,246,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#8B5CF6',borderDash:[4,3],borderWidth:2,datalabels:{...dlL('#8B5CF6'),align:'bottom'}}
+    ]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}},datalabels:DL_L},scales:mks({},{},v=>'$'+v)}});
+  }else if(id==='occ'){
+    dC('occ');
+    charts.occ=new Chart(document.getElementById('chartOcc'),{type:'line',data:{labels:lb,datasets:[
+      {label:'3700M',data:fm.map(m=>Math.round(bOcc[m]?.['3700M']||0)),borderColor:'#3B6EFF',backgroundColor:'rgba(59,110,255,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#3B6EFF',borderWidth:2,datalabels:{...dlP('#3B6EFF')}},
+      {label:'Bayou Park',data:fm.map(m=>Math.round(bOcc[m]?.['Bayou Park']||0)),borderColor:'#10C98A',backgroundColor:'rgba(16,201,138,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#10C98A',borderDash:[4,3],borderWidth:2,datalabels:{...dlP('#10C98A'),align:'bottom'}}
+    ]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y+'%'}},datalabels:DL_P},scales:mks({},{min:0,max:100},v=>v+'%')}});
+  }
+}
+
+// ─── Redraw portfolio charts ────────────────────────────────────────
+function rPC(pf,t){
+  const pd=_PD[pf];if(!pd)return;
+  if(window.ChartDataLabels){Chart.register(ChartDataLabels);Chart.defaults.plugins.datalabels={display:false};}
+  const{months:M,bMP,bADR,bRevPAR,bOcc,hx,rg,fl,ids}=pd;
+  const fm=fltM(M,PP[pf][t]),lb=fm.map(mLabel);
+  if(t==='rev'){dC(ids.rev);charts[ids.rev]=new Chart(document.getElementById(ids.rev),{type:'bar',data:{labels:lb,datasets:[{data:fm.map(m=>Math.round(bMP[m]?.[pf]||0)),backgroundColor:rg,borderRadius:4,datalabels:DL_B}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});}
+  else if(t==='adr'){dC(ids.adr);charts[ids.adr]=new Chart(document.getElementById(ids.adr),{type:'line',data:{labels:lb,datasets:[{data:fm.map(m=>Math.round(bADR[m]?.[pf]||0)),borderColor:hx,backgroundColor:fl,tension:.4,fill:true,pointRadius:3,pointBackgroundColor:hx,borderWidth:2}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({},{},v=>'$'+v)}});}
+  else if(t==='revpar'){dC(ids.revpar);charts[ids.revpar]=new Chart(document.getElementById(ids.revpar),{type:'line',data:{labels:lb,datasets:[{data:fm.map(m=>Math.round(bRevPAR[m]?.[pf]||0)),borderColor:'#F59E0B',backgroundColor:'rgba(245,158,11,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#F59E0B',borderWidth:2}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({},{},v=>'$'+v)}});}
+  else if(t==='occ'){dC(ids.occ);charts[ids.occ]=new Chart(document.getElementById(ids.occ),{type:'line',data:{labels:lb,datasets:[{data:fm.map(m=>Math.round(bOcc[m]?.[pf]||0)),borderColor:hx,backgroundColor:fl,tension:.4,fill:true,pointRadius:3,pointBackgroundColor:hx,borderWidth:2}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y+'%'}}},scales:mks({},{min:0,max:100},v=>v+'%')}});}
+}
+
+// ─── Occ units ────────────────────────────────────────────────────
+function mkOccUnits(elId,pf,diffDays,byUnit,lists){
+  const dc=pf==='3700M'?'#3B6EFF':'#10C98A';
+  const all=(lists||[]).filter(l=>getPF(l.nickname)===pf).map(l=>l.nickname.trim());
+  const rn=Object.entries(byUnit).filter(([,u])=>u.pf===pf).map(([n])=>n);
+  const ns=new Set([...all,...rn]);
+  const ud=Array.from(ns).map(name=>{
+    const num=name.match(/\d+/)?.[0];
+    const m=Object.entries(byUnit).find(([k,u])=>u.pf===pf&&k.match(/\d+/)?.[0]===num);
+    return[name,m?m[1]:{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,pf,count:0}];
+  }).sort((a,b)=>a[1].nights-b[1].nights);
+  document.getElementById(elId).innerHTML=ud.map(([name,u])=>{
+    const op=diffDays>0?Math.min(100,u.nights/diffDays*100):0;
+    const low=op<30,med=op>=30&&op<60;
+    const bc=low?'#F43F5E':med?'#F59E0B':dc;
+    const bdr=low?'border-color:rgba(244,63,94,0.25)':med?'border-color:rgba(245,158,11,0.2)':'';
+    const sn=name.replace(/^(Unit\s+|Apt\s+|Two Bed,?\s*)/i,'').replace(/[-*].*$/,'').trim().split(' ')[0];
+    const bdg=low?`<span class="occ-badge-low">LOW</span>`:med?`<span class="occ-badge-med">MED</span>`:'';
+    return`<div class="occ-card" style="${bdr}"><div class="occ-name"><span class="occ-name-text" title="${name}">${sn}</span>${bdg}</div><div class="occ-bar-track"><div class="occ-bar-fill" style="width:${op}%;background:${bc}"></div></div><div class="occ-pct" style="color:${bc}">${Math.round(op)}%</div></div>`;
+  }).join('');
+}
+
+// ─── Portfolio card ───────────────────────────────────────────────
+function mkPFCard(pf,cls,accent,uc,p,diffDays){
+  const avail=uc*diffDays,occ=avail>0?p.nights/avail:0,adr=p.nights>0?p.roomRev/p.nights:0,revpar=avail>0?p.roomRev/avail:0;
+  const loc=pf==='3700M'?'Dallas, TX':'Houston, TX';
+  const sub=pf==='3700M'?'McKinney Avenue':'Montrose / Midtown';
+  return`<div class="pf-card"><div class="pf-card-head"><div class="pf-card-head-left"><div class="pf-accent-bar" style="background:${accent}"></div><div><div class="pf-name" style="color:${accent}">${pf}</div><div class="pf-location">${loc} · ${sub}</div></div></div><div class="pf-meta"><span class="pf-pill" style="background:${accent}18;color:${accent};border:1px solid ${accent}33">${uc} units</span><span class="pf-pill" style="background:var(--b1);color:var(--t2)">${p.count} bookings</span></div></div><div class="pf-stats"><div class="pf-stat"><div class="pf-stat-label">Occupancy</div><div class="pf-stat-val" style="color:${accent}">${pct(occ)}</div></div><div class="pf-stat"><div class="pf-stat-label">ADR</div><div class="pf-stat-val">${$c(adr)}</div></div><div class="pf-stat"><div class="pf-stat-label">RevPAR</div><div class="pf-stat-val">${$c(revpar)}</div></div><div class="pf-stat"><div class="pf-stat-label">Room Rev.</div><div class="pf-stat-val">${$c(p.roomRev)}</div></div><div class="pf-stat"><div class="pf-stat-label">Cleaning</div><div class="pf-stat-val">${$c(p.clean)}</div></div><div class="pf-stat"><div class="pf-stat-label">Total Rev.</div><div class="pf-stat-val">${$c(p.roomRev+p.clean+(p.otaAdj||0))}</div></div><div class="pf-stat"><div class="pf-stat-label">OTA Comm.</div><div class="pf-stat-val" style="color:var(--rose)">${$c(p.otaComm)}</div></div></div></div>`;
+}
+
+// ─── Unit table builder ───────────────────────────────────────────
+function mkUnitTable(pf,tableId,uc,byUnit,diffDays,lists){
+  const all=(lists||[]).filter(l=>getPF(l.nickname)===pf).map(l=>l.nickname.trim());
+  const rn=Object.entries(byUnit).filter(([,u])=>u.pf===pf).map(([n])=>n);
+  const ns=new Set([...all,...rn]);
+  const units=Array.from(ns).map(name=>{
+    const num=name.match(/\d+/)?.[0];
+    const m=Object.entries(byUnit).find(([k,u])=>u.pf===pf&&k.match(/\d+/)?.[0]===num);
+    return[name,m?m[1]:{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,pf,count:0}];
+  }).sort((a,b)=>b[1].roomRev-a[1].roomRev);
+  let tR=0,tC=0,tA=0,tO=0,tN=0;
+  const rows=units.map(([name,u])=>{
+    const occ=diffDays>0?u.nights/diffDays:0,adr=u.nights>0?u.roomRev/u.nights:0,revpar=diffDays>0?u.roomRev/diffDays:0;
+    tR+=u.roomRev;tC+=u.clean;tA+=(u.otaAdj||0);tO+=u.otaComm;tN+=u.nights;
+    const op=occ*100;
+    const rs=op<30?'style="background:rgba(244,63,94,0.04)"':op<60?'style="background:rgba(245,158,11,0.03)"':'';
+    const os=op<30?'style="color:#F43F5E;font-weight:600"':op<60?'style="color:#F59E0B"':'';
+    return`<tr ${rs}><td>${name}</td><td class="num">${diffDays}</td><td class="num">${Math.round(u.nights)}</td><td class="num" ${os}>${pct(occ)}</td><td class="num">${$c(adr)}</td><td class="num">${$c(revpar)}</td><td class="num">${$c(u.roomRev)}</td><td class="num">${$c(u.clean)}</td><td class="num">${$c(u.roomRev+u.clean+(u.otaAdj||0))}</td><td class="num">${$c(u.otaComm)}</td></tr>`;
+  }).join('');
+  const tA2=uc*diffDays,tOcc=tA2>0?tN/tA2:0,tADR=tN>0?tR/tN:0,tRevPAR=tA2>0?tR/tA2:0;
+  document.querySelector(`#${tableId} tbody`).innerHTML=rows+`<tr class="total-row"><td>TOTAL</td><td class="num">${tA2}</td><td class="num">${Math.round(tN)}</td><td class="num">${pct(tOcc)}</td><td class="num">${$c(tADR)}</td><td class="num">${$c(tRevPAR)}</td><td class="num">${$c(tR)}</td><td class="num">${$c(tC)}</td><td class="num">${$c(tR+tC+tA)}</td><td class="num">${$c(tO)}</td></tr>`;
+  const low=units.filter(([,u])=>(diffDays>0?u.nights/diffDays*100:0)<30);
+  if(low.length){const b=document.createElement('div');b.className='alert-low';b.innerHTML=`<span class="alert-icon">⚠</span><strong>${low.length} unit${low.length>1?'s':''} below 30% occupancy:</strong> ${low.map(([n])=>n.split('-')[0].trim()).join(', ')}`;document.getElementById(tableId).closest('.table-wrap').parentNode.insertBefore(b,document.getElementById(tableId).closest('.table-wrap'));}
+}
+
+// ─── Main render ─────────────────────────────────────────────────
+function render(reservations,from,to,prev,lists){
+  if(window.ChartDataLabels){Chart.register(ChartDataLabels);Chart.defaults.plugins.datalabels={display:false};}
+  const conf=reservations.filter(r=>r.status!=='cancelled');
+  const diffDays=getDays(from,to);
+  const byUnit={},bP={'3700M':{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,count:0},'Bayou Park':{roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,count:0}};
+  const byCh={},bMP={},bADR={},bRevPAR={},bOcc={};
+  const pS=new Date(from+'T00:00:00'),pE=new Date(to+'T23:59:59');
+
+  conf.forEach(r=>{
+    const rrt=r.money?.fareAccommodation||0,clt=r.money?.fareCleaning||0,oa=r.money?.resolutionAmount||0,oc=Math.abs(r.money?.hostServiceFee||0);
+    const pf=getPFR(r),sp=(r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
+    const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+    const ci=new Date(r.checkIn),co=new Date(r.checkOut),tn=Math.max(1,Math.round((co-ci)/86400000));
+    const dR=rrt/tn,dC2=oc/tn;
+    const coYm=co.toISOString().substring(0,7),cip=co>=pS&&co<=pE;
+    let nin=0,cur=new Date(ci);
+    while(cur<co){const ym=cur.toISOString().substring(0,7);if(!bMP[ym])bMP[ym]={'3700M':0,'Bayou Park':0};if(bMP[ym][pf]!==undefined)bMP[ym][pf]+=dR;if(cur>=pS&&cur<=pE)nin++;cur.setDate(cur.getDate()+1);}
+    if(!bMP[coYm])bMP[coYm]={'3700M':0,'Bayou Park':0};
+    const rr=dR*nin,cl=cip?clt:0,cm=dC2*nin,oadj=cip?(r.money?.resolutionAmount||0):0;
+    if(!byUnit[sp])byUnit[sp]={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0,pf,count:0};
+    byUnit[sp].roomRev+=rr;byUnit[sp].clean+=cl;byUnit[sp].otaAdj+=oadj;byUnit[sp].otaComm+=cm;byUnit[sp].nights+=nin;
+    if(nin>0||cip)byUnit[sp].count++;
+    if(bP[pf]){bP[pf].roomRev+=rr;bP[pf].clean+=cl;bP[pf].otaAdj+=oadj;bP[pf].otaComm+=cm;bP[pf].nights+=nin;if(nin>0||cip)bP[pf].count++;}
+    if(!byCh[ch])byCh[ch]=0;byCh[ch]+=rr+cl;
+  });
+
+  const months=Object.keys(bMP).sort();
+  _LD={months,bMP,bADR,bRevPAR,bOcc,toDate:to};
+
+  // Per-portfolio per-month
+  const bCl3={},bClB={},bOA3={},bOAB={},bOC3={},bOCB={},bN3={},bNB={};
+  conf.forEach(r=>{
+    const pf=getPFR(r);if(pf!=='3700M'&&pf!=='Bayou Park')return;
+    const co=new Date(r.checkOut),coYm=co.toISOString().substring(0,7),ci=new Date(r.checkIn);
+    const tn=Math.max(1,Math.round((co-ci)/86400000)),dc=Math.abs(r.money?.hostServiceFee||0)/tn;
+    let cur=new Date(ci);
+    while(cur<co){const ym=cur.toISOString().substring(0,7);if(pf==='3700M'){bN3[ym]=(bN3[ym]||0)+1;bOC3[ym]=(bOC3[ym]||0)+dc;}else{bNB[ym]=(bNB[ym]||0)+1;bOCB[ym]=(bOCB[ym]||0)+dc;}cur.setDate(cur.getDate()+1);}
+    if(pf==='3700M'){bCl3[coYm]=(bCl3[coYm]||0)+(r.money?.fareCleaning||0);bOA3[coYm]=(bOA3[coYm]||0)+(r.money?.resolutionAmount||0);}
+    else{bClB[coYm]=(bClB[coYm]||0)+(r.money?.fareCleaning||0);bOAB[coYm]=(bOAB[coYm]||0)+(r.money?.resolutionAmount||0);}
+  });
+  _SD={bCl3,bClB,bOA3,bOAB,bOC3,bOCB,bN3,bNB,u3:U3,uBP:UBP};
+
+  months.forEach(ym=>{
+    const[y,m]=ym.split('-'),dim=new Date(+y,+m,0).getDate();
+    ['3700M','Bayou Park'].forEach(pf=>{
+      const uc=pf==='3700M'?U3:UBP;
+      const pr=conf.filter(r=>getPFR(r)===pf&&r.checkIn?.substring(0,7)===ym);
+      const pn=pr.reduce((a,r)=>a+(r.nightsCount||0),0),prv=pr.reduce((a,r)=>a+(r.money?.fareAccommodation||0),0),av=uc*dim;
+      if(!bADR[ym])bADR[ym]={};if(!bRevPAR[ym])bRevPAR[ym]={};if(!bOcc[ym])bOcc[ym]={};
+      bADR[ym][pf]=pn>0?prv/pn:0;bRevPAR[ym][pf]=av>0?prv/av:0;bOcc[ym][pf]=av>0?pn/av*100:0;
+    });
+  });
+
+  const du3=lists?lists.filter(l=>getPF(l.nickname)==='3700M').length||U3:U3;
+  const duBP=lists?lists.filter(l=>getPF(l.nickname)==='Bayou Park').length||UBP:UBP;
+  const tRR=bP['3700M'].roomRev+bP['Bayou Park'].roomRev,tCl=bP['3700M'].clean+bP['Bayou Park'].clean;
+  const tOC=bP['3700M'].otaComm+bP['Bayou Park'].otaComm,tNi=bP['3700M'].nights+bP['Bayou Park'].nights;
+  const tAv=(du3+duBP)*diffDays,tOA=bP['3700M'].otaAdj+bP['Bayou Park'].otaAdj,tRev=tRR+tCl+tOA;
+  const tOcc=tAv>0?tNi/tAv:0,tADR=tNi>0?tRR/tNi:0,tRP=tAv>0?tRR/tAv:0;
+
+  // Update bookings/pipeline count badges
+  document.getElementById('bookingsCount').textContent=conf.length;
+
+  // KPIs
+  const kpis=[
+    {l:'Total Revenue',v:$c(tRev),sub:conf.length+' confirmed bookings',acc:'#3B6EFF',delta:prev?delta(tRev,prev.totalRev):''},
+    {l:'Room Revenue',v:$c(tRR),sub:'Net accommodation',acc:'#3B6EFF',delta:prev?delta(tRR,prev.roomRev):''},
+    {l:'Cleaning Fee',v:$c(tCl),sub:'At checkout',acc:'#526070',delta:prev?delta(tCl,prev.clean):''},
+    {l:'OTA Commission',v:$c(tOC),sub:'Channel fees',acc:'#F43F5E',delta:prev?delta(tOC,prev.otaComm):''},
+    {l:'OTA Adjustment',v:tOA<0?'-$'+Math.round(Math.abs(tOA)).toLocaleString():$c(tOA),sub:'Resolution center',acc:'#F59E0B',delta:''},
+    {l:'Occupancy',v:pct(tOcc),sub:fmt(tNi)+' / '+fmt(tAv)+' nights',acc:'#10C98A',delta:prev?delta(tOcc,prev.occ):''},
+    {l:'ADR',v:$c(tADR),sub:'Avg. daily rate',acc:'#F59E0B',delta:prev?delta(tADR,prev.adr):''},
+    {l:'RevPAR',v:$c(tRP),sub:'Per available night',acc:'#F59E0B',delta:prev?delta(tRP,prev.revpar):''},
+  ];
+  document.getElementById('kpiTop').innerHTML=kpis.map(k=>`<div class="kpi" style="--kpi-accent:${k.acc}"><div class="kpi-label"><div class="kpi-label-dot"></div>${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.sub}</div>${k.delta}</div>`).join('');
+
+  // Portfolio cards
+  document.getElementById('portfolioRow').innerHTML=mkPFCard('3700M','pf-blue','#3B6EFF',du3,bP['3700M'],diffDays)+mkPFCard('Bayou Park','pf-teal','#10C98A',duBP,bP['Bayou Park'],diffDays);
+
+  // Overview charts
+  document.getElementById('lgRev').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:#3B6EFF"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:#10C98A"></div>Bayou Park</div>`;
+  rC('rev');
+  mkChBars('channelBars',byCh);
+  document.getElementById('lgADR').innerHTML=`<div class="legend-item"><div class="legend-swatch" style="background:#3B6EFF"></div>3700M</div><div class="legend-item"><div class="legend-swatch" style="background:#10C98A;background:repeating-linear-gradient(90deg,#10C98A 0,#10C98A 4px,transparent 4px,transparent 7px)"></div>Bayou Park</div>`;
+  rC('adr');
+  document.getElementById('lgRevPAR').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:#8B5CF6"></div>Bayou Park</div>`;
+  rC('revpar');
+  document.getElementById('lgOcc').innerHTML=document.getElementById('lgADR').innerHTML;
+  rC('occ');
+
+  // Occ units
+  mkOccUnits('occU3700','3700M',diffDays,byUnit,lists);
+  mkOccUnits('occUBP','Bayou Park',diffDays,byUnit,lists);
+
+  // Build portfolio dashboards
+  function buildPFDash(pf,accent,rg,fl,ids,ucCount){
+    document.getElementById(ids.kpiCard).innerHTML=mkPFCard(pf,'',accent,ucCount,bP[pf],diffDays);
+    const kps=[
+      {l:'Total Revenue',v:$c(bP[pf].roomRev+bP[pf].clean+(bP[pf].otaAdj||0)),sub:bP[pf].count+' bookings',acc:accent},
+      {l:'Room Revenue',v:$c(bP[pf].roomRev),sub:'Net accommodation',acc:accent},
+      {l:'Cleaning Fee',v:$c(bP[pf].clean),sub:'At checkout',acc:'#526070'},
+      {l:'OTA Commission',v:$c(bP[pf].otaComm),sub:'Channel fees',acc:'#F43F5E'},
+      {l:'OTA Adjustment',v:bP[pf].otaAdj<0?'-$'+Math.round(Math.abs(bP[pf].otaAdj||0)).toLocaleString():$c(bP[pf].otaAdj||0),sub:'Resolution center',acc:'#F59E0B'},
+      {l:'Occupancy',v:pct(ucCount*diffDays>0?bP[pf].nights/(ucCount*diffDays):0),sub:fmt(bP[pf].nights)+' nights',acc:'#10C98A'},
+      {l:'ADR',v:$c(bP[pf].nights>0?bP[pf].roomRev/bP[pf].nights:0),sub:'Avg. daily rate',acc:'#F59E0B'},
+      {l:'RevPAR',v:$c(ucCount*diffDays>0?bP[pf].roomRev/(ucCount*diffDays):0),sub:'Per available night',acc:'#F59E0B'},
+    ];
+    document.getElementById(ids.kpi).innerHTML=kps.map(k=>`<div class="kpi" style="--kpi-accent:${k.acc}"><div class="kpi-label"><div class="kpi-label-dot"></div>${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+    const pfCh={};conf.filter(r=>getPFR(r)===pf).forEach(r=>{const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');if(!pfCh[ch])pfCh[ch]=0;pfCh[ch]+=(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0);});
+    mkChBars(ids.ch,pfCh);
+    _PD[pf]={months,bMP,bADR,bRevPAR,bOcc,hx:accent,rg,fl,ids};
+    ['rev','adr','revpar','occ'].forEach(t=>rPC(pf,t));
+    mkOccUnits(ids.occB,pf,diffDays,byUnit,lists);
+    mkUnitTable(pf,ids.tbl,ucCount,byUnit,diffDays,lists);
+  }
+
+  buildPFDash('3700M','#3B6EFF','rgba(59,110,255,0.85)','rgba(59,110,255,0.05)',{kpiCard:'pfCard3700',kpi:'kpi3700',ch:'chBars3700',rev:'cRev3700',adr:'cADR3700',revpar:'cRevPAR3700',occ:'cOcc3700',occB:'occU3700b',tbl:'tbl3700'},du3);
+  buildPFDash('Bayou Park','#10C98A','rgba(16,201,138,0.85)','rgba(16,201,138,0.04)',{kpiCard:'pfCardBP',kpi:'kpiBP',ch:'chBarsBP',rev:'cRevBP',adr:'cADRBP',revpar:'cRevPARBP',occ:'cOccBP',occB:'occUBPb',tbl:'tblBP'},duBP);
+
+  // Bookings table
+  const srt=[...reservations].sort((a,b)=>(b.checkIn||'').localeCompare(a.checkIn||''));
+  document.querySelector('#tblBookings tbody').innerHTML=srt.slice(0,500).map(r=>{
+    const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oa=r.money?.resolutionAmount||0,oc=Math.abs(r.money?.hostServiceFee||0);
+    const p=(r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
+    const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+    const st=r.status||'confirmed',bc=st==='cancelled'?'badge-cancel':st==='inquiry'?'badge-warn':'badge-ok';
+    return`<tr><td>${p}</td><td>${r.guest?.fullName||'—'}</td><td>${r.checkIn?fmtDate(r.checkIn):'—'}</td><td>${r.checkOut?fmtDate(r.checkOut):'—'}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td><span class="badge ${bc}">${st==='cancelled'?'Cancelled':st==='inquiry'?'Inquiry':'Confirmed'}</span></td><td class="num">${$c(rr)}</td><td class="num">${$c(cl)}</td><td class="num">${oa!==0?$c(oa):'—'}</td><td class="num">${$c(rr+cl+oa)}</td><td class="num">${$c(oc)}</td></tr>`;
+  }).join('');
+
+  // Pipeline
+  const today=new Date().toISOString().split('T')[0];
+  const upc=reservations.filter(r=>r.status!=='cancelled'&&r.checkIn&&r.checkIn.split('T')[0]>=today).sort((a,b)=>(a.checkIn||'').localeCompare(b.checkIn||''));
+  document.getElementById('pipelineCount').textContent=upc.length;
+  const pbm={};upc.forEach(r=>{const ym=(r.checkIn||'').substring(0,7);if(!ym)return;const pf=getPFR(r);if(!pbm[ym])pbm[ym]={'3700M':0,'Bayou Park':0};if(pbm[ym][pf]!==undefined)pbm[ym][pf]+=r.money?.fareAccommodation||0;});
+  const pm=Object.keys(pbm).sort();
+  const p3r=upc.filter(r=>getPFR(r)==='3700M').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
+  const pBr=upc.filter(r=>getPFR(r)==='Bayou Park').reduce((a,r)=>a+(r.money?.fareAccommodation||0),0);
+  const pCl=upc.reduce((a,r)=>a+(r.money?.fareCleaning||0),0);
+  const pOC=upc.reduce((a,r)=>a+Math.abs(r.money?.hostServiceFee||0),0);
+  const pNi=upc.reduce((a,r)=>a+(r.nightsCount||0),0);
+  function rbd(res,f,t){const n=new Date();n.setHours(0,0,0,0);const s=new Date(n);s.setDate(s.getDate()+f);const e=new Date(n);e.setDate(e.getDate()+t);let tot=0;res.forEach(r=>{const ci=new Date(r.checkIn);ci.setHours(0,0,0,0);const co=new Date(r.checkOut);co.setHours(0,0,0,0);const tn=Math.max(1,Math.round((co-ci)/86400000));const dr=((r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0))/tn;let cur=new Date(Math.max(ci,s));while(cur<co&&cur<e){tot+=dr;cur.setDate(cur.getDate()+1);}});return tot;}
+
+  document.getElementById('kpiPipeline').innerHTML=[
+    {l:'Total Pipeline',v:$c(p3r+pBr+pCl),sub:upc.length+' upcoming bookings',acc:'#3B6EFF'},
+    {l:'Days 0–30',v:$c(rbd(upc,0,30)),sub:'Confirmed revenue',acc:'#3B6EFF'},
+    {l:'Days 31–60',v:$c(rbd(upc,30,60)),sub:'Confirmed revenue',acc:'#3B6EFF'},
+    {l:'Days 61–90',v:$c(rbd(upc,60,90)),sub:'Confirmed revenue',acc:'#3B6EFF'},
+    {l:'Nights Booked',v:fmt(pNi),sub:'Upcoming nights',acc:'#10C98A'},
+    {l:'OTA Commission',v:$c(pOC),sub:'On upcoming bookings',acc:'#F43F5E'},
+  ].map(k=>`<div class="kpi" style="--kpi-accent:${k.acc}"><div class="kpi-label"><div class="kpi-label-dot"></div>${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  document.getElementById('lgPipeline').innerHTML=`<div class="legend-item"><div class="legend-dot" style="background:#3B6EFF"></div>3700M</div><div class="legend-item"><div class="legend-dot" style="background:#10C98A"></div>Bayou Park</div>`;
+  dC('pipeline');
+  charts.pipeline=new Chart(document.getElementById('chartPipeline'),{type:'bar',data:{labels:pm.map(mLabel),datasets:[
+    {label:'3700M',data:pm.map(m=>Math.round(pbm[m]['3700M']||0)),backgroundColor:'rgba(59,110,255,0.85)',borderRadius:4,datalabels:DL_B},
+    {label:'Bayou Park',data:pm.map(m=>Math.round(pbm[m]['Bayou Park']||0)),backgroundColor:'rgba(16,201,138,0.85)',borderRadius:4,datalabels:DL_B}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});
+
+  const ptot=p3r+pBr||1;
+  document.getElementById('pipePortBars').innerHTML=`<div class="channel-bars" style="margin-top:8px"><div class="ch-row"><div class="ch-label" style="color:#3B6EFF">3700M</div><div class="ch-track"><div class="ch-fill" style="width:${p3r/ptot*100}%;background:#3B6EFF"></div></div><div class="ch-val">${$c(p3r)}</div><div class="ch-pct">${upc.filter(r=>getPFR(r)==='3700M').length} bkgs</div></div><div class="ch-row"><div class="ch-label" style="color:#10C98A">Bayou Park</div><div class="ch-track"><div class="ch-fill" style="width:${pBr/ptot*100}%;background:#10C98A"></div></div><div class="ch-val">${$c(pBr)}</div><div class="ch-pct">${upc.filter(r=>getPFR(r)==='Bayou Park').length} bkgs</div></div></div>`;
+
+  document.querySelector('#tblPipeline tbody').innerHTML=upc.slice(0,200).map(r=>{
+    const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oc=Math.abs(r.money?.hostServiceFee||0);
+    const p=(r.listing?.nickname||r.listing?.title||'—').replace(/\*/g,'').trim();
+    const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+    const du=Math.ceil((new Date(r.checkIn.split('T')[0])-new Date())/86400000);
+    const dl=du===0?'<span style="color:#F59E0B;font-size:9px;margin-left:4px">TODAY</span>':du===1?'<span style="color:#F59E0B;font-size:9px;margin-left:4px">TMW</span>':du<=7?`<span style="color:#F59E0B;font-size:9px;margin-left:4px">${du}d</span>`:'';
+    return`<tr><td>${p}</td><td>${r.guest?.fullName||'—'}</td><td>${fmtDate(r.checkIn)}${dl}</td><td>${fmtDate(r.checkOut)}</td><td class="num">${r.nightsCount||'—'}</td><td>${ch}</td><td class="num">${$c(rr)}</td><td class="num">${$c(cl)}</td><td class="num">${$c(rr+cl)}</td><td class="num">${$c(oc)}</td></tr>`;
+  }).join('');
+
+  window._lastReservations=reservations;
+  document.getElementById('main').style.display='block';
+  document.getElementById('emptyBox').style.display='none';
+  document.getElementById('btnPDF').style.display='';
+  document.getElementById('btnXLSX').style.display='';
+  renderSummary();
+}
+
+// ─── Summary table ────────────────────────────────────────────────
+function renderSummary(){
+  if(!_LD||!_SD)return;
+  const{months:M,bMP,bADR,bRevPAR,bOcc}=_LD;
+  const{bCl3,bClB,bOA3,bOAB,bOC3,bOCB,bN3,bNB,u3,uBP}=_SD;
+  const fm=fltM(M,summaryP);
+  const f$=v=>v===0?'—':'$'+Math.round(Math.abs(v)).toLocaleString();
+  const fP=v=>v===0?'—':Math.round(v*100)+'%';
+  const fN=v=>v===0?'—':Math.round(v).toLocaleString();
+  const fNeg=v=>{if(v===0)return'—';const s='$'+Math.round(Math.abs(v)).toLocaleString();return v<0?`<span class="neg">(${s})</span>`:s;};
+  const lb=fm.map(m=>{const[y,mo]=m.split('-');return new Date(+y,+mo-1).toLocaleString('en-US',{month:'short',year:'2-digit'});});
+  const dim=fm.map(m=>{const[y,mo]=m.split('-');return new Date(+y,+mo,0).getDate();});
+  const hdr=`<tr><th>Metric</th>${fm.map((m,i)=>`<th><div style="font-weight:700">${dim[i]}d</div><div style="font-weight:400;opacity:.7">${lb[i]}</div></th>`).join('')}</tr>`;
+  function pRows(pf,color,uc,bMR,bMCl,bMOA,bMOC,bMN){
+    const rows=[
+      {l:'Units',v:fm.map(()=>uc),f:v=>v},
+      {l:'Available Nights',v:fm.map((m,i)=>dim[i]*uc),f:fN},
+      {l:'Occupied Nights',v:fm.map(m=>bMN[m]||0),f:fN},
+      {l:'Occupancy',v:fm.map((m,i)=>{const a=dim[i]*uc;return a>0?(bMN[m]||0)/a:0;}),f:fP},
+      {l:'ADR',v:fm.map(m=>bADR[m]?.[pf]||0),f:f$},
+      {l:'RevPAR',v:fm.map(m=>bRevPAR[m]?.[pf]||0),f:f$},
+      {l:'Room Revenue',v:fm.map(m=>bMR[m]?.[pf]||0),f:f$,b:true},
+      {l:'Cleaning Fee',v:fm.map(m=>bMCl[m]||0),f:f$},
+      {l:'OTA Adjustment',v:fm.map(m=>bMOA[m]||0),f:fNeg,html:true},
+      {l:'Total Revenue',v:fm.map(m=>(bMR[m]?.[pf]||0)+(bMCl[m]||0)+(bMOA[m]||0)),f:f$,tot:true},
+      {l:'OTA Commission',v:fm.map(m=>bMOC[m]||0),f:fNeg,html:true},
+    ];
+    return`<tr class="stbl-section"><td colspan="${fm.length+1}" style="color:${color}!important">${pf}</td></tr>`+rows.map(r=>`<tr class="${r.tot?'stbl-total':''}"><td style="${r.b?'font-weight:600;color:var(--t0)':''}">${r.l}</td>${r.v.map(v=>`<td>${r.f(v)}</td>`).join('')}</tr>`).join('');
+  }
+  const sp=`<tr><td colspan="${fm.length+1}" style="height:6px;background:var(--bg)"></td></tr>`;
+  document.getElementById('summaryTable').innerHTML=`<div class="stbl-wrap"><table class="stbl"><thead>${hdr}</thead><tbody>${pRows('3700M','#3B6EFF',u3,bMP,bCl3,bOA3,bOC3,bN3)}${sp}${pRows('Bayou Park','#10C98A',uBP,bMP,bClB,bOAB,bOCB,bNB)}</tbody></table></div>`;
+}
+
+// ─── PDF export ───────────────────────────────────────────────────
+async function exportPDF(){
+  const from=df.value,to=dt.value;
+  const btn=document.getElementById('btnPDF');btn.textContent='Generating…';btn.disabled=true;
+  try{
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    const W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight(),mg=14;
+    const INK=[5,7,9],S1=[13,16,24],S2=[17,22,32],BLUE=[59,110,255],TEAL=[16,201,138],AMB=[245,158,11],RED=[244,63,94];
+    const T0=[241,245,251],T1=[203,213,225],T2=[136,150,170],T3=[82,96,112],BRD=[42,52,65];
+    const f$=v=>'$'+Math.round(Math.abs(v)).toLocaleString();
+    const fP=v=>Math.round(v*100)+'%';
+    function pg(ti,su){
+      pdf.setFillColor(...INK);pdf.rect(0,0,W,H,'F');
+      pdf.setFillColor(...S1);pdf.rect(0,0,W,13,'F');
+      pdf.setDrawColor(...BRD);pdf.setLineWidth(.2);pdf.line(mg,13,W-mg,13);
+      pdf.setFillColor(...BLUE);pdf.roundedRect(mg,2.5,8,8,1.2,1.2,'F');
+      pdf.setTextColor(255,255,255);pdf.setFontSize(5.5);pdf.setFont('helvetica','bold');pdf.text('US',mg+4,7.8,{align:'center'});
+      pdf.setTextColor(...T0);pdf.setFontSize(7.5);pdf.setFont('helvetica','bold');pdf.text('US Living',mg+11,7);
+      pdf.setTextColor(...T3);pdf.setFontSize(5.5);pdf.setFont('helvetica','normal');pdf.text('Revenue Intelligence',mg+11,10.5);
+      pdf.setTextColor(...T0);pdf.setFontSize(8.5);pdf.setFont('helvetica','bold');pdf.text(ti,W/2,7.5,{align:'center'});
+      if(su){pdf.setTextColor(...T2);pdf.setFontSize(6);pdf.setFont('helvetica','normal');pdf.text(su,W/2,11.5,{align:'center'});}
+      pdf.setTextColor(...T2);pdf.setFontSize(6);pdf.text(isoToUS(from)+' – '+isoToUS(to),W-mg,8,{align:'right'});
+    }
+    if(!_LD||!_SD){alert('Load data first');return;}
+    const{months:M,bMP}=_LD;
+    const{bCl3,bClB,bOA3,bOAB,bOC3,bOCB,bN3,bNB}=_SD;
+    const p3={rr:0,cl:0,oa:0,oc:0,ni:0},pB={rr:0,cl:0,oa:0,oc:0,ni:0};
+    M.forEach(m=>{p3.rr+=bMP[m]?.['3700M']||0;p3.cl+=bCl3[m]||0;p3.oa+=bOA3[m]||0;p3.oc+=bOC3[m]||0;p3.ni+=bN3[m]||0;pB.rr+=bMP[m]?.['Bayou Park']||0;pB.cl+=bClB[m]||0;pB.oa+=bOAB[m]||0;pB.oc+=bOCB[m]||0;pB.ni+=bNB[m]||0;});
+    const days=Math.max(1,Math.ceil((new Date(to)-new Date(from))/86400000)+1);
+    const a3=U3*days,aB=UBP*days,o3=a3>0?p3.ni/a3:0,oB=aB>0?pB.ni/aB:0;
+    pg('Revenue Overview','Combined Portfolio Performance');
+    let cy=18;const kW=(W-mg*2-10)/4,kH=18;
+    const kpis=[{l:'Total Revenue',v:f$(p3.rr+p3.cl+p3.oa+pB.rr+pB.cl+pB.oa),c:BLUE},{l:'Room Revenue',v:f$(p3.rr+pB.rr),c:BLUE},{l:'Cleaning Fee',v:f$(p3.cl+pB.cl),c:T2},{l:'OTA Commission',v:f$(p3.oc+pB.oc),c:RED},{l:'Occupancy',v:fP((p3.ni+pB.ni)/(a3+aB)),c:TEAL},{l:'ADR',v:f$((p3.ni+pB.ni)>0?(p3.rr+pB.rr)/(p3.ni+pB.ni):0),c:AMB},{l:'RevPAR',v:f$((p3.rr+pB.rr)/(a3+aB)),c:AMB},{l:'OTA Adjustment',v:f$(p3.oa+pB.oa),c:AMB}];
+    kpis.forEach((k,i)=>{const r=Math.floor(i/4),col=i%4,x=mg+col*(kW+3.3),y=cy+r*(kH+3);pdf.setFillColor(...S1);pdf.roundedRect(x,y,kW,kH,1.5,1.5,'F');pdf.setFillColor(...k.c);pdf.rect(x,y,kW,.8,'F');pdf.setTextColor(...T3);pdf.setFontSize(5);pdf.setFont('helvetica','bold');pdf.text(k.l.toUpperCase(),x+3.5,y+4.5);pdf.setTextColor(...T0);pdf.setFontSize(10.5);pdf.setFont('helvetica','bold');pdf.text(k.v,x+3.5,y+12);});
+    cy+=kH*2+3*3+8;
+    const pW=(W-mg*2-4)/2;
+    [{pf:'3700M',c:BLUE,sub:'Dallas — McKinney Avenue · '+U3+' units',st:[{l:'OCC',v:fP(o3)},{l:'ADR',v:f$(a3>0&&p3.ni>0?p3.rr/p3.ni:0)},{l:'RevPAR',v:f$(a3>0?p3.rr/a3:0)},{l:'Room Rev.',v:f$(p3.rr)},{l:'Cleaning',v:f$(p3.cl)},{l:'Total Rev.',v:f$(p3.rr+p3.cl+p3.oa)}]},{pf:'Bayou Park',c:TEAL,sub:'Houston — Montrose / Midtown · '+UBP+' units',st:[{l:'OCC',v:fP(oB)},{l:'ADR',v:f$(aB>0&&pB.ni>0?pB.rr/pB.ni:0)},{l:'RevPAR',v:f$(aB>0?pB.rr/aB:0)},{l:'Room Rev.',v:f$(pB.rr)},{l:'Cleaning',v:f$(pB.cl)},{l:'Total Rev.',v:f$(pB.rr+pB.cl+pB.oa)}]}].forEach((pc,i)=>{const x=mg+i*(pW+4);pdf.setFillColor(...S1);pdf.roundedRect(x,cy,pW,24,2,2,'F');pdf.setDrawColor(...pc.c);pdf.setLineWidth(.5);pdf.roundedRect(x,cy,pW,24,2,2,'S');pdf.setFillColor(...pc.c);pdf.rect(x,cy,2.5,24,'F');pdf.setTextColor(...pc.c);pdf.setFontSize(8);pdf.setFont('helvetica','bold');pdf.text(pc.pf,x+7,cy+7);pdf.setTextColor(...T3);pdf.setFontSize(5.5);pdf.setFont('helvetica','normal');pdf.text(pc.sub,x+7,cy+11.5);const sw=(pW-12)/pc.st.length;pc.st.forEach((s,j)=>{const sx=x+7+j*sw;pdf.setTextColor(...T3);pdf.setFontSize(5);pdf.text(s.l,sx,cy+17);pdf.setTextColor(...T0);pdf.setFontSize(7.5);pdf.setFont('helvetica','bold');pdf.text(s.v,sx,cy+22);pdf.setFont('helvetica','normal');});});
+    const pc=pdf.internal.getNumberOfPages();
+    for(let i=1;i<=pc;i++){pdf.setPage(i);pdf.setTextColor(...T3);pdf.setFontSize(5.5);pdf.text('US Living — Revenue Intelligence  |  Confidential',mg,H-5);pdf.text('Page '+i+' of '+pc,W-mg,H-5,{align:'right'});}
+    pdf.save('US-Living-Revenue-'+from+'-'+to+'.pdf');
+  }catch(e){alert('PDF error: '+e.message);}
+  finally{document.getElementById('btnPDF').innerHTML='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 4h4M4 6.5h4M4 9h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> PDF';document.getElementById('btnPDF').disabled=false;}
+}
+
+// ─── Excel export ─────────────────────────────────────────────────
+function exportExcel(){
+  if(!_LD||!_SD){alert('Load data first');return;}
+  const btn=document.getElementById('btnXLSX');
+  const orig=btn.innerHTML;
+  btn.textContent='Generating…';btn.disabled=true;
+  try{
+    const from=document.getElementById('df').value,to=document.getElementById('dt').value;
+    const {months:M,bMP,bADR,bRevPAR,bOcc}=_LD;
+    const {bCl3,bClB,bOA3,bOAB,bOC3,bOCB,bN3,bNB}=_SD;
+    const $=v=>Math.round(v);
+    const fP=v=>parseFloat((v*100).toFixed(1));
+    const allM=M.slice().sort();
+    const dim=m=>{const[y,mo]=m.split('-');return new Date(+y,+mo,0).getDate();};
+    const mLbl=m=>{const[y,mo]=m.split('-');return new Date(+y,+mo-1).toLocaleString('en-US',{month:'short',year:'numeric'});};
+    const N=allM.length;
+
+    // Helper: encode cell address
+    function enc(r,c){return XLSX.utils.encode_cell({r,c});}
+
+    // Helper: number format strings
+    const FD='#,##0;(#,##0);"-"';
+    const FP='0.0%;"-"';
+    const FI='#,##0;"-"';
+
+    // ── Build a sheet from scratch with proper styling via XLSX ────
+    // We build an AOA (array of arrays) and then apply cell-level fmt
+    function buildSummarySheet(){
+      const rows=[];
+
+      // Title
+      rows.push(['US Living — Revenue Intelligence','Period: '+isoToUS(from)+' – '+isoToUS(to),...Array(N).fill(''),'']);
+
+      // Column headers
+      rows.push(['Metric',...allM.map(mLbl),'Total']);
+
+      // Portfolio section builder
+      function portRows(pf,bMR,bMCl,bMOA,bMOC,bMN,uc){
+        const metrics=[
+          {l:pf+' — '+(pf==='3700M'?'Dallas, McKinney Ave':'Houston, Montrose / Midtown'),header:true,vals:[]},
+          {l:'Units',            vals:allM.map(()=>uc),                                                    fmt:FI},
+          {l:'Available Nights', vals:allM.map(m=>dim(m)*uc),                                             fmt:FI},
+          {l:'Occupied Nights',  vals:allM.map(m=>Math.round(bMN[m]||0)),                                 fmt:FI},
+          {l:'Occupancy (%)',    vals:allM.map(m=>{const a=dim(m)*uc;return a>0?(bMN[m]||0)/a:0;}),      fmt:FP,pct:true},
+          {l:'ADR ($)',          vals:allM.map(m=>$(bADR[m]?.[pf]||0)),                                   fmt:FD},
+          {l:'RevPAR ($)',       vals:allM.map(m=>$(bRevPAR[m]?.[pf]||0)),                                fmt:FD},
+          {l:'Room Revenue ($)', vals:allM.map(m=>$(bMR[m]?.[pf]||0)),                                    fmt:FD,rev:true},
+          {l:'Cleaning Fee ($)', vals:allM.map(m=>$(bMCl[m]||0)),                                         fmt:FD},
+          {l:'OTA Adjustment ($)',vals:allM.map(m=>Math.round(bMOA[m]||0)),                               fmt:FD},
+          {l:'Total Revenue ($)',vals:allM.map(m=>$((bMR[m]?.[pf]||0)+(bMCl[m]||0)+(bMOA[m]||0))),      fmt:FD,tot:true},
+          {l:'OTA Commission ($)',vals:allM.map(m=>$(bMOC[m]||0)),                                        fmt:FD,ota:true},
+          {l:'',spacer:true},
+        ];
+        metrics.forEach(m=>{
+          if(m.header){rows.push([m.l,...Array(N+1).fill('')]);return;}
+          if(m.spacer){rows.push(Array(N+2).fill(''));return;}
+          const total = m.pct
+            ? m.vals.filter(v=>v>0).reduce((a,b)=>a+b,0)/(m.vals.filter(v=>v>0).length||1)
+            : (m.l.includes('ADR')||m.l.includes('RevPAR'))
+            ? m.vals.filter(v=>v>0).reduce((a,b)=>a+b,0)/(m.vals.filter(v=>v>0).length||1)
+            : m.vals.reduce((a,b)=>a+b,0);
+          rows.push([m.l,...m.vals,Math.round(total)]);
+        });
+      }
+      portRows('3700M',  bMP,bCl3,bOA3,bOC3,bN3,12);
+      portRows('Bayou Park',bMP,bClB,bOAB,bOCB,bNB,20);
+
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+
+      // Apply number formats to data cells
+      // Row 0=title, Row 1=col headers, then data starts row 2
+      // Col 0=label, cols 1..N=months, col N+1=total
+      let dataRow=2;
+      function applyPortFmts(pf,uc){
+        dataRow++; // section header row
+        const metricFmts=[FI,FI,FI,FP,FD,FD,FD,FD,FD,FD,FD];
+        metricFmts.forEach((fmt)=>{
+          for(let c=1;c<=N+1;c++){
+            const addr=enc(dataRow,c);
+            if(!ws[addr])ws[addr]={t:'n',v:0};
+            ws[addr].z=fmt;
+          }
+          dataRow++;
+        });
+        dataRow++; // spacer
+      }
+      applyPortFmts('3700M',12);
+      applyPortFmts('Bayou Park',20);
+
+      ws['!cols']=[{wch:24},...allM.map(()=>({wch:12})),{wch:12}];
+      ws['!freeze']={xSplit:1,ySplit:2};
+      return ws;
+    }
+
+    // ── Bookings sheet ─────────────────────────────────────────────
+    function buildBookingsSheet(){
+      if(!window._lastReservations)return null;
+      const hdr=['Property','Guest','Confirmation','Check-in','Check-out','Nights','Channel','Status','Room Rev ($)','Cleaning ($)','OTA Adj ($)','Total Rev ($)','OTA Comm ($)'];
+      const rows=_lastReservations.slice().sort((a,b)=>(b.checkIn||'').localeCompare(a.checkIn||'')).map(r=>{
+        const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oa=r.money?.resolutionAmount||0,oc=Math.abs(r.money?.hostServiceFee||0);
+        const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+        return[(r.listing?.nickname||r.listing?.title||'').replace(/\*/g,'').trim(),
+          r.guest?.fullName||'',r.confirmationCode||'',
+          r.checkIn?isoToUS(r.checkIn.split('T')[0]):'',
+          r.checkOut?isoToUS(r.checkOut.split('T')[0]):'',
+          r.nightsCount||0,ch,r.status||'confirmed',
+          Math.round(rr),Math.round(cl),Math.round(oa),Math.round(rr+cl+oa),Math.round(oc)];
+      });
+      const ws=XLSX.utils.aoa_to_sheet([hdr,...rows]);
+      // Apply dollar format to money cols (8-12, 0-indexed)
+      const range=XLSX.utils.decode_range(ws['!ref']);
+      for(let R=1;R<=range.e.r;R++){
+        for(let C=8;C<=12;C++){
+          const a=enc(R,C);if(ws[a])ws[a].z=FD;
+        }
+        const nCell=enc(R,5);if(ws[nCell])ws[nCell].z=FI;
+      }
+      ws['!cols']=[{wch:30},{wch:22},{wch:16},{wch:12},{wch:12},{wch:7},{wch:14},{wch:12},{wch:12},{wch:11},{wch:10},{wch:12},{wch:12}];
+      ws['!freeze']={xSplit:2,ySplit:1};
+      return ws;
+    }
+
+    // ── Pipeline sheet ─────────────────────────────────────────────
+    function buildPipelineSheet(){
+      if(!window._lastReservations)return null;
+      const today=new Date().toISOString().split('T')[0];
+      const upc=_lastReservations.filter(r=>r.status!=='cancelled'&&r.checkIn&&r.checkIn.split('T')[0]>=today)
+        .sort((a,b)=>(a.checkIn||'').localeCompare(b.checkIn||''));
+      const hdr=['Property','Guest','Check-in','Check-out','Nights','Days Away','Channel','Room Rev ($)','Cleaning ($)','Total Rev ($)','OTA Comm ($)'];
+      const rows=upc.map(r=>{
+        const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oc=Math.abs(r.money?.hostServiceFee||0);
+        const du=Math.ceil((new Date(r.checkIn.split('T')[0])-new Date())/86400000);
+        const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
+        return[(r.listing?.nickname||r.listing?.title||'').replace(/\*/g,'').trim(),
+          r.guest?.fullName||'',isoToUS(r.checkIn.split('T')[0]),isoToUS(r.checkOut.split('T')[0]),
+          r.nightsCount||0,du,ch,Math.round(rr),Math.round(cl),Math.round(rr+cl),Math.round(oc)];
+      });
+      const ws=XLSX.utils.aoa_to_sheet([hdr,...rows]);
+      const range=XLSX.utils.decode_range(ws['!ref']);
+      for(let R=1;R<=range.e.r;R++){
+        for(let C=7;C<=10;C++){const a=enc(R,C);if(ws[a])ws[a].z=FD;}
+        [4,5].forEach(C=>{const a=enc(R,C);if(ws[a])ws[a].z=FI;});
+      }
+      ws['!cols']=[{wch:30},{wch:22},{wch:12},{wch:12},{wch:7},{wch:10},{wch:14},{wch:12},{wch:11},{wch:12},{wch:12}];
+      ws['!freeze']={xSplit:2,ySplit:1};
+      return ws;
+    }
+
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,buildSummarySheet(),'Monthly Summary');
+    const wsBk=buildBookingsSheet();if(wsBk)XLSX.utils.book_append_sheet(wb,wsBk,'Bookings');
+    const wsPP=buildPipelineSheet();if(wsPP)XLSX.utils.book_append_sheet(wb,wsPP,'Pipeline');
+    XLSX.writeFile(wb,`US-Living-Revenue-${from}-${to}.xlsx`);
+
+  }catch(e){alert('Excel error: '+e.message);console.error(e);}
+  finally{btn.innerHTML=orig;btn.disabled=false;}
+}
+!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>US Living — Revenue Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 /* ─────────────────────────────────────────────────────────────
    RESET & TOKENS
@@ -1777,7 +3360,7 @@ function exportExcel(){
     }
 
     // ── Assemble workbook using XLSXStyle ──────────────────────────
-    const XS=window.XLSXStyle||window.XLSX; // xlsx-js-style exposes as XLSXStyle
+     // xlsx-js-style exposes as XLSXStyle
 
     const wb=XS.utils.book_new();
 
