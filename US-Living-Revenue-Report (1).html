@@ -8,6 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -671,6 +672,7 @@ function render(reservations,from,to,prev,lists){
 
   window._lastReservations=reservations;
   window._lastFrom=from;window._lastTo=to;
+  window._lastBP=bP;window._lastDiffDays=diffDays;window._lastDu3=du3;window._lastDuBP=duBP;
   document.getElementById('main').style.display='block';
   document.getElementById('emptyBox').style.display='none';
   document.getElementById('btnPDF').style.display='';
@@ -708,43 +710,173 @@ function renderSummary(){
 
 // ─── PDF export ─────────────────────────────────────────────────
 async function exportPDF(){
+  if(!_LD||!_SD){alert('Load data first');return;}
   const from=df.value,to=dt.value;
-  const btn=document.getElementById('btnPDF');btn.textContent='Generating…';btn.disabled=true;
+  const btn=document.getElementById('btnPDF');
+  const origHTML=btn.innerHTML;
+  btn.innerHTML='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg> Building PDF…';
+  btn.disabled=true;
+
   try{
-    const{jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-    const W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight(),mg=14;
-    const INK=[5,7,9],S1=[13,16,24],BLUE=[59,110,255],TEAL=[16,201,138],AMB=[245,158,11],RED=[244,63,94];
-    const T0=[241,245,251],T2=[136,150,170],T3=[82,96,112],BRD=[42,52,65];
-    const f$=v=>'$'+Math.round(Math.abs(v)).toLocaleString();const fP=v=>Math.round(v*100)+'%';
-    function pg(ti,su){
-      pdf.setFillColor(...INK);pdf.rect(0,0,W,H,'F');pdf.setFillColor(...S1);pdf.rect(0,0,W,13,'F');
-      pdf.setDrawColor(...BRD);pdf.setLineWidth(.2);pdf.line(mg,13,W-mg,13);
-      pdf.setFillColor(...BLUE);pdf.roundedRect(mg,2.5,8,8,1.2,1.2,'F');
-      pdf.setTextColor(255,255,255);pdf.setFontSize(5.5);pdf.setFont('helvetica','bold');pdf.text('US',mg+4,7.8,{align:'center'});
-      pdf.setTextColor(...T0);pdf.setFontSize(7.5);pdf.setFont('helvetica','bold');pdf.text('US Living',mg+11,7);
-      pdf.setTextColor(...T3);pdf.setFontSize(5.5);pdf.setFont('helvetica','normal');pdf.text('Revenue Intelligence',mg+11,10.5);
-      pdf.setTextColor(...T0);pdf.setFontSize(8.5);pdf.setFont('helvetica','bold');pdf.text(ti,W/2,7.5,{align:'center'});
-      if(su){pdf.setTextColor(...T2);pdf.setFontSize(6);pdf.setFont('helvetica','normal');pdf.text(su,W/2,11.5,{align:'center'});}
-      pdf.setTextColor(...T2);pdf.setFontSize(6);pdf.text(isoToUS(from)+' – '+isoToUS(to),W-mg,8,{align:'right'});
+    const{jsPDF}=window.jspdf;
+
+    // Sections to capture: each entry = { label, tabName, tabEl, selector }
+    const sections=[
+      {label:'Overview',    tab:'overview'},
+      {label:'Summary',     tab:'summary'},
+      {label:'3700M',       tab:'tab3700'},
+      {label:'Bayou Park',  tab:'tabBP'},
+      {label:'Bookings',    tab:'bookings'},
+      {label:'Pipeline',    tab:'pipeline'},
+    ];
+
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
+    const PW=pdf.internal.pageSize.getWidth();   // 210mm
+    const PH=pdf.internal.pageSize.getHeight();  // 297mm
+    const mg=10; // margin mm
+    const contentW=PW-mg*2;
+    let firstPage=true;
+
+    // Save current active tab so we can restore it
+    const activeTabEl=document.querySelector('.tab.active');
+    const activeTabName=activeTabEl?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1]||'overview';
+
+    // Header bar height in mm
+    const HDR_H=14;
+
+    function drawPageHeader(){
+      // Dark header bar
+      pdf.setFillColor(5,7,9);
+      pdf.rect(0,0,PW,HDR_H,'F');
+      // Blue brand icon
+      pdf.setFillColor(59,110,255);
+      pdf.roundedRect(mg,3,7,7,1,1,'F');
+      pdf.setTextColor(255,255,255);pdf.setFontSize(5.5);pdf.setFont('helvetica','bold');
+      pdf.text('US',mg+3.5,7.5,{align:'center'});
+      // Brand name
+      pdf.setTextColor(241,245,251);pdf.setFontSize(8);pdf.setFont('helvetica','bold');
+      pdf.text('US Living',mg+10,6.5);
+      pdf.setTextColor(82,96,112);pdf.setFontSize(5);pdf.setFont('helvetica','normal');
+      pdf.text('REVENUE INTELLIGENCE',mg+10,10.2);
+      // Period
+      pdf.setTextColor(136,150,170);pdf.setFontSize(6.5);
+      pdf.text(isoToUS(from)+' – '+isoToUS(to),PW-mg,7.5,{align:'right'});
+      // Separator line
+      pdf.setDrawColor(30,36,48);pdf.setLineWidth(0.3);
+      pdf.line(0,HDR_H,PW,HDR_H);
     }
-    if(!_LD||!_SD){alert('Load data first');return;}
-    const{months:M,bMP}=_LD;const{bCl3,bClB,bOA3,bOAB,bOC3,bOCB,bN3,bNB}=_SD;
-    const p3={rr:0,cl:0,oa:0,oc:0,ni:0},pB={rr:0,cl:0,oa:0,oc:0,ni:0};
-    M.forEach(m=>{p3.rr+=bMP[m]?.['3700M']||0;p3.cl+=bCl3[m]||0;p3.oa+=bOA3[m]||0;p3.oc+=bOC3[m]||0;p3.ni+=bN3[m]||0;pB.rr+=bMP[m]?.['Bayou Park']||0;pB.cl+=bClB[m]||0;pB.oa+=bOAB[m]||0;pB.oc+=bOCB[m]||0;pB.ni+=bNB[m]||0;});
-    const days=Math.max(1,Math.ceil((new Date(to)-new Date(from))/86400000)+1);
-    const a3=U3*days,aB=UBP*days,o3=a3>0?p3.ni/a3:0,oB=aB>0?pB.ni/aB:0;
-    pg('Revenue Overview','Combined Portfolio Performance');
-    let cy=18;const kW=(W-mg*2-10)/4,kH=18;
-    const kpis=[{l:'Total Revenue',v:f$(p3.rr+p3.cl+p3.oa+pB.rr+pB.cl+pB.oa),c:BLUE},{l:'Room Revenue',v:f$(p3.rr+pB.rr),c:BLUE},{l:'Cleaning Fee',v:f$(p3.cl+pB.cl),c:[136,150,170]},{l:'OTA Commission',v:f$(p3.oc+pB.oc),c:RED},{l:'Occupancy',v:fP((p3.ni+pB.ni)/(a3+aB)),c:TEAL},{l:'ADR',v:f$((p3.ni+pB.ni)>0?(p3.rr+pB.rr)/(p3.ni+pB.ni):0),c:AMB},{l:'RevPAR',v:f$((p3.rr+pB.rr)/(a3+aB)),c:AMB},{l:'OTA Adjustment',v:f$(p3.oa+pB.oa),c:AMB}];
-    kpis.forEach((k,i)=>{const r=Math.floor(i/4),col=i%4,x=mg+col*(kW+3.3),y=cy+r*(kH+3);pdf.setFillColor(...S1);pdf.roundedRect(x,y,kW,kH,1.5,1.5,'F');pdf.setFillColor(...k.c);pdf.rect(x,y,kW,.8,'F');pdf.setTextColor(...T3);pdf.setFontSize(5);pdf.setFont('helvetica','bold');pdf.text(k.l.toUpperCase(),x+3.5,y+4.5);pdf.setTextColor(...T0);pdf.setFontSize(10.5);pdf.setFont('helvetica','bold');pdf.text(k.v,x+3.5,y+12);});
-    cy+=kH*2+3*3+8;const pW=(W-mg*2-4)/2;
-    [{pf:'3700M',c:BLUE,sub:'Dallas — McKinney Avenue · '+U3+' units',st:[{l:'OCC',v:fP(o3)},{l:'ADR',v:f$(a3>0&&p3.ni>0?p3.rr/p3.ni:0)},{l:'RevPAR',v:f$(a3>0?p3.rr/a3:0)},{l:'Room Rev.',v:f$(p3.rr)},{l:'Cleaning',v:f$(p3.cl)},{l:'Total Rev.',v:f$(p3.rr+p3.cl+p3.oa)}]},{pf:'Bayou Park',c:TEAL,sub:'Houston — Montrose / Midtown · '+UBP+' units',st:[{l:'OCC',v:fP(oB)},{l:'ADR',v:f$(aB>0&&pB.ni>0?pB.rr/pB.ni:0)},{l:'RevPAR',v:f$(aB>0?pB.rr/aB:0)},{l:'Room Rev.',v:f$(pB.rr)},{l:'Cleaning',v:f$(pB.cl)},{l:'Total Rev.',v:f$(pB.rr+pB.cl+pB.oa)}]}].forEach((pc,i)=>{const x=mg+i*(pW+4);pdf.setFillColor(...S1);pdf.roundedRect(x,cy,pW,24,2,2,'F');pdf.setDrawColor(...pc.c);pdf.setLineWidth(.5);pdf.roundedRect(x,cy,pW,24,2,2,'S');pdf.setFillColor(...pc.c);pdf.rect(x,cy,2.5,24,'F');pdf.setTextColor(...pc.c);pdf.setFontSize(8);pdf.setFont('helvetica','bold');pdf.text(pc.pf,x+7,cy+7);pdf.setTextColor(...T3);pdf.setFontSize(5.5);pdf.setFont('helvetica','normal');pdf.text(pc.sub,x+7,cy+11.5);const sw=(pW-12)/pc.st.length;pc.st.forEach((s,j)=>{const sx=x+7+j*sw;pdf.setTextColor(...T3);pdf.setFontSize(5);pdf.text(s.l,sx,cy+17);pdf.setTextColor(...T0);pdf.setFontSize(7.5);pdf.setFont('helvetica','bold');pdf.text(s.v,sx,cy+22);pdf.setFont('helvetica','normal');});});
-    const pc=pdf.internal.getNumberOfPages();
-    for(let i=1;i<=pc;i++){pdf.setPage(i);pdf.setTextColor(...T3);pdf.setFontSize(5.5);pdf.text('US Living — Revenue Intelligence  |  Confidential',mg,H-5);pdf.text('Page '+i+' of '+pc,W-mg,H-5,{align:'right'});}
-    pdf.save('US-Living-Revenue-'+from+'-'+to+'.pdf');
-  }catch(e){alert('PDF error: '+e.message);}
-  finally{document.getElementById('btnPDF').innerHTML='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 4h4M4 6.5h4M4 9h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> PDF';document.getElementById('btnPDF').disabled=false;}
+
+    function drawPageFooter(pageNum,totalPages){
+      const footerY=PH-6;
+      pdf.setFillColor(5,7,9);pdf.rect(0,PH-10,PW,10,'F');
+      pdf.setDrawColor(30,36,48);pdf.setLineWidth(0.2);pdf.line(0,PH-10,PW,PH-10);
+      pdf.setTextColor(82,96,112);pdf.setFontSize(5.5);pdf.setFont('helvetica','normal');
+      pdf.text('US Living — Revenue Intelligence  |  Confidential',mg,footerY);
+      pdf.text(`Page ${pageNum} of ${totalPages}`,PW-mg,footerY,{align:'right'});
+    }
+
+    // Capture a tab as image and add to PDF
+    async function captureTab(tabName){
+      // Show this tab
+      ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>{
+        const e=document.getElementById('tab-'+t);if(e)e.style.display='none';
+      });
+      const tabEl=document.getElementById('tab-'+tabName);
+      if(!tabEl)return;
+      tabEl.style.display='';
+
+      // Wait for charts/layout to settle
+      await new Promise(r=>setTimeout(r,300));
+
+      // Capture
+      const canvas=await html2canvas(tabEl,{
+        backgroundColor:'#050709',
+        scale:2,
+        useCORS:true,
+        allowTaint:true,
+        logging:false,
+        windowWidth:1440,
+        scrollY:0,
+        onclone:(doc)=>{
+          // Make sure cloned element is visible and full width
+          const el=doc.getElementById('tab-'+tabName);
+          if(el){el.style.display='';el.style.minHeight='auto';}
+        }
+      });
+
+      // How tall is the content in mm?
+      const imgW=canvas.width;
+      const imgH=canvas.height;
+      const scale=contentW/imgW*1; // px to mm (at 96dpi: 1px = 0.2646mm, but we use ratio)
+      const mmH=(imgH/imgW)*contentW;
+
+      const USABLE=PH-HDR_H-10; // usable height per page (minus header + footer)
+      const pxPerMm=imgW/contentW;
+      const sliceH=USABLE*pxPerMm; // px per page slice
+
+      let sliceTop=0;
+      let pageIdx=0;
+
+      while(sliceTop<imgH){
+        if(!firstPage) pdf.addPage();
+        firstPage=false;
+
+        // Create a slice canvas
+        const sliceCanvas=document.createElement('canvas');
+        const actualSlice=Math.min(sliceH,imgH-sliceTop);
+        sliceCanvas.width=imgW;
+        sliceCanvas.height=actualSlice;
+        const ctx=sliceCanvas.getContext('2d');
+        ctx.drawImage(canvas,0,sliceTop,imgW,actualSlice,0,0,imgW,actualSlice);
+
+        const imgData=sliceCanvas.toDataURL('image/jpeg',0.92);
+        const sliceMmH=(actualSlice/imgW)*contentW;
+
+        drawPageHeader();
+        pdf.addImage(imgData,'JPEG',mg,HDR_H+1,contentW,sliceMmH);
+
+        sliceTop+=sliceH;
+        pageIdx++;
+      }
+    }
+
+    // Capture each section
+    btn.innerHTML=`<svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg> Capturing...`;
+
+    for(let i=0;i<sections.length;i++){
+      const sec=sections[i];
+      btn.innerHTML=`<svg width="12" height="12" viewBox="0 0 12 12"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg> ${i+1}/${sections.length}: ${sec.label}`;
+      await captureTab(sec.tab);
+    }
+
+    // Add footer to all pages
+    const totalPages=pdf.internal.getNumberOfPages();
+    for(let i=1;i<=totalPages;i++){
+      pdf.setPage(i);
+      drawPageFooter(i,totalPages);
+    }
+
+    // Restore original tab
+    ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>{
+      const e=document.getElementById('tab-'+t);if(e)e.style.display='none';
+    });
+    const restoreEl=document.getElementById('tab-'+activeTabName);
+    if(restoreEl)restoreEl.style.display='';
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    if(activeTabEl)activeTabEl.classList.add('active');
+
+    pdf.save(`US-Living-Revenue-${from}-${to}.pdf`);
+
+  }catch(e){
+    alert('PDF error: '+e.message);
+    console.error(e);
+  }finally{
+    btn.innerHTML=origHTML;
+    btn.disabled=false;
+  }
 }
+
+
 
 // ─── Excel export — ExcelJS (full styling in browser) ───────────
 async function exportExcel(){
