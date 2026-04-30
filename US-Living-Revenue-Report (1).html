@@ -911,13 +911,15 @@ function render(reservations,from,to,prev,lists){
   window._lastReservations=reservations;
   window._lastFrom=from;window._lastTo=to;
   window._lastBP=bP;window._lastDiffDays=diffDays;window._lastDu3=du3;window._lastDuBP=duBP;
-  applyCompare();
+  window._lastByUnit=byUnit;window._lastLists=lists;
   document.getElementById('main').style.display='block';
   document.getElementById('emptyBox').style.display='none';
   // document.getElementById('btnPDF').style.display=''; // PDF disabled
   document.getElementById('btnXLSX').style.display='';
   document.getElementById('compareToggle').style.display='';
   renderSummary();
+  // Trigger compare after render (async, updates KPIs/charts when data arrives)
+  applyCompare();
 }
 
 function renderSummary(){
