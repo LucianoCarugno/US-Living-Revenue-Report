@@ -442,6 +442,7 @@ async function applyCompare(){
     };
     refreshKPIs();
     refreshCharts();
+    refreshPortfolioTabs();
   }catch(e){console.error('Compare fetch error:',e);}
 }
 
@@ -481,8 +482,66 @@ function refreshKPIs(){
 
 function refreshCharts(){
   if(!_LD) return;
-  // Re-render overview charts with compare overlay
   ['rev','adr','revpar','occ'].forEach(id=>rC(id));
+}
+
+function refreshPortfolioTabs(){
+  if(!window._lastBP||!window._lastDiffDays||!window._lastLists) return;
+  const bP=window._lastBP;
+  const diffDays=window._lastDiffDays;
+  const du3=window._lastDu3||12;
+  const duBP=window._lastDuBP||20;
+  const byUnit=window._lastByUnit||{};
+  const lists=window._lastLists||[];
+
+  function rebuildPFKPIs(pf,accent,ucCount,ids){
+    // Recompute portfolio compare exactly like buildPFDash does
+    let pfCmp={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0};
+    if(_cmpData&&_cmpData.reservations){
+      const cF=_cmpData.from,cT=_cmpData.to;
+      const cS=new Date(cF+'T00:00:00'),cE=new Date(cT+'T23:59:59');
+      _cmpData.reservations.filter(r=>r.status!=='cancelled'&&getPFR(r)===pf).forEach(r=>{
+        const ci=new Date(r.checkIn),co=new Date(r.checkOut),tn=Math.max(1,Math.round((co-ci)/86400000));
+        const dR=(r.money?.fareAccommodation||0)/tn,dOC=Math.abs(r.money?.hostServiceFee||0)/tn;
+        let nin=0,cur=new Date(ci);
+        while(cur<co){if(cur>=cS&&cur<=cE)nin++;cur.setDate(cur.getDate()+1);}
+        pfCmp.roomRev+=dR*nin;pfCmp.otaComm+=dOC*nin;pfCmp.nights+=nin;
+        if(co>=cS&&co<=cE){pfCmp.clean+=(r.money?.fareCleaning||0);pfCmp.otaAdj+=(r.money?.resolutionAmount||0);}
+      });
+    }
+    const pfOcc=ucCount*diffDays>0?bP[pf].nights/(ucCount*diffDays):0;
+    const pfADR=bP[pf].nights>0?bP[pf].roomRev/bP[pf].nights:0;
+    const pfRevPAR=ucCount*diffDays>0?bP[pf].roomRev/(ucCount*diffDays):0;
+    const pfTotRev=bP[pf].roomRev+bP[pf].clean+(bP[pf].otaAdj||0);
+    const cmpD2=_cmpData?getDays(_cmpData.from,_cmpData.to):diffDays;
+    const pfCmpOcc=_cmpData?pfCmp.nights/(ucCount*cmpD2):0;
+    const pfCmpADR=_cmpData&&pfCmp.nights>0?pfCmp.roomRev/pfCmp.nights:0;
+    const pfCmpRevPAR=_cmpData?pfCmp.roomRev/(ucCount*cmpD2):0;
+    const pfCmpTot=pfCmp.roomRev+pfCmp.clean+pfCmp.otaAdj;
+    const cmpLbl2=_cmpData?'vs '+_cmpData.label:'';
+    const kps=[
+      {l:'Total Revenue',v:$c(pfTotRev),raw:pfTotRev,acc:accent,sub:bP[pf].count+' bookings',cmpV:_cmpData?pfCmpTot:null},
+      {l:'Room Revenue',v:$c(bP[pf].roomRev),raw:bP[pf].roomRev,acc:accent,sub:'Net accommodation',cmpV:_cmpData?pfCmp.roomRev:null},
+      {l:'Cleaning Fee',v:$c(bP[pf].clean),raw:bP[pf].clean,acc:'#526070',sub:'At checkout',cmpV:_cmpData?pfCmp.clean:null},
+      {l:'OTA Commission',v:$c(bP[pf].otaComm),raw:bP[pf].otaComm,acc:'#F43F5E',sub:'Channel fees',cmpV:_cmpData?pfCmp.otaComm:null},
+      {l:'OTA Adjustment',v:bP[pf].otaAdj<0?'-$'+Math.round(Math.abs(bP[pf].otaAdj||0)).toLocaleString():$c(bP[pf].otaAdj||0),raw:bP[pf].otaAdj||0,acc:'#F59E0B',sub:'Resolution center',cmpV:null},
+      {l:'Occupancy',v:pct(pfOcc),raw:pfOcc,acc:'#10C98A',sub:fmt(bP[pf].nights)+' nights',cmpV:_cmpData?pfCmpOcc:null,isPct:true},
+      {l:'ADR',v:$c(pfADR),raw:pfADR,acc:'#F59E0B',sub:'Avg. daily rate',cmpV:_cmpData?pfCmpADR:null},
+      {l:'RevPAR',v:$c(pfRevPAR),raw:pfRevPAR,acc:'#F59E0B',sub:'Per available night',cmpV:_cmpData?pfCmpRevPAR:null},
+    ];
+    const el=document.getElementById(ids.kpi);
+    if(!el) return;
+    el.innerHTML=kps.map(k=>{
+      const d=k.cmpV!=null?deltaVsCmp(k.raw,k.cmpV):'';
+      const cv=k.cmpV!=null&&cmpLbl2?'<div class="cmp-label">'+cmpLbl2+': '+(k.isPct?pct(k.cmpV):$c(k.cmpV))+'</div>':'';
+      return'<div class="kpi" style="--kpi-accent:'+k.acc+'"><div class="kpi-label"><div class="kpi-label-dot"></div>'+k.l+'</div><div class="kpi-value">'+k.v+'</div><div class="kpi-sub">'+k.sub+'</div>'+d+cv+'</div>';
+    }).join('');
+    // Also refresh charts for this portfolio
+    ['rev','adr','revpar','occ'].forEach(t=>rPC(pf,t));
+  }
+
+  rebuildPFKPIs('3700M','#3B6EFF',du3,{kpi:'kpi3700',kpiCard:'pfCard3700',ch:'chBars3700',rev:'cRev3700',adr:'cADR3700',revpar:'cRevPAR3700',occ:'cOcc3700',occB:'occU3700b',tbl:'tbl3700'});
+  rebuildPFKPIs('Bayou Park','#10C98A',duBP,{kpi:'kpiBP',kpiCard:'pfCardBP',ch:'chBarsBP',rev:'cRevBP',adr:'cADRBP',revpar:'cRevPARBP',occ:'cOccBP',occB:'occUBPb',tbl:'tblBP'});
 }
 
 let csvRes=null,csvName=null,csvMode=false;
