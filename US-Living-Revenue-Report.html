@@ -62,6 +62,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t0);min-height:100
 .source-btn{font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:none;background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;font-family:var(--sans);}
 .source-btn:hover{color:var(--t1)}
 .source-btn.active{background:var(--s4);color:var(--t0);box-shadow:0 1px 3px rgba(0,0,0,0.4)}
+/* Compare toggle */
+.compare-toggle{display:flex;align-items:center;background:var(--s1);border:1px solid var(--blue-ring);border-radius:var(--r2);padding:3px;gap:2px;}
+.compare-btn{font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:none;background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;font-family:var(--sans);white-space:nowrap;}
+.compare-btn:hover{color:var(--t1)}
+.compare-btn.active{background:var(--s4);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.4)}
+/* Compare delta badges */
+.kpi-delta-cmp{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:500;padding:2px 6px;border-radius:var(--r1);margin-top:4px;font-family:var(--mono);letter-spacing:.3px;opacity:.75;}
+.kpi-delta-cmp.up{background:rgba(16,201,138,0.08);color:#10C98A}
+.kpi-delta-cmp.down{background:rgba(244,63,94,0.08);color:#F43F5E}
+.kpi-delta-cmp.neutral{background:var(--b1);color:var(--t3)}
+.cmp-label{font-size:9px;color:var(--t3);font-family:var(--mono);margin-top:3px;letter-spacing:.2px;}
 .tabs{display:flex;align-items:center;gap:2px;border-bottom:1px solid var(--b1);margin-bottom:32px;}
 .tab{font-size:12.5px;font-weight:500;padding:10px 16px 11px;cursor:pointer;color:var(--t3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px;letter-spacing:.1px;}
 .tab:hover{color:var(--t1)}
@@ -213,6 +224,11 @@ tr.total-row td:first-child{font-family:var(--mono);font-size:11px;font-weight:7
         <button class="source-btn" id="btnCSV" onclick="switchToCSV()"><span id="csvBtnLabel">CSV</span></button>
         <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="loadCSV(this)">
       </div>
+      <div class="compare-toggle" id="compareToggle" style="display:none">
+        <button class="compare-btn active" id="cmpOff" onclick="setCompare('off',this)">Off</button>
+        <button class="compare-btn" id="cmpPP" onclick="setCompare('pp',this)">vs Prior Period</button>
+        <button class="compare-btn" id="cmpYoY" onclick="setCompare('yoy',this)">vs Prior Year</button>
+      </div>
       <button class="btn btn-ghost" id="btnPDF" onclick="exportPDF()" style="display:none !important">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 4h4M4 6.5h4M4 9h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         PDF
@@ -336,6 +352,10 @@ const PP={'3700M':{rev:12,adr:12,revpar:12,occ:12},'Bayou Park':{rev:12,adr:12,r
 let summaryP=12;
 const MONO="'JetBrains Mono',monospace";
 
+// ─── Compare mode ─────────────────────────────────────────────
+let compareMode='off'; // 'off' | 'pp' | 'yoy'
+let _cmpData=null; // comparison period computed data
+
 const now=new Date();
 const df=document.getElementById('df'),dt=document.getElementById('dt');
 df.value=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
@@ -349,6 +369,128 @@ function syncDates(){
   document.getElementById('dtDisplay').textContent=dtv?isoToUS(dtv):'MM/DD/YYYY';
 }
 function fmtDate(v){return isoToUS(typeof v==='string'?v.split('T')[0]:v.toISOString().split('T')[0]);}
+
+// ─── Compare mode functions ───────────────────────────────────
+function setCompare(mode,btn){
+  compareMode=mode;
+  document.querySelectorAll('.compare-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(_LD) applyCompare();
+}
+
+function getCmpPeriod(from,to){
+  const f=new Date(from+' 00:00'), t=new Date(to+' 00:00');
+  if(compareMode==='yoy'){
+    const f2=new Date(f); f2.setFullYear(f2.getFullYear()-1);
+    const t2=new Date(t); t2.setFullYear(t2.getFullYear()-1);
+    return{from:f2.toISOString().split('T')[0], to:t2.toISOString().split('T')[0], label:'Prior Year'};
+  }else if(compareMode==='pp'){
+    const diff=t-f+86400000;
+    return{from:new Date(f-diff).toISOString().split('T')[0], to:new Date(f-86400000).toISOString().split('T')[0], label:'Prior Period'};
+  }
+  return null;
+}
+
+function deltaVsCmp(cur,cmp){
+  if(!cmp||cmp===0)return'';
+  const p=((cur-cmp)/Math.abs(cmp))*100,up=p>=0;
+  const arrow=up?'↑':'↓';
+  return`<div class="kpi-delta-cmp ${up?'up':'down'}">${arrow} ${(up?'+':'')}${Math.round(Math.abs(p))}%</div>`;
+}
+
+async function applyCompare(){
+  const from=df.value,to=dt.value;
+  if(!from||!to) return;
+
+  if(compareMode==='off'){
+    _cmpData=null;
+    refreshKPIs();
+    refreshCharts();
+    return;
+  }
+
+  const cmpPeriod=getCmpPeriod(from,to);
+  if(!cmpPeriod) return;
+
+  // Fetch/filter comparison data
+  let cmpRes;
+  try{
+    if(csvMode&&csvRes){
+      cmpRes=csvRes; // same dataset, filter by date in calcTotals
+    }else{
+      cmpRes=await fetchAll(cmpPeriod.from,cmpPeriod.to);
+    }
+    // Compute compare monthly data
+    const cmpConf=cmpRes.filter(r=>r.status!=='cancelled');
+    const cmpBMP={},cmpBADR={},cmpBRevPAR={},cmpBOcc={};
+    cmpConf.forEach(r=>{
+      const pf2=getPFR(r),rrt2=r.money?.fareAccommodation||0;
+      const ci2=new Date(r.checkIn),co2=new Date(r.checkOut),tn2=Math.max(1,Math.round((co2-ci2)/86400000));
+      const dR2=rrt2/tn2;let cur2=new Date(ci2);
+      while(cur2<co2){const ym2=cur2.toISOString().substring(0,7);if(!cmpBMP[ym2])cmpBMP[ym2]={'3700M':0,'Bayou Park':0};if(cmpBMP[ym2][pf2]!==undefined)cmpBMP[ym2][pf2]+=dR2;cur2.setDate(cur2.getDate()+1);}
+    });
+    Object.keys(cmpBMP).forEach(ym=>{
+      const[y,m]=ym.split('-'),dim2=new Date(+y,+m,0).getDate();
+      ['3700M','Bayou Park'].forEach(pf=>{
+        const uc2=pf==='3700M'?12:20;
+        const pr2=cmpConf.filter(r=>getPFR(r)===pf&&r.checkIn?.substring(0,7)===ym);
+        const pn2=pr2.reduce((a,r)=>a+(r.nightsCount||0),0),prv2=pr2.reduce((a,r)=>a+(r.money?.fareAccommodation||0),0),av2=uc2*dim2;
+        if(!cmpBADR[ym])cmpBADR[ym]={};if(!cmpBRevPAR[ym])cmpBRevPAR[ym]={};if(!cmpBOcc[ym])cmpBOcc[ym]={};
+        cmpBADR[ym][pf]=pn2>0?prv2/pn2:0;cmpBRevPAR[ym][pf]=av2>0?prv2/av2:0;cmpBOcc[ym][pf]=av2>0?pn2/av2*100:0;
+      });
+    });
+    _cmpData={
+      totals:calcTotals(cmpRes,cmpPeriod.from,cmpPeriod.to,window._lastDu3||12,window._lastDuBP||20),
+      label:cmpPeriod.label,
+      from:cmpPeriod.from,
+      to:cmpPeriod.to,
+      reservations:cmpRes,
+      bMP:cmpBMP,bADR:cmpBADR,bRevPAR:cmpBRevPAR,bOcc:cmpBOcc
+    };
+    refreshKPIs();
+    refreshCharts();
+  }catch(e){console.error('Compare fetch error:',e);}
+}
+
+function refreshKPIs(){
+  if(!window._lastBP||!_LD) return;
+  const bp3=window._lastBP?.['3700M']||{};
+  const bpB=window._lastBP?.['Bayou Park']||{};
+  const diffDays=window._lastDiffDays||1;
+  const du3=window._lastDu3||12, duBP=window._lastDuBP||20;
+
+  const tRR=bp3.roomRev+bpB.roomRev, tCl=bp3.clean+bpB.clean;
+  const tOC=bp3.otaComm+bpB.otaComm, tNi=bp3.nights+bpB.nights;
+  const tAv=(du3+duBP)*diffDays, tOA=bp3.otaAdj+bpB.otaAdj, tRev=tRR+tCl+tOA;
+  const tOcc=tAv>0?tNi/tAv:0, tADR=tNi>0?tRR/tNi:0, tRP=tAv>0?tRR/tAv:0;
+
+  const cmp=_cmpData?.totals;
+  const cmpLabel=_cmpData?`vs ${_cmpData.label}`:'';
+
+  const kpis=[
+    {l:'Total Revenue',   v:$c(tRev),   raw:tRev,  sub:(bp3.count||0)+(bpB.count||0)+' confirmed bookings', acc:'#3B6EFF', cmpV:cmp?.totalRev},
+    {l:'Room Revenue',    v:$c(tRR),    raw:tRR,   sub:'Net accommodation', acc:'#3B6EFF', cmpV:cmp?.roomRev},
+    {l:'Cleaning Fee',    v:$c(tCl),    raw:tCl,   sub:'At checkout', acc:'#526070', cmpV:cmp?.clean},
+    {l:'OTA Commission',  v:$c(tOC),    raw:tOC,   sub:'Channel fees', acc:'#F43F5E', cmpV:cmp?.otaComm},
+    {l:'OTA Adjustment',  v:tOA<0?'-$'+Math.round(Math.abs(tOA)).toLocaleString():$c(tOA), raw:tOA, sub:'Resolution center', acc:'#F59E0B', cmpV:null},
+    {l:'Occupancy',       v:pct(tOcc),  raw:tOcc,  sub:fmt(tNi)+' / '+fmt(tAv)+' nights', acc:'#10C98A', cmpV:cmp?.occ, isPct:true},
+    {l:'ADR',             v:$c(tADR),   raw:tADR,  sub:'Avg. daily rate', acc:'#F59E0B', cmpV:cmp?.adr},
+    {l:'RevPAR',          v:$c(tRP),    raw:tRP,   sub:'Per available night', acc:'#F59E0B', cmpV:cmp?.revpar},
+  ];
+
+  document.getElementById('kpiTop').innerHTML=kpis.map(k=>{
+    const d=k.cmpV!=null?deltaVsCmp(k.raw,k.cmpV):'';
+    const cmpVal=k.cmpV!=null&&cmpLabel
+      ?`<div class="cmp-label">${cmpLabel}: ${k.isPct?pct(k.cmpV):$c(k.cmpV)}</div>`:'';
+    return`<div class="kpi" style="--kpi-accent:${k.acc}"><div class="kpi-label"><div class="kpi-label-dot"></div>${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.sub}</div>${d}${cmpVal}</div>`;
+  }).join('');
+}
+
+function refreshCharts(){
+  if(!_LD) return;
+  // Re-render overview charts with compare overlay
+  ['rev','adr','revpar','occ'].forEach(id=>rC(id));
+}
 
 let csvRes=null,csvName=null,csvMode=false;
 (function(){try{const s=localStorage.getItem('guesty_csv')||localStorage.getItem('g_csv');const n=localStorage.getItem('guesty_csv_name')||localStorage.getItem('g_csv_name');if(s){csvRes=JSON.parse(s);csvName=n||'saved file';csvMode=true;}}catch(e){}})();
@@ -477,9 +619,15 @@ function rC(id){
   const{months:M,bMP,bADR,bRevPAR,bOcc}=_LD;
   const fm=fltM(M,CP[id]),lb=fm.map(mLabel);
   if(id==='rev'){dC('rev');charts.rev=new Chart(document.getElementById('chartRev'),{type:'bar',data:{labels:lb,datasets:[{label:'3700M',data:fm.map(m=>Math.round(bMP[m]['3700M']||0)),backgroundColor:'rgba(59,110,255,0.85)',borderRadius:4,borderSkipped:false,datalabels:DL_B},{label:'Bayou Park',data:fm.map(m=>Math.round(bMP[m]['Bayou Park']||0)),backgroundColor:'rgba(16,201,138,0.85)',borderRadius:4,borderSkipped:false,datalabels:DL_B}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});}
-  else if(id==='adr'){dC('adr');charts.adr=new Chart(document.getElementById('chartADR'),{type:'line',data:{labels:lb,datasets:[{label:'3700M',data:fm.map(m=>Math.round(bADR[m]?.['3700M']||0)),borderColor:'#3B6EFF',backgroundColor:'rgba(59,110,255,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#3B6EFF',borderWidth:2,datalabels:{...dlL('#3B6EFF')}},{label:'Bayou Park',data:fm.map(m=>Math.round(bADR[m]?.['Bayou Park']||0)),borderColor:'#10C98A',backgroundColor:'rgba(16,201,138,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#10C98A',borderDash:[4,3],borderWidth:2,datalabels:{...dlL('#10C98A'),align:'bottom'}}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}},datalabels:DL_L},scales:mks({},{},v=>'$'+v)}});}
+  else if(id==='adr'){dC('adr');
+    const adrDS=[{label:'3700M',data:fm.map(m=>Math.round(bADR[m]?.['3700M']||0)),borderColor:'#3B6EFF',backgroundColor:'rgba(59,110,255,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#3B6EFF',borderWidth:2,datalabels:{...dlL('#3B6EFF')}},{label:'Bayou Park',data:fm.map(m=>Math.round(bADR[m]?.['Bayou Park']||0)),borderColor:'#10C98A',backgroundColor:'rgba(16,201,138,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#10C98A',borderDash:[4,3],borderWidth:2,datalabels:{...dlL('#10C98A'),align:'bottom'}}];
+    if(_cmpData&&_cmpData.bADR){adrDS.push({label:'3700M (cmp)',data:fm.map(m=>Math.round(_cmpData.bADR[m]?.['3700M']||0)),borderColor:'rgba(59,110,255,0.3)',backgroundColor:'transparent',tension:.4,fill:false,pointRadius:2,borderWidth:1.5,borderDash:[3,3],datalabels:{display:false}});adrDS.push({label:'BP (cmp)',data:fm.map(m=>Math.round(_cmpData.bADR[m]?.['Bayou Park']||0)),borderColor:'rgba(16,201,138,0.3)',backgroundColor:'transparent',tension:.4,fill:false,pointRadius:2,borderWidth:1.5,borderDash:[3,3],datalabels:{display:false}});}
+    charts.adr=new Chart(document.getElementById('chartADR'),{type:'line',data:{labels:lb,datasets:adrDS},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}},datalabels:DL_L},scales:mks({},{},v=>'$'+v)}});}
   else if(id==='revpar'){dC('revpar');charts.revpar=new Chart(document.getElementById('chartRevPAR'),{type:'line',data:{labels:lb,datasets:[{label:'3700M',data:fm.map(m=>Math.round(bRevPAR[m]?.['3700M']||0)),borderColor:'#F59E0B',backgroundColor:'rgba(245,158,11,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#F59E0B',borderWidth:2,datalabels:{...dlL('#F59E0B')}},{label:'Bayou Park',data:fm.map(m=>Math.round(bRevPAR[m]?.['Bayou Park']||0)),borderColor:'#8B5CF6',backgroundColor:'rgba(139,92,246,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#8B5CF6',borderDash:[4,3],borderWidth:2,datalabels:{...dlL('#8B5CF6'),align:'bottom'}}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}},datalabels:DL_L},scales:mks({},{},v=>'$'+v)}});}
-  else if(id==='occ'){dC('occ');charts.occ=new Chart(document.getElementById('chartOcc'),{type:'line',data:{labels:lb,datasets:[{label:'3700M',data:fm.map(m=>Math.round(bOcc[m]?.['3700M']||0)),borderColor:'#3B6EFF',backgroundColor:'rgba(59,110,255,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#3B6EFF',borderWidth:2,datalabels:{...dlP('#3B6EFF')}},{label:'Bayou Park',data:fm.map(m=>Math.round(bOcc[m]?.['Bayou Park']||0)),borderColor:'#10C98A',backgroundColor:'rgba(16,201,138,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#10C98A',borderDash:[4,3],borderWidth:2,datalabels:{...dlP('#10C98A'),align:'bottom'}}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y+'%'}},datalabels:DL_P},scales:mks({},{min:0,max:100},v=>v+'%')}});}
+  else if(id==='occ'){dC('occ');
+    const occDS=[{label:'3700M',data:fm.map(m=>Math.round(bOcc[m]?.['3700M']||0)),borderColor:'#3B6EFF',backgroundColor:'rgba(59,110,255,0.05)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#3B6EFF',borderWidth:2,datalabels:{...dlP('#3B6EFF')}},{label:'Bayou Park',data:fm.map(m=>Math.round(bOcc[m]?.['Bayou Park']||0)),borderColor:'#10C98A',backgroundColor:'rgba(16,201,138,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#10C98A',borderDash:[4,3],borderWidth:2,datalabels:{...dlP('#10C98A'),align:'bottom'}}];
+    if(_cmpData&&_cmpData.bOcc){occDS.push({label:'3700M (cmp)',data:fm.map(m=>Math.round(_cmpData.bOcc[m]?.['3700M']||0)),borderColor:'rgba(59,110,255,0.3)',backgroundColor:'transparent',tension:.4,fill:false,pointRadius:2,borderWidth:1.5,borderDash:[3,3],datalabels:{display:false}});occDS.push({label:'BP (cmp)',data:fm.map(m=>Math.round(_cmpData.bOcc[m]?.['Bayou Park']||0)),borderColor:'rgba(16,201,138,0.3)',backgroundColor:'transparent',tension:.4,fill:false,pointRadius:2,borderWidth:1.5,borderDash:[3,3],datalabels:{display:false}});}
+    charts.occ=new Chart(document.getElementById('chartOcc'),{type:'line',data:{labels:lb,datasets:occDS},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y+'%'}},datalabels:DL_P},scales:mks({},{min:0,max:100},v=>v+'%')}});}
 }
 function rPC(pf,t){
   const pd=_PD[pf];if(!pd)return;
@@ -673,10 +821,13 @@ function render(reservations,from,to,prev,lists){
   window._lastReservations=reservations;
   window._lastFrom=from;window._lastTo=to;
   window._lastBP=bP;window._lastDiffDays=diffDays;window._lastDu3=du3;window._lastDuBP=duBP;
+  // Apply compare if active
+  if(compareMode!=='off') applyCompare();
   document.getElementById('main').style.display='block';
   document.getElementById('emptyBox').style.display='none';
   // document.getElementById('btnPDF').style.display=''; // PDF disabled
   document.getElementById('btnXLSX').style.display='';
+  document.getElementById('compareToggle').style.display='';
   renderSummary();
 }
 
