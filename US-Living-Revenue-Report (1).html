@@ -225,8 +225,7 @@ tr.total-row td:first-child{font-family:var(--mono);font-size:11px;font-weight:7
         <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="loadCSV(this)">
       </div>
       <div class="compare-toggle" id="compareToggle" style="display:none">
-        <button class="compare-btn active" id="cmpOff" onclick="setCompare('off',this)">Off</button>
-        <button class="compare-btn" id="cmpPP" onclick="setCompare('pp',this)">vs Prior Period</button>
+        <button class="compare-btn active" id="cmpPP" onclick="setCompare('pp',this)">vs Prior Period</button>
         <button class="compare-btn" id="cmpYoY" onclick="setCompare('yoy',this)">vs Prior Year</button>
       </div>
       <button class="btn btn-ghost" id="btnPDF" onclick="exportPDF()" style="display:none !important">
@@ -353,7 +352,7 @@ let summaryP=12;
 const MONO="'JetBrains Mono',monospace";
 
 // ─── Compare mode ─────────────────────────────────────────────
-let compareMode='off'; // 'off' | 'pp' | 'yoy'
+let compareMode='pp'; // 'off' | 'pp' | 'yoy'
 let _cmpData=null; // comparison period computed data
 
 const now=new Date();
@@ -402,12 +401,6 @@ async function applyCompare(){
   const from=df.value,to=dt.value;
   if(!from||!to) return;
 
-  if(compareMode==='off'){
-    _cmpData=null;
-    refreshKPIs();
-    refreshCharts();
-    return;
-  }
 
   const cmpPeriod=getCmpPeriod(from,to);
   if(!cmpPeriod) return;
@@ -634,10 +627,19 @@ function rPC(pf,t){
   if(window.ChartDataLabels){Chart.register(ChartDataLabels);Chart.defaults.plugins.datalabels={display:false};}
   const{months:M,bMP,bADR,bRevPAR,bOcc,hx,rg,fl,ids}=pd;
   const fm=fltM(M,PP[pf][t]),lb=fm.map(mLabel);
-  if(t==='rev'){dC(ids.rev);charts[ids.rev]=new Chart(document.getElementById(ids.rev),{type:'bar',data:{labels:lb,datasets:[{data:fm.map(m=>Math.round(bMP[m]?.[pf]||0)),backgroundColor:rg,borderRadius:4,datalabels:DL_B}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});}
-  else if(t==='adr'){dC(ids.adr);charts[ids.adr]=new Chart(document.getElementById(ids.adr),{type:'line',data:{labels:lb,datasets:[{data:fm.map(m=>Math.round(bADR[m]?.[pf]||0)),borderColor:hx,backgroundColor:fl,tension:.4,fill:true,pointRadius:3,pointBackgroundColor:hx,borderWidth:2}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({},{},v=>'$'+v)}});}
+  if(t==='rev'){dC(ids.rev);
+    const pRevDS=[{data:fm.map(m=>Math.round(bMP[m]?.[pf]||0)),backgroundColor:rg,borderRadius:4,datalabels:DL_B}];
+    if(_cmpData&&_cmpData.bMP)pRevDS.push({data:fm.map(m=>Math.round(_cmpData.bMP[m]?.[pf]||0)),type:'line',borderColor:'rgba(255,255,255,0.35)',backgroundColor:'transparent',tension:.4,fill:false,pointRadius:2,borderWidth:1.5,borderDash:[3,3],datalabels:{display:false}});
+    charts[ids.rev]=new Chart(document.getElementById(ids.rev),{type:'bar',data:{labels:lb,datasets:pRevDS},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({stacked:true},{stacked:true},v=>'$'+(v/1000).toFixed(0)+'k')}});}
+  else if(t==='adr'){dC(ids.adr);
+    const pAdrDS=[{data:fm.map(m=>Math.round(bADR[m]?.[pf]||0)),borderColor:hx,backgroundColor:fl,tension:.4,fill:true,pointRadius:3,pointBackgroundColor:hx,borderWidth:2}];
+    if(_cmpData&&_cmpData.bADR)pAdrDS.push({data:fm.map(m=>Math.round(_cmpData.bADR[m]?.[pf]||0)),borderColor:hx+'80',backgroundColor:'transparent',tension:.4,fill:false,pointRadius:2,borderWidth:1.5,borderDash:[3,3],datalabels:{display:false}});
+    charts[ids.adr]=new Chart(document.getElementById(ids.adr),{type:'line',data:{labels:lb,datasets:pAdrDS},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({},{},v=>'$'+v)}});}
   else if(t==='revpar'){dC(ids.revpar);charts[ids.revpar]=new Chart(document.getElementById(ids.revpar),{type:'line',data:{labels:lb,datasets:[{data:fm.map(m=>Math.round(bRevPAR[m]?.[pf]||0)),borderColor:'#F59E0B',backgroundColor:'rgba(245,158,11,0.04)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#F59E0B',borderWidth:2}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+$c(c.parsed.y)}}},scales:mks({},{},v=>'$'+v)}});}
-  else if(t==='occ'){dC(ids.occ);charts[ids.occ]=new Chart(document.getElementById(ids.occ),{type:'line',data:{labels:lb,datasets:[{data:fm.map(m=>Math.round(bOcc[m]?.[pf]||0)),borderColor:hx,backgroundColor:fl,tension:.4,fill:true,pointRadius:3,pointBackgroundColor:hx,borderWidth:2}]},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y+'%'}}},scales:mks({},{min:0,max:100},v=>v+'%')}});}
+  else if(t==='occ'){dC(ids.occ);
+    const pOccDS=[{data:fm.map(m=>Math.round(bOcc[m]?.[pf]||0)),borderColor:hx,backgroundColor:fl,tension:.4,fill:true,pointRadius:3,pointBackgroundColor:hx,borderWidth:2}];
+    if(_cmpData&&_cmpData.bOcc)pOccDS.push({data:fm.map(m=>Math.round(_cmpData.bOcc[m]?.[pf]||0)),borderColor:hx+'80',backgroundColor:'transparent',tension:.4,fill:false,pointRadius:2,borderWidth:1.5,borderDash:[3,3],datalabels:{display:false}});
+    charts[ids.occ]=new Chart(document.getElementById(ids.occ),{type:'line',data:{labels:lb,datasets:pOccDS},options:{...COPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y+'%'}}},scales:mks({},{min:0,max:100},v=>v+'%')}});}
 }
 
 function mkOccUnits(elId,pf,diffDays,byUnit,lists){
@@ -755,17 +757,46 @@ function render(reservations,from,to,prev,lists){
 
   function buildPFDash(pf,accent,rg,fl,ids,ucCount){
     document.getElementById(ids.kpiCard).innerHTML=mkPFCard(pf,'',accent,ucCount,bP[pf],diffDays);
+    // Portfolio-level compare data
+    let pfCmp={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0};
+    if(_cmpData&&_cmpData.reservations){
+      const cF=_cmpData.from,cT=_cmpData.to;
+      const cS=new Date(cF+'T00:00:00'),cE=new Date(cT+'T23:59:59');
+      const cD=getDays(cF,cT);
+      _cmpData.reservations.filter(r=>r.status!=='cancelled'&&getPFR(r)===pf).forEach(r=>{
+        const ci=new Date(r.checkIn),co=new Date(r.checkOut),tn=Math.max(1,Math.round((co-ci)/86400000));
+        const dR=(r.money?.fareAccommodation||0)/tn,dOC=Math.abs(r.money?.hostServiceFee||0)/tn;
+        let nin=0,cur=new Date(ci);
+        while(cur<co){if(cur>=cS&&cur<=cE)nin++;cur.setDate(cur.getDate()+1);}
+        pfCmp.roomRev+=dR*nin;pfCmp.otaComm+=dOC*nin;pfCmp.nights+=nin;
+        if(co>=cS&&co<=cE){pfCmp.clean+=(r.money?.fareCleaning||0);pfCmp.otaAdj+=(r.money?.resolutionAmount||0);}
+      });
+    }
+    const pfOcc=ucCount*diffDays>0?bP[pf].nights/(ucCount*diffDays):0;
+    const pfADR=bP[pf].nights>0?bP[pf].roomRev/bP[pf].nights:0;
+    const pfRevPAR=ucCount*diffDays>0?bP[pf].roomRev/(ucCount*diffDays):0;
+    const pfTotRev=bP[pf].roomRev+bP[pf].clean+(bP[pf].otaAdj||0);
+    const cmpD2=_cmpData?getDays(_cmpData.from,_cmpData.to):diffDays;
+    const pfCmpOcc=_cmpData?pfCmp.nights/(ucCount*cmpD2):0;
+    const pfCmpADR=_cmpData&&pfCmp.nights>0?pfCmp.roomRev/pfCmp.nights:0;
+    const pfCmpRevPAR=_cmpData?pfCmp.roomRev/(ucCount*cmpD2):0;
+    const pfCmpTot=pfCmp.roomRev+pfCmp.clean+pfCmp.otaAdj;
+    const cmpLbl2=_cmpData?'vs '+_cmpData.label:'';
     const kps=[
-      {l:'Total Revenue',v:$c(bP[pf].roomRev+bP[pf].clean+(bP[pf].otaAdj||0)),sub:bP[pf].count+' bookings',acc:accent},
-      {l:'Room Revenue',v:$c(bP[pf].roomRev),sub:'Net accommodation',acc:accent},
-      {l:'Cleaning Fee',v:$c(bP[pf].clean),sub:'At checkout',acc:'#526070'},
-      {l:'OTA Commission',v:$c(bP[pf].otaComm),sub:'Channel fees',acc:'#F43F5E'},
-      {l:'OTA Adjustment',v:bP[pf].otaAdj<0?'-$'+Math.round(Math.abs(bP[pf].otaAdj||0)).toLocaleString():$c(bP[pf].otaAdj||0),sub:'Resolution center',acc:'#F59E0B'},
-      {l:'Occupancy',v:pct(ucCount*diffDays>0?bP[pf].nights/(ucCount*diffDays):0),sub:fmt(bP[pf].nights)+' nights',acc:'#10C98A'},
-      {l:'ADR',v:$c(bP[pf].nights>0?bP[pf].roomRev/bP[pf].nights:0),sub:'Avg. daily rate',acc:'#F59E0B'},
-      {l:'RevPAR',v:$c(ucCount*diffDays>0?bP[pf].roomRev/(ucCount*diffDays):0),sub:'Per available night',acc:'#F59E0B'},
+      {l:'Total Revenue',v:$c(pfTotRev),raw:pfTotRev,sub:bP[pf].count+' bookings',acc:accent,cmpV:_cmpData?pfCmpTot:null},
+      {l:'Room Revenue',v:$c(bP[pf].roomRev),raw:bP[pf].roomRev,sub:'Net accommodation',acc:accent,cmpV:_cmpData?pfCmp.roomRev:null},
+      {l:'Cleaning Fee',v:$c(bP[pf].clean),raw:bP[pf].clean,sub:'At checkout',acc:'#526070',cmpV:_cmpData?pfCmp.clean:null},
+      {l:'OTA Commission',v:$c(bP[pf].otaComm),raw:bP[pf].otaComm,sub:'Channel fees',acc:'#F43F5E',cmpV:_cmpData?pfCmp.otaComm:null},
+      {l:'OTA Adjustment',v:bP[pf].otaAdj<0?'-$'+Math.round(Math.abs(bP[pf].otaAdj||0)).toLocaleString():$c(bP[pf].otaAdj||0),raw:bP[pf].otaAdj||0,sub:'Resolution center',acc:'#F59E0B',cmpV:null},
+      {l:'Occupancy',v:pct(pfOcc),raw:pfOcc,sub:fmt(bP[pf].nights)+' nights',acc:'#10C98A',cmpV:_cmpData?pfCmpOcc:null,isPct:true},
+      {l:'ADR',v:$c(pfADR),raw:pfADR,sub:'Avg. daily rate',acc:'#F59E0B',cmpV:_cmpData?pfCmpADR:null},
+      {l:'RevPAR',v:$c(pfRevPAR),raw:pfRevPAR,sub:'Per available night',acc:'#F59E0B',cmpV:_cmpData?pfCmpRevPAR:null},
     ];
-    document.getElementById(ids.kpi).innerHTML=kps.map(k=>`<div class="kpi" style="--kpi-accent:${k.acc}"><div class="kpi-label"><div class="kpi-label-dot"></div>${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+    document.getElementById(ids.kpi).innerHTML=kps.map(k=>{
+      const d=k.cmpV!=null?deltaVsCmp(k.raw,k.cmpV):'';
+      const cv=k.cmpV!=null&&cmpLbl2?'<div class="cmp-label">'+cmpLbl2+': '+(k.isPct?pct(k.cmpV):$c(k.cmpV))+'</div>':'';
+      return'<div class="kpi" style="--kpi-accent:'+k.acc+'"><div class="kpi-label"><div class="kpi-label-dot"></div>'+k.l+'</div><div class="kpi-value">'+k.v+'</div><div class="kpi-sub">'+k.sub+'</div>'+d+cv+'</div>';
+    }).join('');
     const pfCh={};conf.filter(r=>getPFR(r)===pf).forEach(r=>{const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');if(!pfCh[ch])pfCh[ch]=0;pfCh[ch]+=(r.money?.fareAccommodation||0)+(r.money?.fareCleaning||0);});
     mkChBars(ids.ch,pfCh);
     _PD[pf]={months,bMP,bADR,bRevPAR,bOcc,hx:accent,rg,fl,ids};
@@ -821,8 +852,7 @@ function render(reservations,from,to,prev,lists){
   window._lastReservations=reservations;
   window._lastFrom=from;window._lastTo=to;
   window._lastBP=bP;window._lastDiffDays=diffDays;window._lastDu3=du3;window._lastDuBP=duBP;
-  // Apply compare if active
-  if(compareMode!=='off') applyCompare();
+  applyCompare();
   document.getElementById('main').style.display='block';
   document.getElementById('emptyBox').style.display='none';
   // document.getElementById('btnPDF').style.display=''; // PDF disabled
