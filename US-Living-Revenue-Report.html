@@ -62,12 +62,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--t0);min-height:100
 .source-btn{font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:none;background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;font-family:var(--sans);}
 .source-btn:hover{color:var(--t1)}
 .source-btn.active{background:var(--s4);color:var(--t0);box-shadow:0 1px 3px rgba(0,0,0,0.4)}
-/* Compare toggle */
 .compare-toggle{display:flex;align-items:center;background:var(--s1);border:1px solid var(--blue-ring);border-radius:var(--r2);padding:3px;gap:2px;}
 .compare-btn{font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:none;background:transparent;color:var(--t3);cursor:pointer;transition:all .15s;font-family:var(--sans);white-space:nowrap;}
 .compare-btn:hover{color:var(--t1)}
 .compare-btn.active{background:var(--s4);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.4)}
-/* Compare delta badges */
 .kpi-delta-cmp{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:500;padding:2px 6px;border-radius:var(--r1);margin-top:4px;font-family:var(--mono);letter-spacing:.3px;opacity:.75;}
 .kpi-delta-cmp.up{background:rgba(16,201,138,0.08);color:#10C98A}
 .kpi-delta-cmp.down{background:rgba(244,63,94,0.08);color:#F43F5E}
@@ -351,9 +349,8 @@ const PP={'3700M':{rev:12,adr:12,revpar:12,occ:12},'Bayou Park':{rev:12,adr:12,r
 let summaryP=12;
 const MONO="'JetBrains Mono',monospace";
 
-// ─── Compare mode ─────────────────────────────────────────────
-let compareMode='pp'; // 'off' | 'pp' | 'yoy'
-let _cmpData=null; // comparison period computed data
+let compareMode='pp';
+let _cmpData=null;
 
 const now=new Date();
 const df=document.getElementById('df'),dt=document.getElementById('dt');
@@ -369,7 +366,6 @@ function syncDates(){
 }
 function fmtDate(v){return isoToUS(typeof v==='string'?v.split('T')[0]:v.toISOString().split('T')[0]);}
 
-// ─── Compare mode functions ───────────────────────────────────
 function setCompare(mode,btn){
   compareMode=mode;
   document.querySelectorAll('.compare-btn').forEach(b=>b.classList.remove('active'));
@@ -400,20 +396,15 @@ function deltaVsCmp(cur,cmp){
 async function applyCompare(){
   const from=df.value,to=dt.value;
   if(!from||!to) return;
-
-
   const cmpPeriod=getCmpPeriod(from,to);
   if(!cmpPeriod) return;
-
-  // Fetch/filter comparison data
   let cmpRes;
   try{
     if(csvMode&&csvRes){
-      cmpRes=csvRes; // same dataset, filter by date in calcTotals
+      cmpRes=csvRes;
     }else{
       cmpRes=await fetchAll(cmpPeriod.from,cmpPeriod.to);
     }
-    // Compute compare monthly data
     const cmpConf=cmpRes.filter(r=>r.status!=='cancelled');
     const cmpBMP={},cmpBADR={},cmpBRevPAR={},cmpBOcc={};
     cmpConf.forEach(r=>{
@@ -452,30 +443,25 @@ function refreshKPIs(){
   const bpB=window._lastBP?.['Bayou Park']||{};
   const diffDays=window._lastDiffDays||1;
   const du3=window._lastDu3||12, duBP=window._lastDuBP||20;
-
   const tRR=bp3.roomRev+bpB.roomRev, tCl=bp3.clean+bpB.clean;
   const tOC=bp3.otaComm+bpB.otaComm, tNi=bp3.nights+bpB.nights;
   const tAv=(du3+duBP)*diffDays, tOA=bp3.otaAdj+bpB.otaAdj, tRev=tRR+tCl+tOA;
   const tOcc=tAv>0?tNi/tAv:0, tADR=tNi>0?tRR/tNi:0, tRP=tAv>0?tRR/tAv:0;
-
   const cmp=_cmpData?.totals;
   const cmpLabel=_cmpData?`vs ${_cmpData.label}`:'';
-
   const kpis=[
-    {l:'Total Revenue',   v:$c(tRev),   raw:tRev,  sub:(bp3.count||0)+(bpB.count||0)+' confirmed bookings', acc:'#3B6EFF', cmpV:cmp?.totalRev},
-    {l:'Room Revenue',    v:$c(tRR),    raw:tRR,   sub:'Net accommodation', acc:'#3B6EFF', cmpV:cmp?.roomRev},
-    {l:'Cleaning Fee',    v:$c(tCl),    raw:tCl,   sub:'At checkout', acc:'#526070', cmpV:cmp?.clean},
-    {l:'OTA Commission',  v:$c(tOC),    raw:tOC,   sub:'Channel fees', acc:'#F43F5E', cmpV:cmp?.otaComm},
-    {l:'OTA Adjustment',  v:tOA<0?'-$'+Math.round(Math.abs(tOA)).toLocaleString():$c(tOA), raw:tOA, sub:'Resolution center', acc:'#F59E0B', cmpV:null},
-    {l:'Occupancy',       v:pct(tOcc),  raw:tOcc,  sub:fmt(tNi)+' / '+fmt(tAv)+' nights', acc:'#10C98A', cmpV:cmp?.occ, isPct:true},
-    {l:'ADR',             v:$c(tADR),   raw:tADR,  sub:'Avg. daily rate', acc:'#F59E0B', cmpV:cmp?.adr},
-    {l:'RevPAR',          v:$c(tRP),    raw:tRP,   sub:'Per available night', acc:'#F59E0B', cmpV:cmp?.revpar},
+    {l:'Total Revenue',v:$c(tRev),raw:tRev,sub:(bp3.count||0)+(bpB.count||0)+' confirmed bookings',acc:'#3B6EFF',cmpV:cmp?.totalRev},
+    {l:'Room Revenue',v:$c(tRR),raw:tRR,sub:'Net accommodation',acc:'#3B6EFF',cmpV:cmp?.roomRev},
+    {l:'Cleaning Fee',v:$c(tCl),raw:tCl,sub:'At checkout',acc:'#526070',cmpV:cmp?.clean},
+    {l:'OTA Commission',v:$c(tOC),raw:tOC,sub:'Channel fees',acc:'#F43F5E',cmpV:cmp?.otaComm},
+    {l:'OTA Adjustment',v:tOA<0?'-$'+Math.round(Math.abs(tOA)).toLocaleString():$c(tOA),raw:tOA,sub:'Resolution center',acc:'#F59E0B',cmpV:null},
+    {l:'Occupancy',v:pct(tOcc),raw:tOcc,sub:fmt(tNi)+' / '+fmt(tAv)+' nights',acc:'#10C98A',cmpV:cmp?.occ,isPct:true},
+    {l:'ADR',v:$c(tADR),raw:tADR,sub:'Avg. daily rate',acc:'#F59E0B',cmpV:cmp?.adr},
+    {l:'RevPAR',v:$c(tRP),raw:tRP,sub:'Per available night',acc:'#F59E0B',cmpV:cmp?.revpar},
   ];
-
   document.getElementById('kpiTop').innerHTML=kpis.map(k=>{
     const d=k.cmpV!=null?deltaVsCmp(k.raw,k.cmpV):'';
-    const cmpVal=k.cmpV!=null&&cmpLabel
-      ?`<div class="cmp-label">${cmpLabel}: ${k.isPct?pct(k.cmpV):$c(k.cmpV)}</div>`:'';
+    const cmpVal=k.cmpV!=null&&cmpLabel?`<div class="cmp-label">${cmpLabel}: ${k.isPct?pct(k.cmpV):$c(k.cmpV)}</div>`:'';
     return`<div class="kpi" style="--kpi-accent:${k.acc}"><div class="kpi-label"><div class="kpi-label-dot"></div>${k.l}</div><div class="kpi-value">${k.v}</div><div class="kpi-sub">${k.sub}</div>${d}${cmpVal}</div>`;
   }).join('');
 }
@@ -491,11 +477,8 @@ function refreshPortfolioTabs(){
   const diffDays=window._lastDiffDays;
   const du3=window._lastDu3||12;
   const duBP=window._lastDuBP||20;
-  const byUnit=window._lastByUnit||{};
-  const lists=window._lastLists||[];
 
   function rebuildPFKPIs(pf,accent,ucCount,ids){
-    // Recompute portfolio compare exactly like buildPFDash does
     let pfCmp={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0};
     if(_cmpData&&_cmpData.reservations){
       const cF=_cmpData.from,cT=_cmpData.to;
@@ -536,7 +519,6 @@ function refreshPortfolioTabs(){
       const cv=k.cmpV!=null&&cmpLbl2?'<div class="cmp-label">'+cmpLbl2+': '+(k.isPct?pct(k.cmpV):$c(k.cmpV))+'</div>':'';
       return'<div class="kpi" style="--kpi-accent:'+k.acc+'"><div class="kpi-label"><div class="kpi-label-dot"></div>'+k.l+'</div><div class="kpi-value">'+k.v+'</div><div class="kpi-sub">'+k.sub+'</div>'+d+cv+'</div>';
     }).join('');
-    // Also refresh charts for this portfolio
     ['rev','adr','revpar','occ'].forEach(t=>rPC(pf,t));
   }
 
@@ -556,7 +538,15 @@ function updateSourceUI(){
 }
 function switchToAPI(){csvMode=false;updateSourceUI();loadData();}
 function switchToCSV(){if(csvRes){csvMode=true;updateSourceUI();loadData();}else document.getElementById('csvFile').click();}
-function uploadNewCSV(){document.getElementById('csvFile').click();}
+
+// ── FIXED: clear old cache before uploading new CSV ──
+function uploadNewCSV(){
+  try{localStorage.removeItem('guesty_csv');localStorage.removeItem('guesty_csv_name');localStorage.removeItem('g_csv');localStorage.removeItem('g_csv_name');}catch(e){}
+  csvRes=null;csvName=null;csvMode=false;
+  document.getElementById('csvFile').value='';
+  document.getElementById('csvFile').click();
+}
+
 function clearCSV(){csvRes=null;csvName=null;csvMode=false;try{localStorage.removeItem('guesty_csv');localStorage.removeItem('guesty_csv_name');localStorage.removeItem('g_csv');localStorage.removeItem('g_csv_name');}catch(e){}document.getElementById('csvFile').value='';updateSourceUI();}
 
 function parseCSV(text){
@@ -573,11 +563,18 @@ function parseCSV(text){
       money:{fareAccommodation:parseFloat(c(12))||0,fareCleaning:parseFloat(c(13))||0,hostServiceFee:Math.abs(parseFloat(c(14))||0),resolutionAmount:parseFloat(c(15))||0}};
   }).filter(Boolean);
 }
+
+// ── FIXED: clear old cache FIRST, then save new CSV ──
 async function loadCSV(inp){
   const file=inp.files[0];if(!file)return;
   document.getElementById('csvBtnLabel').textContent='...';
-  const text=await file.text();csvRes=parseCSV(text);csvName=file.name;csvMode=true;
-  try{localStorage.setItem('guesty_csv',JSON.stringify(csvRes));localStorage.setItem('guesty_csv_name',file.name);}catch(e){}
+  // Clear old cached CSV before loading new one
+  try{localStorage.removeItem('guesty_csv');localStorage.removeItem('guesty_csv_name');localStorage.removeItem('g_csv');localStorage.removeItem('g_csv_name');}catch(e){}
+  csvRes=null;csvName=null;
+  const text=await file.text();
+  csvRes=parseCSV(text);csvName=file.name;csvMode=true;
+  try{localStorage.setItem('guesty_csv',JSON.stringify(csvRes));localStorage.setItem('guesty_csv_name',file.name);}catch(e){console.warn('localStorage full, CSV loaded in-memory only');}
+  inp.value=''; // reset so same file can be re-selected
   updateSourceUI();loadData();
 }
 
@@ -816,12 +813,10 @@ function render(reservations,from,to,prev,lists){
 
   function buildPFDash(pf,accent,rg,fl,ids,ucCount){
     document.getElementById(ids.kpiCard).innerHTML=mkPFCard(pf,'',accent,ucCount,bP[pf],diffDays);
-    // Portfolio-level compare data
     let pfCmp={roomRev:0,clean:0,otaAdj:0,otaComm:0,nights:0};
     if(_cmpData&&_cmpData.reservations){
       const cF=_cmpData.from,cT=_cmpData.to;
       const cS=new Date(cF+'T00:00:00'),cE=new Date(cT+'T23:59:59');
-      const cD=getDays(cF,cT);
       _cmpData.reservations.filter(r=>r.status!=='cancelled'&&getPFR(r)===pf).forEach(r=>{
         const ci=new Date(r.checkIn),co=new Date(r.checkOut),tn=Math.max(1,Math.round((co-ci)/86400000));
         const dR=(r.money?.fareAccommodation||0)/tn,dOC=Math.abs(r.money?.hostServiceFee||0)/tn;
@@ -914,11 +909,9 @@ function render(reservations,from,to,prev,lists){
   window._lastByUnit=byUnit;window._lastLists=lists;
   document.getElementById('main').style.display='block';
   document.getElementById('emptyBox').style.display='none';
-  // document.getElementById('btnPDF').style.display=''; // PDF disabled
   document.getElementById('btnXLSX').style.display='';
   document.getElementById('compareToggle').style.display='';
   renderSummary();
-  // Trigger compare after render (async, updates KPIs/charts when data arrives)
   applyCompare();
 }
 
@@ -950,147 +943,38 @@ function renderSummary(){
   document.getElementById('summaryTable').innerHTML=`<div class="stbl-wrap"><table class="stbl"><thead>${hdr}</thead><tbody>${pRows('3700M','#3B6EFF',u3,bMP,bCl3,bOA3,bOC3,bN3)}${sp}${pRows('Bayou Park','#10C98A',uBP,bMP,bClB,bOAB,bOCB,bNB)}</tbody></table></div>`;
 }
 
-// ─── PDF export ─────────────────────────────────────────────────
-
-
 async function exportPDF(){
   if(!_LD||!_SD){alert('Load data first');return;}
   const from=df.value,to=dt.value;
   const btn=document.getElementById('btnPDF');
   const origHTML=btn.innerHTML;
-  btn.innerHTML='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg> Building…';
-  btn.disabled=true;
+  btn.innerHTML='Building…';btn.disabled=true;
   try{
     const{jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4',compress:true});
     const PW=pdf.internal.pageSize.getWidth(),PH=pdf.internal.pageSize.getHeight();
-    const mg=8, contentW=PW-mg*2;
-    const HDR_H=12, FTR_H=7;
-    const USABLE=PH-HDR_H-FTR_H-3;
+    const mg=8,contentW=PW-mg*2,HDR_H=12,FTR_H=7,USABLE=PH-HDR_H-FTR_H-3;
     let pageNum=0;
-
-    function drawHdr(){
-      // Full dark background for entire page
-      pdf.setFillColor(5,7,9); pdf.rect(0,0,PW,PH,'F');
-      // Header bar
-      pdf.setFillColor(8,11,16); pdf.rect(0,0,PW,HDR_H,'F');
-      pdf.setDrawColor(20,26,36); pdf.setLineWidth(0.2); pdf.line(0,HDR_H,PW,HDR_H);
-      // Brand icon
-      pdf.setFillColor(59,110,255); pdf.roundedRect(mg,2,7,7,1,1,'F');
-      pdf.setTextColor(255,255,255); pdf.setFontSize(5); pdf.setFont('helvetica','bold');
-      pdf.text('US',mg+3.5,6.5,{align:'center'});
-      // Brand text
-      pdf.setTextColor(241,245,251); pdf.setFontSize(7.5); pdf.setFont('helvetica','bold');
-      pdf.text('US Living',mg+10,6);
-      pdf.setTextColor(82,96,112); pdf.setFontSize(4.5); pdf.setFont('helvetica','normal');
-      pdf.text('REVENUE INTELLIGENCE',mg+10,9.5);
-      // Period
-      pdf.setTextColor(136,150,170); pdf.setFontSize(6);
-      pdf.text(isoToUS(from)+' – '+isoToUS(to),PW-mg,7,{align:'right'});
-    }
-
-    function drawFtr(cur,tot){
-      pdf.setFillColor(5,7,9); pdf.rect(0,PH-FTR_H,PW,FTR_H,'F');
-      pdf.setDrawColor(20,26,36); pdf.setLineWidth(0.15); pdf.line(mg,PH-FTR_H,PW-mg,PH-FTR_H);
-      pdf.setTextColor(82,96,112); pdf.setFontSize(5); pdf.setFont('helvetica','normal');
-      pdf.text('US Living — Revenue Intelligence  |  Confidential',mg,PH-2);
-      pdf.text(`Page ${cur} of ${tot}`,PW-mg,PH-2,{align:'right'});
-    }
-
-    // Capture element and add slices to PDF
-    async function addElement(el,label){
-      btn.innerHTML=`<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg> ${label}`;
-      await new Promise(r=>setTimeout(r,300));
-
-      const canvas=await html2canvas(el,{
-        backgroundColor:'#050709',
-        scale:2,
-        useCORS:true,
-        allowTaint:true,
-        logging:false,
-        scrollX:0, scrollY:0,
-        removeContainer:true,
-      });
-
-      const imgW=canvas.width, imgH=canvas.height;
-      const mmPerPx=contentW/imgW;
-      const slicePx=Math.floor(USABLE/mmPerPx); // pixels per page
-
-      let top=0;
-      while(top<imgH){
-        if(pageNum>0) pdf.addPage();
-        pageNum++;
-        drawHdr();
-
-        const actualSlice=Math.min(slicePx, imgH-top);
-        // Only add page if there's meaningful content (>5% of page height)
-        if(actualSlice < slicePx * 0.05){ top+=slicePx; continue; }
-
-        const sc=document.createElement('canvas');
-        sc.width=imgW; sc.height=actualSlice;
-        sc.getContext('2d').drawImage(canvas, 0,top, imgW,actualSlice, 0,0, imgW,actualSlice);
-        const imgData=sc.toDataURL('image/jpeg',0.9);
-        pdf.addImage(imgData,'JPEG', mg, HDR_H+1.5, contentW, actualSlice*mmPerPx);
-        top+=slicePx;
-      }
-    }
-
-    const tabs=[
-      {tab:'overview',  label:'Overview (1/5)'},
-      {tab:'summary',   label:'Summary (2/5)'},
-      {tab:'tab3700',   label:'3700M (3/5)'},
-      {tab:'tabBP',     label:'Bayou Park (4/5)'},
-      {tab:'pipeline',  label:'Pipeline (5/5)'},
-    ];
-
+    function drawHdr(){pdf.setFillColor(5,7,9);pdf.rect(0,0,PW,PH,'F');pdf.setFillColor(8,11,16);pdf.rect(0,0,PW,HDR_H,'F');pdf.setDrawColor(20,26,36);pdf.setLineWidth(0.2);pdf.line(0,HDR_H,PW,HDR_H);pdf.setFillColor(59,110,255);pdf.roundedRect(mg,2,7,7,1,1,'F');pdf.setTextColor(255,255,255);pdf.setFontSize(5);pdf.setFont('helvetica','bold');pdf.text('US',mg+3.5,6.5,{align:'center'});pdf.setTextColor(241,245,251);pdf.setFontSize(7.5);pdf.setFont('helvetica','bold');pdf.text('US Living',mg+10,6);pdf.setTextColor(82,96,112);pdf.setFontSize(4.5);pdf.setFont('helvetica','normal');pdf.text('REVENUE INTELLIGENCE',mg+10,9.5);pdf.setTextColor(136,150,170);pdf.setFontSize(6);pdf.text(isoToUS(from)+' – '+isoToUS(to),PW-mg,7,{align:'right'});}
+    function drawFtr(cur,tot){pdf.setFillColor(5,7,9);pdf.rect(0,PH-FTR_H,PW,FTR_H,'F');pdf.setDrawColor(20,26,36);pdf.setLineWidth(0.15);pdf.line(mg,PH-FTR_H,PW-mg,PH-FTR_H);pdf.setTextColor(82,96,112);pdf.setFontSize(5);pdf.setFont('helvetica','normal');pdf.text('US Living — Revenue Intelligence  |  Confidential',mg,PH-2);pdf.text(`Page ${cur} of ${tot}`,PW-mg,PH-2,{align:'right'});}
+    async function addElement(el,label){btn.innerHTML=label;await new Promise(r=>setTimeout(r,300));const canvas=await html2canvas(el,{backgroundColor:'#050709',scale:2,useCORS:true,allowTaint:true,logging:false,scrollX:0,scrollY:0,removeContainer:true});const imgW=canvas.width,imgH=canvas.height,mmPerPx=contentW/imgW,slicePx=Math.floor(USABLE/mmPerPx);let top=0;while(top<imgH){if(pageNum>0)pdf.addPage();pageNum++;drawHdr();const actualSlice=Math.min(slicePx,imgH-top);if(actualSlice<slicePx*0.05){top+=slicePx;continue;}const sc=document.createElement('canvas');sc.width=imgW;sc.height=actualSlice;sc.getContext('2d').drawImage(canvas,0,top,imgW,actualSlice,0,0,imgW,actualSlice);const imgData=sc.toDataURL('image/jpeg',0.9);pdf.addImage(imgData,'JPEG',mg,HDR_H+1.5,contentW,actualSlice*mmPerPx);top+=slicePx;}}
+    const tabs=[{tab:'overview',label:'Overview (1/5)'},{tab:'summary',label:'Summary (2/5)'},{tab:'tab3700',label:'3700M (3/5)'},{tab:'tabBP',label:'Bayou Park (4/5)'},{tab:'pipeline',label:'Pipeline (5/5)'}];
     const activePre=document.querySelector('.tab.active');
     const activeNamePre=activePre?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1]||'overview';
-
-    // Hide UI chrome during capture
-    const topbar=document.querySelector('.topbar');
-    const tabsBar=document.getElementById('tabsBar');
-    const topbarDisplay=topbar?topbar.style.display:'';
-    const tabsDisplay=tabsBar?tabsBar.style.display:'';
-    if(topbar) topbar.style.display='none';
-    if(tabsBar) tabsBar.style.display='none';
-
-    for(const{tab,label} of tabs){
-      ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>{
-        const e=document.getElementById('tab-'+t); if(e) e.style.display='none';
-      });
-      const tabEl=document.getElementById('tab-'+tab);
-      if(!tabEl) continue;
-      tabEl.style.display='';
-      await new Promise(r=>setTimeout(r,450)); // wait for charts
-      await addElement(tabEl, label);
-    }
-
-    // Restore UI chrome
-    if(topbar) topbar.style.display=topbarDisplay;
-    if(tabsBar) tabsBar.style.display=tabsDisplay;
-
-    // Add footers
-    const total=pdf.internal.getNumberOfPages();
-    for(let i=1;i<=total;i++){ pdf.setPage(i); drawFtr(i,total); }
-
-    // Restore tab
-    ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>{
-      const e=document.getElementById('tab-'+t); if(e) e.style.display='none';
-    });
-    const restoreEl=document.getElementById('tab-'+activeNamePre);
-    if(restoreEl) restoreEl.style.display='';
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    if(activePre) activePre.classList.add('active');
-
+    const topbar=document.querySelector('.topbar'),tabsBar=document.getElementById('tabsBar');
+    const topbarDisplay=topbar?topbar.style.display:'',tabsDisplay=tabsBar?tabsBar.style.display:'';
+    if(topbar)topbar.style.display='none';if(tabsBar)tabsBar.style.display='none';
+    for(const{tab,label}of tabs){['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display='none';});const tabEl=document.getElementById('tab-'+tab);if(!tabEl)continue;tabEl.style.display='';await new Promise(r=>setTimeout(r,450));await addElement(tabEl,label);}
+    if(topbar)topbar.style.display=topbarDisplay;if(tabsBar)tabsBar.style.display=tabsDisplay;
+    const total=pdf.internal.getNumberOfPages();for(let i=1;i<=total;i++){pdf.setPage(i);drawFtr(i,total);}
+    ['overview','summary','tab3700','tabBP','bookings','pipeline'].forEach(t=>{const e=document.getElementById('tab-'+t);if(e)e.style.display='none';});
+    const restoreEl=document.getElementById('tab-'+activeNamePre);if(restoreEl)restoreEl.style.display='';
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));if(activePre)activePre.classList.add('active');
     pdf.save(`US-Living-Revenue-${from}-${to}.pdf`);
-
-  }catch(e){ alert('PDF error: '+e.message); console.error(e); }
-  finally{ btn.innerHTML=origHTML; btn.disabled=false; }
+  }catch(e){alert('PDF error: '+e.message);console.error(e);}
+  finally{btn.innerHTML=origHTML;btn.disabled=false;}
 }
 
-
-
-// ─── Excel export — ExcelJS (full styling in browser) ───────────
 async function exportExcel(){
   if(!_LD||!_SD){alert('Load data first');return;}
   const btn=document.getElementById('btnXLSX');const orig=btn.innerHTML;
@@ -1103,99 +987,26 @@ async function exportExcel(){
     const allM=M.slice().sort();
     const dim=m=>{const[y,mo]=m.split('-');return new Date(+y,+mo,0).getDate();};
     const mLbl=m=>{const[y,mo]=m.split('-');return new Date(+y,+mo-1).toLocaleString('en-US',{month:'short',year:'numeric'});};
-
-    const wb=new ExcelJS.Workbook();
-    wb.creator='US Living Dashboard';wb.created=new Date();
-
-    // ── Palette ──────────────────────────────────────────────────
-    const C={
-      navyDark:'0C111D',navyHdr:'1C2B3A',navyPort:'1A3460',greenPort:'0D4535',
-      blueTotal:'2563EB',greenTotal:'059669',blueRev:'EEF3FB',
-      amberBg:'FFFBEB',amberTxt:'92400E',
-      white:'FFFFFF',offWhite:'F5F8FC',
-      txtDark:'1E293B',txtMid:'475569',txtNavy:'1E3A6E',hdrTxt:'C8D8EC',
-      border:'E2E8F0',brdNavy:'2A3A50',blueAcc:'3B6EFF',
-      gBg:'D1FAE5',gTx:'065F46',rBg:'FEE2E2',rTx:'7F1D1D',aBg:'FEF3C7',aTx:'78350F'
-    };
-
-    // Style helper
-    function applyCell(cell,{fill,font,align,border,numFmt}={}){
-      if(fill)cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+fill}};
-      if(font)cell.font={name:'Calibri',size:font.sz||9,bold:!!font.bold,color:{argb:'FF'+(font.color||C.txtDark)}};
-      if(align)cell.alignment={horizontal:align.h||'left',vertical:'middle'};
-      if(border){
-        const mk=(s,c)=>({style:s,color:{argb:'FF'+c}});
-        cell.border={
-          bottom:border.bot?mk(border.bot,border.botC||C.border):mk('thin',C.border),
-          top:border.top?mk(border.top,border.topC||C.border):undefined,
-          right:mk('thin',border.rightC||C.border)
-        };
-      }
-      if(numFmt)cell.numFmt=numFmt;
-    }
-
+    const wb=new ExcelJS.Workbook();wb.creator='US Living Dashboard';wb.created=new Date();
+    const C={navyDark:'0C111D',navyHdr:'1C2B3A',navyPort:'1A3460',greenPort:'0D4535',blueTotal:'2563EB',greenTotal:'059669',blueRev:'EEF3FB',amberBg:'FFFBEB',amberTxt:'92400E',white:'FFFFFF',offWhite:'F5F8FC',txtDark:'1E293B',txtMid:'475569',txtNavy:'1E3A6E',hdrTxt:'C8D8EC',border:'E2E8F0',brdNavy:'2A3A50',blueAcc:'3B6EFF',gBg:'D1FAE5',gTx:'065F46',rBg:'FEE2E2',rTx:'7F1D1D',aBg:'FEF3C7',aTx:'78350F'};
     const thin=(c=C.border)=>({style:'thin',color:{argb:'FF'+c}});
     const medium=(c)=>({style:'medium',color:{argb:'FF'+c}});
-
-    // ════════════════════════════════════════════════════════════
-    // SHEET 1: Monthly Summary
-    // ════════════════════════════════════════════════════════════
     const ws=wb.addWorksheet('Monthly Summary',{properties:{tabColor:{argb:'FF2563EB'}}});
     const N=allM.length;
-
-    // Column widths
-    ws.getColumn(1).width=23;
-    for(let c=2;c<=N+2;c++) ws.getColumn(c).width=11;
-
-    // Row 1: Title
+    ws.getColumn(1).width=23;for(let c=2;c<=N+2;c++)ws.getColumn(c).width=11;
     ws.getRow(1).height=24;
     const r1=ws.getRow(1);
-    for(let c=1;c<=N+2;c++){
-      const cell=r1.getCell(c);
-      cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyDark}};
-      cell.border={};
-      if(c===1){
-        cell.value='US Living — Revenue Intelligence';
-        cell.font={name:'Calibri',size:14,bold:true,color:{argb:'FF'+C.white}};
-        cell.alignment={horizontal:'left',vertical:'middle'};
-      }else if(c===2){
-        cell.value='Period: '+isoToUS(from)+' – '+isoToUS(to);
-        cell.font={name:'Calibri',size:9,color:{argb:'FF6B9EFF'}};
-        cell.alignment={horizontal:'left',vertical:'middle'};
-      }
-    }
+    for(let c=1;c<=N+2;c++){const cell=r1.getCell(c);cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyDark}};cell.border={};if(c===1){cell.value='US Living — Revenue Intelligence';cell.font={name:'Calibri',size:14,bold:true,color:{argb:'FF'+C.white}};cell.alignment={horizontal:'left',vertical:'middle'};}else if(c===2){cell.value='Period: '+isoToUS(from)+' – '+isoToUS(to);cell.font={name:'Calibri',size:9,color:{argb:'FF6B9EFF'}};cell.alignment={horizontal:'left',vertical:'middle'};}}
     ws.mergeCells(1,1,1,N+2);
-
-    // Row 2: Column headers
     ws.getRow(2).height=18;
     const r2=ws.getRow(2);
     const hdrCells=[{v:'Metric',h:'left'},...allM.map(m=>({v:mLbl(m),h:'center'})),{v:'Total',h:'center'}];
-    hdrCells.forEach((h,i)=>{
-      const cell=r2.getCell(i+1);
-      cell.value=h.v;
-      cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyHdr}};
-      cell.font={name:'Calibri',size:8,bold:true,color:{argb:'FF'+C.hdrTxt}};
-      cell.alignment={horizontal:h.h,vertical:'middle'};
-      cell.border={bottom:medium(C.blueAcc),right:thin(C.brdNavy)};
-    });
-
-    // Portfolio section builder
+    hdrCells.forEach((h,i)=>{const cell=r2.getCell(i+1);cell.value=h.v;cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyHdr}};cell.font={name:'Calibri',size:8,bold:true,color:{argb:'FF'+C.hdrTxt}};cell.alignment={horizontal:h.h,vertical:'middle'};cell.border={bottom:medium(C.blueAcc),right:thin(C.brdNavy)};});
     function addPortSection(pf,bMR,bMCl,bMOA,bMOC,bMN,uc,sectFill,totFill){
       let rowNum=ws.rowCount+1;
-
-      // Section header
       ws.getRow(rowNum).height=17;
-      for(let c=1;c<=N+2;c++){
-        const cell=ws.getRow(rowNum).getCell(c);
-        cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+sectFill}};
-        cell.font={name:'Calibri',size:9,bold:true,color:{argb:'FF'+C.white}};
-        cell.alignment={horizontal:'left',vertical:'middle'};
-        cell.border={bottom:thin(sectFill==='1A3460'?'2D5299':'178A6A'),right:thin(sectFill==='1A3460'?'2D5299':'178A6A')};
-        if(c===1)cell.value=`${pf} — ${pf==='3700M'?'Dallas, McKinney Ave':'Houston, Montrose / Midtown'}`;
-      }
-      ws.mergeCells(rowNum,1,rowNum,N+2);
-      rowNum++;
-
+      for(let c=1;c<=N+2;c++){const cell=ws.getRow(rowNum).getCell(c);cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+sectFill}};cell.font={name:'Calibri',size:9,bold:true,color:{argb:'FF'+C.white}};cell.alignment={horizontal:'left',vertical:'middle'};cell.border={bottom:thin(sectFill==='1A3460'?'2D5299':'178A6A'),right:thin(sectFill==='1A3460'?'2D5299':'178A6A')};if(c===1)cell.value=`${pf} — ${pf==='3700M'?'Dallas, McKinney Ave':'Houston, Montrose / Midtown'}`;}
+      ws.mergeCells(rowNum,1,rowNum,N+2);rowNum++;
       const metrics=[
         {l:'Units',vals:allM.map(()=>uc),fmt:'#,##0;"-"',alt:false},
         {l:'Available Nights',vals:allM.map(m=>dim(m)*uc),fmt:'#,##0;"-"',alt:true},
@@ -1209,223 +1020,71 @@ async function exportExcel(){
         {l:'Total Revenue',vals:allM.map(m=>Math.round((bMR[m]?.[pf]||0)+(bMCl[m]||0)+(bMOA[m]||0))),fmt:'$#,##0;($#,##0);"-"',alt:false,tot:true},
         {l:'OTA Commission',vals:allM.map(m=>Math.round(bMOC[m]||0)),fmt:'$#,##0;($#,##0);"-"',alt:true,ota:true},
       ];
-
       metrics.forEach(metric=>{
-        ws.getRow(rowNum).height=16;
-        const row=ws.getRow(rowNum);
-        const isOdd=rowNum%2===1;
-
+        ws.getRow(rowNum).height=16;const row=ws.getRow(rowNum);
         let lblBg,numBg,lblColor,numColor,lblBold=false,rowBorder=thin();
-        if(metric.tot){
-          lblBg=numBg=totFill;lblColor=numColor=C.white;lblBold=true;
-          rowBorder={style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}};
-        }else if(metric.rev){
-          lblBg=numBg=C.blueRev;lblColor=numColor=C.txtNavy;lblBold=true;
-          rowBorder=thin('BFDBFE');
-        }else if(metric.ota){
-          lblBg=numBg=C.amberBg;lblColor=numColor=C.amberTxt;
-          rowBorder=thin('FDE68A');
-        }else{
-          lblBg=numBg=metric.alt?C.offWhite:C.white;
-          lblColor=C.txtMid;numColor=C.txtDark;
-        }
-
-        // Label cell
-        const lbl=row.getCell(1);
-        lbl.value=metric.l;
-        lbl.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+lblBg}};
-        lbl.font={name:'Calibri',size:9,bold:lblBold,color:{argb:'FF'+lblColor}};
-        lbl.alignment={horizontal:'left',vertical:'middle'};
-        lbl.border={bottom:metric.tot?{style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}}:rowBorder,right:thin()};
-
-        // Value cells
+        if(metric.tot){lblBg=numBg=totFill;lblColor=numColor=C.white;lblBold=true;rowBorder={style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}};}
+        else if(metric.rev){lblBg=numBg=C.blueRev;lblColor=numColor=C.txtNavy;lblBold=true;rowBorder=thin('BFDBFE');}
+        else if(metric.ota){lblBg=numBg=C.amberBg;lblColor=numColor=C.amberTxt;rowBorder=thin('FDE68A');}
+        else{lblBg=numBg=metric.alt?C.offWhite:C.white;lblColor=C.txtMid;numColor=C.txtDark;}
+        const lbl=row.getCell(1);lbl.value=metric.l;lbl.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+lblBg}};lbl.font={name:'Calibri',size:9,bold:lblBold,color:{argb:'FF'+lblColor}};lbl.alignment={horizontal:'left',vertical:'middle'};lbl.border={bottom:metric.tot?{style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}}:rowBorder,right:thin()};
         let total=0;
-        metric.vals.forEach((v,i)=>{
-          const cell=row.getCell(i+2);
-          cell.value=v;
-          cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+numBg}};
-          cell.font={name:'Calibri',size:9,bold:lblBold,color:{argb:'FF'+numColor}};
-          cell.alignment={horizontal:'right',vertical:'middle'};
-          cell.numFmt=metric.fmt;
-          cell.border={
-            bottom:metric.tot?{style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}}:rowBorder,
-            top:metric.tot?{style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}}:undefined,
-            right:thin()
-          };
-          if(metric.fmt.includes('%')) total+=v; else total+=v;
-        });
-
-        // Total column
-        const totV=metric.fmt.includes('%')
-          ? metric.vals.filter(v=>v>0).reduce((a,b)=>a+b,0)/(metric.vals.filter(v=>v>0).length||1)
-          : (metric.l==='ADR'||metric.l==='RevPAR')
-          ? metric.vals.filter(v=>v>0).reduce((a,b)=>a+b,0)/(metric.vals.filter(v=>v>0).length||1)
-          : total;
-        const totCell=row.getCell(N+2);
-        totCell.value=metric.fmt.includes('%')?totV:Math.round(totV);
-        totCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+numBg}};
-        totCell.font={name:'Calibri',size:9,bold:lblBold,color:{argb:'FF'+numColor}};
-        totCell.alignment={horizontal:'right',vertical:'middle'};
-        totCell.numFmt=metric.fmt;
-        totCell.border={bottom:metric.tot?{style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}}:rowBorder,right:thin()};
-
+        metric.vals.forEach((v,i)=>{const cell=row.getCell(i+2);cell.value=v;cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+numBg}};cell.font={name:'Calibri',size:9,bold:lblBold,color:{argb:'FF'+numColor}};cell.alignment={horizontal:'right',vertical:'middle'};cell.numFmt=metric.fmt;cell.border={bottom:metric.tot?{style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}}:rowBorder,top:metric.tot?{style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}}:undefined,right:thin()};total+=v;});
+        const totV=metric.fmt.includes('%')||metric.l==='ADR'||metric.l==='RevPAR'?metric.vals.filter(v=>v>0).reduce((a,b)=>a+b,0)/(metric.vals.filter(v=>v>0).length||1):total;
+        const totCell=row.getCell(N+2);totCell.value=metric.fmt.includes('%')?totV:Math.round(totV);totCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+numBg}};totCell.font={name:'Calibri',size:9,bold:lblBold,color:{argb:'FF'+numColor}};totCell.alignment={horizontal:'right',vertical:'middle'};totCell.numFmt=metric.fmt;totCell.border={bottom:metric.tot?{style:'medium',color:{argb:'FF'+(totFill==='2563EB'?'1D4ED8':'047857')}}:rowBorder,right:thin()};
         rowNum++;
       });
-
       return rowNum;
     }
-
     addPortSection('3700M',bMP,bCl3,bOA3,bOC3,bN3,12,C.navyPort,C.blueTotal);
-
-    // Spacer row
-    const sRow=ws.getRow(ws.rowCount+1);
-    sRow.height=8;
-    for(let c=1;c<=N+2;c++){const cell=sRow.getCell(c);cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyDark}};cell.border={};}
-    ws.mergeCells(ws.rowCount,1,ws.rowCount,N+2);
-
+    const sRow=ws.getRow(ws.rowCount+1);sRow.height=8;for(let c=1;c<=N+2;c++){const cell=sRow.getCell(c);cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyDark}};cell.border={};}ws.mergeCells(ws.rowCount,1,ws.rowCount,N+2);
     addPortSection('Bayou Park',bMP,bClB,bOAB,bOCB,bNB,20,C.greenPort,C.greenTotal);
-
-    // Freeze panes
     ws.views=[{state:'frozen',xSplit:1,ySplit:2,activeCell:'B3'}];
-
-    // ════════════════════════════════════════════════════════════
-    // SHEET 2: Bookings
-    // ════════════════════════════════════════════════════════════
     if(window._lastReservations){
       const wsBk=wb.addWorksheet('Bookings',{properties:{tabColor:{argb:'FF059669'}}});
-      const bkCols=[
-        {key:'prop',header:'Property',width:32},{key:'guest',header:'Guest',width:22},
-        {key:'conf',header:'Confirmation',width:16},{key:'ci',header:'Check-in',width:12},
-        {key:'co',header:'Check-out',width:12},{key:'ni',header:'Nights',width:7},
-        {key:'ch',header:'Channel',width:14},{key:'st',header:'Status',width:12},
-        {key:'rr',header:'Room Rev ($)',width:12},{key:'cl',header:'Cleaning ($)',width:11},
-        {key:'oa',header:'OTA Adj ($)',width:10},{key:'tr',header:'Total Rev ($)',width:12},
-        {key:'oc',header:'OTA Comm ($)',width:12}
-      ];
+      const bkCols=[{key:'prop',header:'Property',width:32},{key:'guest',header:'Guest',width:22},{key:'conf',header:'Confirmation',width:16},{key:'ci',header:'Check-in',width:12},{key:'co',header:'Check-out',width:12},{key:'ni',header:'Nights',width:7},{key:'ch',header:'Channel',width:14},{key:'st',header:'Status',width:12},{key:'rr',header:'Room Rev ($)',width:12},{key:'cl',header:'Cleaning ($)',width:11},{key:'oa',header:'OTA Adj ($)',width:10},{key:'tr',header:'Total Rev ($)',width:12},{key:'oc',header:'OTA Comm ($)',width:12}];
       bkCols.forEach((col,i)=>{wsBk.getColumn(i+1).width=col.width;});
-
-      // Header row
-      wsBk.getRow(1).height=18;
-      bkCols.forEach((col,i)=>{
-        const cell=wsBk.getRow(1).getCell(i+1);
-        cell.value=col.header;
-        cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyHdr}};
-        cell.font={name:'Calibri',size:8,bold:true,color:{argb:'FF'+C.hdrTxt}};
-        cell.alignment={horizontal:i<2?'left':'center',vertical:'middle'};
-        cell.border={bottom:medium(C.blueAcc),right:thin(C.brdNavy)};
-      });
-
+      wsBk.getRow(1).height=18;bkCols.forEach((col,i)=>{const cell=wsBk.getRow(1).getCell(i+1);cell.value=col.header;cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyHdr}};cell.font={name:'Calibri',size:8,bold:true,color:{argb:'FF'+C.hdrTxt}};cell.alignment={horizontal:i<2?'left':'center',vertical:'middle'};cell.border={bottom:medium(C.blueAcc),right:thin(C.brdNavy)};});
       const moneyFmt='$#,##0;($#,##0);"-"';
       const sortedBk=[..._lastReservations].sort((a,b)=>(b.checkIn||'').localeCompare(a.checkIn||''));
-
       sortedBk.forEach((r,ri)=>{
-        const alt=ri%2===1;const bg=alt?C.offWhite:C.white;
-        const row=wsBk.getRow(ri+2);row.height=16;
+        const alt=ri%2===1;const bg=alt?C.offWhite:C.white;const row=wsBk.getRow(ri+2);row.height=16;
         const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oa=r.money?.resolutionAmount||0,oc=Math.abs(r.money?.hostServiceFee||0);
         const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
-        const st=r.status||'confirmed';
-        const stLower=st.toLowerCase();
+        const st=r.status||'confirmed',stLower=st.toLowerCase();
         const stBg=stLower.includes('cancel')?C.rBg:stLower.includes('inquiry')?C.aBg:C.gBg;
         const stTx=stLower.includes('cancel')?C.rTx:stLower.includes('inquiry')?C.aTx:C.gTx;
         const stLabel=stLower.includes('cancel')?'Cancelled':stLower.includes('inquiry')?'Inquiry':'Confirmed';
-
-        const vals=[
-          {v:(r.listing?.nickname||r.listing?.title||'').replace(/\*/g,'').trim(),h:'left',bold:true,col:C.txtDark},
-          {v:r.guest?.fullName||'',h:'left',col:C.txtMid},
-          {v:r.confirmationCode||'',h:'left',col:C.txtMid},
-          {v:r.checkIn?isoToUS(r.checkIn.split('T')[0]):'',h:'left',col:C.txtMid},
-          {v:r.checkOut?isoToUS(r.checkOut.split('T')[0]):'',h:'left',col:C.txtMid},
-          {v:r.nightsCount||0,h:'center',col:C.txtDark,fmt:'#,##0;"-"'},
-          {v:ch,h:'left',col:C.txtMid},
-          {v:stLabel,h:'center',col:stTx,bg:stBg,bold:true},
-          {v:Math.round(rr),h:'right',col:C.txtDark,fmt:moneyFmt},
-          {v:Math.round(cl),h:'right',col:C.txtDark,fmt:moneyFmt},
-          {v:Math.round(oa),h:'right',col:C.txtDark,fmt:moneyFmt},
-          {v:Math.round(rr+cl+oa),h:'right',col:C.txtDark,fmt:moneyFmt},
-          {v:Math.round(oc),h:'right',col:C.txtDark,fmt:moneyFmt},
-        ];
-        vals.forEach((vd,ci)=>{
-          const cell=row.getCell(ci+1);
-          cell.value=vd.v;
-          cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+(vd.bg||bg)}};
-          cell.font={name:'Calibri',size:9,bold:!!vd.bold,color:{argb:'FF'+(vd.col||C.txtDark)}};
-          cell.alignment={horizontal:vd.h,vertical:'middle'};
-          cell.border={bottom:thin(),right:thin()};
-          if(vd.fmt)cell.numFmt=vd.fmt;
-        });
+        const vals=[{v:(r.listing?.nickname||r.listing?.title||'').replace(/\*/g,'').trim(),h:'left',bold:true,col:C.txtDark},{v:r.guest?.fullName||'',h:'left',col:C.txtMid},{v:r.confirmationCode||'',h:'left',col:C.txtMid},{v:r.checkIn?isoToUS(r.checkIn.split('T')[0]):'',h:'left',col:C.txtMid},{v:r.checkOut?isoToUS(r.checkOut.split('T')[0]):'',h:'left',col:C.txtMid},{v:r.nightsCount||0,h:'center',col:C.txtDark,fmt:'#,##0;"-"'},{v:ch,h:'left',col:C.txtMid},{v:stLabel,h:'center',col:stTx,bg:stBg,bold:true},{v:Math.round(rr),h:'right',col:C.txtDark,fmt:moneyFmt},{v:Math.round(cl),h:'right',col:C.txtDark,fmt:moneyFmt},{v:Math.round(oa),h:'right',col:C.txtDark,fmt:moneyFmt},{v:Math.round(rr+cl+oa),h:'right',col:C.txtDark,fmt:moneyFmt},{v:Math.round(oc),h:'right',col:C.txtDark,fmt:moneyFmt}];
+        vals.forEach((vd,ci)=>{const cell=row.getCell(ci+1);cell.value=vd.v;cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+(vd.bg||bg)}};cell.font={name:'Calibri',size:9,bold:!!vd.bold,color:{argb:'FF'+(vd.col||C.txtDark)}};cell.alignment={horizontal:vd.h,vertical:'middle'};cell.border={bottom:thin(),right:thin()};if(vd.fmt)cell.numFmt=vd.fmt;});
       });
       wsBk.views=[{state:'frozen',xSplit:0,ySplit:1,activeCell:'A2'}];
     }
-
-    // ════════════════════════════════════════════════════════════
-    // SHEET 3: Pipeline
-    // ════════════════════════════════════════════════════════════
     if(window._lastReservations){
       const wsPP=wb.addWorksheet('Pipeline',{properties:{tabColor:{argb:'FFF59E0B'}}});
       const today=new Date().toISOString().split('T')[0];
       const upc=[..._lastReservations].filter(r=>r.status!=='cancelled'&&r.checkIn&&r.checkIn.split('T')[0]>=today).sort((a,b)=>(a.checkIn||'').localeCompare(b.checkIn||''));
-      const ppCols=[
-        {header:'Property',width:32},{header:'Guest',width:22},{header:'Check-in',width:12},
-        {header:'Check-out',width:12},{header:'Nights',width:7},{header:'Days Away',width:10},
-        {header:'Channel',width:14},{header:'Room Rev ($)',width:12},{header:'Cleaning ($)',width:11},
-        {header:'Total Rev ($)',width:12},{header:'OTA Comm ($)',width:12}
-      ];
+      const ppCols=[{header:'Property',width:32},{header:'Guest',width:22},{header:'Check-in',width:12},{header:'Check-out',width:12},{header:'Nights',width:7},{header:'Days Away',width:10},{header:'Channel',width:14},{header:'Room Rev ($)',width:12},{header:'Cleaning ($)',width:11},{header:'Total Rev ($)',width:12},{header:'OTA Comm ($)',width:12}];
       ppCols.forEach((col,i)=>{wsPP.getColumn(i+1).width=col.width;});
-      wsPP.getRow(1).height=18;
-      ppCols.forEach((col,i)=>{
-        const cell=wsPP.getRow(1).getCell(i+1);
-        cell.value=col.header;
-        cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyHdr}};
-        cell.font={name:'Calibri',size:8,bold:true,color:{argb:'FF'+C.hdrTxt}};
-        cell.alignment={horizontal:i<2?'left':'center',vertical:'middle'};
-        cell.border={bottom:medium(C.blueAcc),right:thin(C.brdNavy)};
-      });
+      wsPP.getRow(1).height=18;ppCols.forEach((col,i)=>{const cell=wsPP.getRow(1).getCell(i+1);cell.value=col.header;cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+C.navyHdr}};cell.font={name:'Calibri',size:8,bold:true,color:{argb:'FF'+C.hdrTxt}};cell.alignment={horizontal:i<2?'left':'center',vertical:'middle'};cell.border={bottom:medium(C.blueAcc),right:thin(C.brdNavy)};});
       const moneyFmt='$#,##0;($#,##0);"-"';
       upc.forEach((r,ri)=>{
-        const alt=ri%2===1;const bg=alt?C.offWhite:C.white;
-        const row=wsPP.getRow(ri+2);row.height=16;
+        const alt=ri%2===1;const bg=alt?C.offWhite:C.white;const row=wsPP.getRow(ri+2);row.height=16;
         const rr=r.money?.fareAccommodation||0,cl=r.money?.fareCleaning||0,oc=Math.abs(r.money?.hostServiceFee||0);
         const du=Math.ceil((new Date(r.checkIn.split('T')[0])-new Date())/86400000);
         const urgent=du<=7;
         const ch=r.source==='airbnb2'?'Airbnb':r.source==='bookingCom'?'Booking.com':r.source==='manual'?'Direct':(r.source||'Direct');
-        const vals=[
-          {v:(r.listing?.nickname||r.listing?.title||'').replace(/\*/g,'').trim(),h:'left',bold:true,col:C.txtDark},
-          {v:r.guest?.fullName||'',h:'left',col:C.txtMid},
-          {v:isoToUS(r.checkIn.split('T')[0]),h:'left',col:C.txtMid},
-          {v:isoToUS(r.checkOut.split('T')[0]),h:'left',col:C.txtMid},
-          {v:r.nightsCount||0,h:'center',col:C.txtDark,fmt:'#,##0;"-"'},
-          {v:du,h:'center',col:urgent?C.amberTxt:C.txtDark,bg:urgent?C.amberBg:bg,bold:urgent,fmt:'#,##0;"-"'},
-          {v:ch,h:'left',col:C.txtMid},
-          {v:Math.round(rr),h:'right',col:C.txtDark,fmt:moneyFmt},
-          {v:Math.round(cl),h:'right',col:C.txtDark,fmt:moneyFmt},
-          {v:Math.round(rr+cl),h:'right',col:C.txtDark,fmt:moneyFmt},
-          {v:Math.round(oc),h:'right',col:C.txtDark,fmt:moneyFmt},
-        ];
-        vals.forEach((vd,ci)=>{
-          const cell=row.getCell(ci+1);
-          cell.value=vd.v;
-          cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+(vd.bg||bg)}};
-          cell.font={name:'Calibri',size:9,bold:!!vd.bold,color:{argb:'FF'+(vd.col||C.txtDark)}};
-          cell.alignment={horizontal:vd.h,vertical:'middle'};
-          cell.border={bottom:thin(),right:thin()};
-          if(vd.fmt)cell.numFmt=vd.fmt;
-        });
+        const vals=[{v:(r.listing?.nickname||r.listing?.title||'').replace(/\*/g,'').trim(),h:'left',bold:true,col:C.txtDark},{v:r.guest?.fullName||'',h:'left',col:C.txtMid},{v:isoToUS(r.checkIn.split('T')[0]),h:'left',col:C.txtMid},{v:isoToUS(r.checkOut.split('T')[0]),h:'left',col:C.txtMid},{v:r.nightsCount||0,h:'center',col:C.txtDark,fmt:'#,##0;"-"'},{v:du,h:'center',col:urgent?C.amberTxt:C.txtDark,bg:urgent?C.amberBg:bg,bold:urgent,fmt:'#,##0;"-"'},{v:ch,h:'left',col:C.txtMid},{v:Math.round(rr),h:'right',col:C.txtDark,fmt:moneyFmt},{v:Math.round(cl),h:'right',col:C.txtDark,fmt:moneyFmt},{v:Math.round(rr+cl),h:'right',col:C.txtDark,fmt:moneyFmt},{v:Math.round(oc),h:'right',col:C.txtDark,fmt:moneyFmt}];
+        vals.forEach((vd,ci)=>{const cell=row.getCell(ci+1);cell.value=vd.v;cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF'+(vd.bg||bg)}};cell.font={name:'Calibri',size:9,bold:!!vd.bold,color:{argb:'FF'+(vd.col||C.txtDark)}};cell.alignment={horizontal:vd.h,vertical:'middle'};cell.border={bottom:thin(),right:thin()};if(vd.fmt)cell.numFmt=vd.fmt;});
       });
       wsPP.views=[{state:'frozen',xSplit:0,ySplit:1,activeCell:'A2'}];
     }
-
-    // ── Download ─────────────────────────────────────────────────
     const buffer=await wb.xlsx.writeBuffer();
     const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=`US-Living-Revenue-${from}-${to}.xlsx`;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`US-Living-Revenue-${from}-${to}.xlsx`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
   }catch(e){alert('Excel error: '+e.message);console.error(e);}
   finally{btn.innerHTML=orig;btn.disabled=false;}
 }
-
 </script>
 </body>
 </html>
